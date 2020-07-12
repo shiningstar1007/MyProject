@@ -4,7 +4,6 @@
 #define MAX 3000
 
 void main(){
-
 	int count;
 	int i,j;
 	int n[MAX];
@@ -25,8 +24,4 @@ void main(){
 	if(a!=0) printf("Not Jolly\n");
 
 	else printf("Jolly\n");
-	
-	
-
-
 }
