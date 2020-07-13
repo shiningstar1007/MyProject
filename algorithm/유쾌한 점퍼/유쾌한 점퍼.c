@@ -1,27 +1,23 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#define MAX 3000
+#define MAX_BUF_SIZE 4096
 
 void main(){
-	int count;
-	int i,j;
-	int n[MAX];
-	int a=0;
-
+	int i, j, Count, Num = 0;
+	int n[MAX_BUF_SIZE];
 	
 	scanf("%d",&count);
 
-	for(i=0; i<count; i++){
+	for(i=0; i<count; i++) {
 		scanf("%d",&n[i]);
 	}
 
-	for(i=0; i<count-1; i++){
-		if(abs(n[i]-n[i+1])>count) a++; //break;
+	for(i=0; i<count-1; i++) {
+		if(abs(n[i]-n[i+1])>count) Num++; //break;
 		
 	}
 
-	if(a!=0) printf("Not Jolly\n");
-
+	if(Num!=0) printf("Not Jolly\n");
 	else printf("Jolly\n");
 }
