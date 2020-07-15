@@ -1,4 +1,4 @@
-#include "MiniFlt.h"
+#include "StdAfx.h"
 
 PFLT_FILTER g_hFilter;
 
