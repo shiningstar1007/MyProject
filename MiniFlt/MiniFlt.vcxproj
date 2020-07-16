@@ -79,6 +79,7 @@
   </ImportGroup>
   <ItemGroup Label="WrappedTaskItems">
     <ClInclude Include="CommFunc.h" />
+    <ClInclude Include="Context.h" />
     <ClInclude Include="MiniFlt.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
@@ -170,6 +171,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CommFunc.c" />
+    <ClCompile Include="Context.c" />
     <ClCompile Include="MiniFlt.c" />
     <ResourceCompile Include="MiniFlt.rc" />
   </ItemGroup>

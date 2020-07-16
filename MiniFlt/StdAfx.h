@@ -11,5 +11,6 @@
 
 #include "MiniFlt.h"
 #include "CommFunc.h"
+#include "Context.h"
 
 #endif
