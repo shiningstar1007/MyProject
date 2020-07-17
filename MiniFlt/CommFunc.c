@@ -97,3 +97,21 @@ ULONG MySNPrintfW(
 
 	return (ULONG)wcslen(DestBuf);
 }
+
+VOID GetVersion()
+{
+	RTL_OSVERSIONINFOW VersionInfo;
+
+	RtlGetVersion(&VersionInfo);
+
+	if (VersionInfo.dwMajorVersion == 6) {
+		if (VersionInfo.dwMinorVersion == 0) g_WinVersion = WV_2008;
+		else if (VersionInfo.dwMinorVersion == 1) g_WinVersion = WV_2008R2;
+		else if (VersionInfo.dwMinorVersion == 2) g_WinVersion = WV_2012;
+		else if (VersionInfo.dwMinorVersion == 3) g_WinVersion = WV_2012R2;
+	}
+	else if (VersionInfo.dwMajorVersion == 10) {
+		if (VersionInfo.dwMinorVersion == 0) g_WinVersion = WV_2016;
+	}
+	else g_WinVersion = WV_UNKNOWN;
+}

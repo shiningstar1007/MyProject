@@ -14,12 +14,6 @@ MiniFltUnload (
     _In_ FLT_FILTER_UNLOAD_FLAGS Flags
     );
 
-VOID
-MiniFltContextCleanup (
-    _In_ PFLT_CONTEXT Context,
-    _In_ FLT_CONTEXT_TYPE ContextType
-    );
-
 NTSTATUS
 MiniFltInstanceSetup (
     _In_ PCFLT_RELATED_OBJECTS FltObjects,
@@ -149,18 +143,6 @@ MiniFltUnload (
   FltUnregisterFilter(g_hFilter);
 
   return STATUS_SUCCESS;
-}
-
-VOID
-MiniFltContextCleanup (
-  _In_ PFLT_CONTEXT Context,
-  _In_ FLT_CONTEXT_TYPE ContextType
-  )
-{
-  UNREFERENCED_PARAMETER(Context);
-  UNREFERENCED_PARAMETER(ContextType);
-  
-  PAGED_CODE();
 }
 
 NTSTATUS

@@ -18,6 +18,17 @@ typedef unsigned long ULONG, * PULONG, DWORD;
 typedef unsigned char BYTE, * PBYTE;
 typedef long BOOL, * PBOOL;
 
+typedef enum {
+	WV_UNKNOWN = 0,
+	WV_2008 = 6002,   // 6.0 Windows Vista, Server 2008
+	WV_2008R2 = 7601, // 6.1 Windows 7, Server 2008 R2
+	WV_2012 = 9200, 	// 6.2 windows 8, Server 2012
+	WV_2012R2 = 9600, // 6.3 windows 8, Server 2012 R2
+	WV_2016 = 14393   // 10.0 windows 10, Server 2016
+} WINDOWS_VERSION;
+
+extern WINDOWS_VERSION g_WinVersion;
+
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,
 	_Inout_ PLONG MemCnt
