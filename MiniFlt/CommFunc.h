@@ -29,6 +29,45 @@ typedef enum {
 
 extern WINDOWS_VERSION g_WinVersion;
 
+#define NT_PROCNAMELEN 16
+#define SYSNAMEW L"System"
+#define SYSNAME  "System"
+
+#define PROC_OFFSET_WS2008        0x14C
+#define PROC_OFFSET_WIN7          0x16C
+#define PROC_OFFSET_WS2008_x64    0x238 //Same in Vista x64
+#define PROC_OFFSET_WS2008_x64_R2 0x2E0 //Same in Windows 7 x64
+#define PROC_OFFSET_WS2012_x86    0x170 //Same in Windows 8, 8.1, 2012R2, 10 x86
+#define PROC_OFFSET_WS2012_x64    0x438 //Same in Windows 8, 8.1, 2012R2 (all x64)
+#define PROC_OFFSET_WS2016_x86    0x174 //same in windows 10 (1511 to 1607)
+#define PROC_OFFSET_WS2016_x64    0x448 //same in windows 10 (1511 to 1607)
+#define PROC_OFFSET_WS2019_x86    0x17C //same in windows 10 (1607 later)
+#define PROC_OFFSET_WS2019_x64    0x450 //same in windows 10 (1607 later)
+
+#define PEB_OFFSET_WS2008        0x188
+#define PEB_OFFSET_WIN7          0x1A8
+#define PEB_OFFSET_WS2008_x64    0x290 //Same in Vista x64
+#define PEB_OFFSET_WS2008_x64_R2 0x338 //Same in Windows 7 x64
+#define PEB_OFFSET_WS2012_x86    0x140 //Same in Windows 8, 8.1, 2012R2
+#define PEB_OFFSET_WS2012_x64    0x3e8 //Same in Windows 8, 8.1, 2012R2 (all x64)
+#define PEB_OFFSET_WS2016_x86    0x144 //same in windows 10 (10 to 1607)
+#define PEB_OFFSET_WS2016_x64    0x3F8 //same in windows 10 (all x64)
+#define PEB_OFFSET_WS2019_x86    0x14C //same in windows 10 (1607 later)
+
+#ifdef _WIN64
+#define PARAMETERS_OFFSET    0x020
+#define IMAGEPATH_OFFSET     0x060
+#define COMMANDLINE_OFFSET   0x070
+#define STATION_OFFSET			 0x210
+#define DESKTOP_OFFSET       0x0C0
+#else
+#define PARAMETERS_OFFSET    0x010
+#define IMAGEPATH_OFFSET     0x038
+#define COMMANDLINE_OFFSET   0x040
+#define STATION_OFFSET       0x1D4
+#define DESKTOP_OFFSET       0x078
+#endif
+
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,
 	_Inout_ PLONG MemCnt

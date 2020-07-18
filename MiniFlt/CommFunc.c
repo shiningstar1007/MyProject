@@ -115,3 +115,49 @@ VOID GetVersion()
 	}
 	else g_WinVersion = WV_UNKNOWN;
 }
+
+ULONG g_ProcNameOffset = 0, g_PebOffset = 0;
+VOID InitializeProcess()
+{
+	PEPROCESS pProcess = PsGetCurrentProcess();
+
+	if (!pProcess) return;
+
+	for (g_ProcNameOffset = 0; g_ProcNameOffset < 3 * PAGE_SIZE; g_ProcNameOffset++)
+		if (!_strnicmp(SYSNAME, (PCHAR)pProcess + g_ProcNameOffset, strlen(SYSNAME))) break;
+
+	switch (g_ProcNameOffset) {
+		case PROC_OFFSET_WS2008:
+			g_PebOffset = PEB_OFFSET_WS2008;
+			break;
+		case PROC_OFFSET_WIN7:
+			g_PebOffset = PEB_OFFSET_WIN7;
+			break;
+		case PROC_OFFSET_WS2008_x64:
+			g_PebOffset = PEB_OFFSET_WS2008_x64;
+			break;
+		case PROC_OFFSET_WS2008_x64_R2:
+			g_PebOffset = PEB_OFFSET_WS2008_x64_R2;
+			break;
+		case PROC_OFFSET_WS2012_x86:
+			g_PebOffset = PEB_OFFSET_WS2012_x86;
+			break;
+		case PROC_OFFSET_WS2012_x64:
+			g_PebOffset = PEB_OFFSET_WS2012_x64;
+			break;
+		case PROC_OFFSET_WS2016_x86:
+			g_PebOffset = PEB_OFFSET_WS2016_x86;
+			break;
+		case PROC_OFFSET_WS2016_x64:
+			g_PebOffset = PEB_OFFSET_WS2016_x64;
+			break;
+		case PROC_OFFSET_WS2019_x86:
+			g_PebOffset = PEB_OFFSET_WS2019_x86;
+			break;
+		case PROC_OFFSET_WS2019_x64:
+			g_PebOffset = PEB_OFFSET_WS2016_x64;
+			break;
+		default:
+			DbgPrint("Unknown Process Offset");
+	}
+}
