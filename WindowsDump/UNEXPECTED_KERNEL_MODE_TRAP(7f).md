@@ -18,7 +18,7 @@ BUGCHECK_STR: 0x7f_8 이 나오면 스택 오버플로우 일 수 있다고 MSDN
 
  
 
-UNEXPECTED_KERNEL_MODE_TRAP (7f) <- BSOD가 발생한 코드  
+__UNEXPECTED_KERNEL_MODE_TRAP (7f) <- BSOD가 발생한 코드__  
 This means a trap occurred in kernel mode, and it's a trap of a kind  
 that the kernel isn't allowed to have/catch (bound trap) or that  
 is always instant death (double fault). The first number in the  
@@ -35,7 +35,7 @@ Else
 Endif  
 kb will then show the corrected stack.  
 Arguments:  
-Arg1: 0000000000000008, EXCEPTION_DOUBLE_FAULT  
+__Arg1: 0000000000000008, EXCEPTION_DOUBLE_FAULT__  
 Arg2: 0000000080050033  
 Arg3: 00000000000406f8  
 Arg4: fffff88001482416  
@@ -160,8 +160,8 @@ FAILURE_ID_HASH: {0f9ebaaf-2e04-8097-fea0-1da0b10cd026}
 
  
 
-!analyze -v 명령을 사용하면 이렇게 친절하게 분석을 해주네요.  
-일단 이거만 봐서는 잘 모르겠고 현재 스레드의 상태를 확인해 보도록 하겠습니다.
+__!analyze -v 명령을 사용하면 이렇게 친절하게 분석을 해주네요.  
+일단 이거만 봐서는 잘 모르겠고 현재 스레드의 상태를 확인해 보도록 하겠습니다.__
  
 kd> !thread  
 THREAD fffffab0f950db50 Cid 0004.144c Teb: 0000000000000000 Win32Thread: 0000000000000000 RUNNING on processor 4  
@@ -220,19 +220,14 @@ fffff8800b9c21d0 fffff88000c42f28 : fffffab02283b3d0 fffffab02498d990 fffffab024
 fffff8800b9c2260 fffff88000c42df5 : fffffab02283b3d0 fffffab02498d990 fffff88000000000 00000000`00000000 : rosempio!DsmWriteEvent+0x220a8  
  
 
-여기서 가장 중요하게 봐야 하는거는
-
-Stack Init fffff8800b9c6c70 Current fffff8800b9c1a50  
-Base fffff8800b9c7000 Limit fffff8800b9c1000  
-입니다. 이거는 스택 범위 값을 나타냅니다.
-
-보통은 스레드가 실행되면 ESP 레지스터 값은 항상 Stack Init (fffff8800b9c6c70)과 Limit (fffff8800b9c1000)
-
-사이에 있어야 합니다. 일반적으로 ESP 레지스터 값은 Current (fffff8800b9c1a50) 와 상대적으로 유사합니다.
-
-그리고 Current 값은 Stack Init 값과 Limit 값 사이에 있는걸 볼 수 있습니다.
-
-그렇다면 현재 스택 정보를 저장한 레지스터 상태를 봐야 합니다.
+여기서 가장 중요하게 봐야 하는거는  
+__Stack Init fffff8800b9c6c70 Current fffff8800b9c1a50    
+Base fffff8800b9c7000 Limit fffff8800b9c1000__    
+입니다. 이거는 스택 범위 값을 나타냅니다.  
+보통은 스레드가 실행되면 ESP 레지스터 값은 항상 Stack Init (fffff8800b9c6c70)과 Limit (fffff8800b9c1000)  
+사이에 있어야 합니다. 일반적으로 ESP 레지스터 값은 Current (fffff8800b9c1a50) 와 상대적으로 유사합니다.  
+그리고 Current 값은 Stack Init 값과 Limit 값 사이에 있는걸 볼 수 있습니다.  
+그렇다면 현재 스택 정보를 저장한 레지스터 상태를 봐야 합니다. 
 
 
 kd>.trap fffff880021748b0  
@@ -245,23 +240,18 @@ iopl=0 nv up ei pl nz na pe nc ql2300+0x69416: fffff88001482416 899424c0000000
 mov dword ptr [rsp+0C0h],edx ss:0018:fffff880`0b9c0fd0=???????? 
  
 
-ESP는 64bit에서 rsp로 통합되어 사용되니 rsp를 확인하면 됩니다. 
+__ESP는 64bit에서 rsp로 통합되어 사용되니 rsp를 확인하면 됩니다.__ 
 
 Stack Init fffff8800b9c6c70 Current fffff8800b9c1a50  
 Base fffff8800b9c7000 Limit fffff8800b9c1000  
 rsp=fffff8800b9c0f10  
 
-여기서 rsp 값을 확인 하면 (fffff8800b9c0f10) 로 이 값이 범위를 벗어나는 것으로 보여지면서 스택 오버플로우가 의심되는것으로 보여지네요.
-
-그렇다면 이제 실제 스택 메모리를 얼마나 사용하는지를 확인해보면 되겠습니다.
-
-보통 실제로 스택 사용량을 확인하는 방법은 ChildEBP 의 변화량을 보는 방법이 있는데
-
-그걸 다 어느 세월에 계산하면서 일일히 체크를 할까요...
-
-그래서 대신 계산을 해주는 kf 명령어를 사용하면 스택 메모리 사용량을 보여줍니다.
-
-위에서 콜스택이 엄청 길어서 인자를 100으로 주었고 거기서 간추려보겠습니다
+여기서 rsp 값을 확인 하면 (fffff8800b9c0f10) 로 이 값이 범위를 벗어나는 것으로 보여지면서 스택 오버플로우가 의심 되는것으로 보여지네요.  
+그렇다면 이제 실제 스택 메모리를 얼마나 사용하는지를 확인해보면 되겠습니다.  
+보통 실제로 스택 사용량을 확인하는 방법은 ChildEBP 의 변화량을 보는 방법이 있는데  
+그걸 다 어느 세월에 계산하면서 일일히 체크를 할까요...  
+그래서 대신 계산을 해주는 kf 명령어를 사용하면 스택 메모리 사용량을 보여줍니다.  
+위에서 콜스택이 엄청 길어서 인자를 100으로 주었고 거기서 간추려보겠습니다  
  
 
 kd> kf 100
@@ -275,12 +265,8 @@ kd> kf 100
 |**<center>140</center>** | <center>fffff8800b9c1050</center> |*<center>fffff8800136c113</center>* |*<center>ql2300+0x6dc7a</center>* |
 
 
-ql2300+69416 여기서 보니까 스택 메모리를 무려 984c660이나 사용을 하네요...
-
-보통 커널 스택 메모리는 x86의 경우는 12K 이고 x64의 경우는 24K 입니다. 
-
-자세한건 MSDN을 찾아보시면 될 거 같구요.
-
-이로써 ql2300+69416 여기에서 무려 984c660 이나 되는 대량의 스택 메모리를
-
-사용하여 문제가 발생하였다는것을 확인 할 수 있게 되었습니다.
+ql2300+69416 여기서 보니까 스택 메모리를 무려 984c660이나 사용을 하네요...  
+보통 커널 스택 메모리는 x86의 경우는 12K 이고 x64의 경우는 24K 입니다.   
+자세한건 MSDN을 찾아보시면 될 거 같구요.  
+이로써 ql2300+69416 여기에서 무려 984c660 이나 되는 대량의 스택 메모리를  
+사용하여 문제가 발생하였다는것을 확인 할 수 있게 되었습니다.  
