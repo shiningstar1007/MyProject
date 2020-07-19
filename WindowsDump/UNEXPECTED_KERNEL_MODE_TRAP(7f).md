@@ -53,82 +53,82 @@ ANALYSIS_VERSION: 6.3.9600.17237 (debuggers(dbg).140716-0327) amd64fre
 
 LAST_CONTROL_TRANSFER: from fffff80001cf2f69 to fffff80001ce4ba0
 
-STACK_TEXT:
-fffff88002174768 fffff80001cf2f69 : 000000000000007f 0000000000000008 0000000080050033 00000000000406f8 : nt!KeBugCheckEx
-fffff88002174770 fffff80001cefa4b : 0000000000000000 0000000000000000 0000000000000000 0000000000000000 : nt!KiBugCheckDispatch+0x69
-fffff880021748b0 fffff88001482416 : 0000000000000000 0000000000000000 0000000000000000 0000000000000000 : nt!KiDoubleFaultAbort+0x28b
-fffff8800b9c0f10 fffff88001486c7a : fffffab0f6061008 fffffab0227bea10 0000000000000000 0000000000000000 : ql2300+0x69416 <- BSOD 문제가 발생한 위치
-fffff8800b9c1050 fffff8800136c113 : fffffab021f17600 fffffab0227bea10 0000000000000000 0000000000000000 : ql2300+0x6dc7a
-fffff8800b9c10d0 fffff80001c0d5f3 : 0000000000000000 0000000000000000 0000000000000000 fffff88005af60b8 : storport!RaidpAdapterContinueScatterGather+0xc3
-fffff8800b9c1140 fffff8800136be7a : fffff88005af6010 fffffab02493b010 000000000000003c 0000000000000000 : hal!HalBuildScatterGatherList+0x203
-fffff8800b9c11b0 fffff8800136baf7 : 0000000000000001 fffffab02147fb10 0000000000000001 fffffab02493b088 : storport!RaUnitStartIo+0x28a
-fffff8800b9c1230 fffff8800136b71d : 000000002493b001 fffff8800138a110 0000000300040000 0000000000000000 : storport!RaUnitScsiIrp+0x397
-fffff8800b9c12f0 fffff88000c5f273 : 0000000000000000 0000000000000001 fffffab0227bea68 fffffab0258baf08 : storport!RaDriverScsiIrp+0x5d
-fffff8800b9c1330 fffff88000c5d374 : fffffab021f8f680 fffffab02493b010 0000000000000000 0000000000000000 : rosempio!DsmWriteEvent+0x3e3f3
-fffff8800b9c13f0 fffff88000c39fc4 : fffffab021f8f680 fffffab02493b010 fffffab02493b010 fffffab020906010 : rosempio!DsmWriteEvent+0x3c4f4
-fffff8800b9c1670 fffff88000c39649 : fffffab021f8f680 fffffab02493b010 fffffab0258baf08 0000000000000000 : rosempio!DsmWriteEvent+0x19144
-fffff8800b9c16d0 fffff88000c39ea8 : fffffab021f8f680 fffffab02493b010 0000000000000000 fffffab0227bea68 : rosempio!DsmWriteEvent+0x187c9
-fffff8800b9c1790 fffff88000c3272e : fffffab021f8f680 fffffab02493b010 0000000100000000 0000000000000000 : rosempio!DsmWriteEvent+0x19028
-fffff8800b9c17f0 fffff88000c525db : fffffab021f8f680 fffffab02493b010 fffff8800b9c1888 0000000000000001 : rosempio!DsmWriteEvent+0x118ae
-fffff8800b9c1830 fffff88000c42f28 : fffffab02283b3d0 fffffab02493b010 fffffab02493b010 0000000000000000 : rosempio!DsmWriteEvent+0x3175b
-fffff8800b9c18c0 fffff88000c42df5 : fffffab02283b3d0 fffffab02493b010 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8
-fffff8800b9c1920 fffff88000c43059 : fffffab02283b3d0 fffffab02493b010 fffff88005af6390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75
-fffff8800b9c1980 fffff88000c41e13 : fffffab02283b3d0 fffffab02493b010 fffffab0f6061008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9
-fffff8800b9c19d0 fffff88000c417c3 : fffffab02283b3d0 fffffab02493b010 0000000000000001 fffffab0227be8f0 : rosempio!DsmWriteEvent+0x20f93
-fffff8800b9c1a20 fffff88000c3274b : fffffab02283b3d0 fffffab02493b010 0000000000002000 fffffab11c6ae010 : rosempio!DsmWriteEvent+0x20943
-fffff8800b9c1a80 fffff88001801445 : fffffab02283b3d0 fffffab02493b010 fffffab0227be8f0 0000004530035000 : rosempio!DsmWriteEvent+0x118cb
-fffff8800b9c1ac0 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355
-fffff8800b9c1b60 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26
-fffff8800b9c1b90 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3 
-fffff8800b9c1c10 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341 
-fffff8800b9c1d00 fffff88000c42f28 : fffffab02283b3d0 fffffab020906010 fffffab020906010 0000000000000000 : rosempio!DsmWriteEvent+0x317f1 
-fffff8800b9c1d90 fffff88000c42df5 : fffffab02283b3d0 fffffab020906010 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8 
-fffff8800b9c1df0 fffff88000c43059 : fffffab02283b3d0 fffffab020906010 fffff88003d2e390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75 
-fffff8800b9c1e50 fffff88000c41e13 : fffffab02283b3d0 fffffab020906010 fffffab0f5aa8008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9 
-fffff8800b9c1ea0 fffff88000c417c3 : fffffab02283b3d0 fffffab020906010 0000000000000001 fffffab0249685f0 : rosempio!DsmWriteEvent+0x20f93 
-fffff8800b9c1ef0 fffff88000c3274b : fffffab02283b3d0 fffffab020906010 0000000000002000 fffffab11c695ab0 : rosempio!DsmWriteEvent+0x20943 
-fffff8800b9c1f50 fffff88001801445 : fffffab02283b3d0 fffffab020906010 fffffab0249685f0 000000452f09f000 : rosempio!DsmWriteEvent+0x118cb 
-fffff8800b9c1f90 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355 
-fffff8800b9c2030 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26 
-fffff8800b9c2060 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3
-fffff8800b9c20e0 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341
-fffff8800b9c21d0 fffff88000c42f28 : fffffab02283b3d0 fffffab02498d990 fffffab02498d990 0000000000000000 : rosempio!DsmWriteEvent+0x317f1
-fffff8800b9c2260 fffff88000c42df5 : fffffab02283b3d0 fffffab02498d990 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8
-fffff8800b9c22c0 fffff88000c43059 : fffffab02283b3d0 fffffab02498d990 fffff88005af6390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75
-fffff8800b9c2320 fffff88000c41e13 : fffffab02283b3d0 fffffab02498d990 fffffab0f6061008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9
-fffff8800b9c2370 fffff88000c417c3 : fffffab02283b3d0 fffffab02498d990 0000000000000001 fffffab02498de60 : rosempio!DsmWriteEvent+0x20f93
-fffff8800b9c23c0 fffff88000c3274b : fffffab02283b3d0 fffffab02498d990 0000000000002000 fffffab11c693010 : rosempio!DsmWriteEvent+0x20943
-fffff8800b9c2420 fffff88001801445 : fffffab02283b3d0 fffffab02498d990 fffffab02498de60 000000452ec8b000 : rosempio!DsmWriteEvent+0x118cb
-fffff8800b9c2460 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355
-fffff8800b9c2500 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26
-fffff8800b9c2530 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3 
-fffff8800b9c25b0 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341 
-fffff8800b9c26a0 fffff88000c42f28 : fffffab02283b3d0 fffffab02266a010 fffffab02266a010 0000000000000000 : rosempio!DsmWriteEvent+0x317f1 
-fffff8800b9c2730 fffff88000c42df5 : fffffab02283b3d0 fffffab02266a010 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8 
-fffff8800b9c2790 fffff88000c43059 : fffffab02283b3d0 fffffab02266a010 fffff88003d2e390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75 
-fffff8800b9c27f0 fffff88000c41e13 : fffffab02283b3d0 fffffab02266a010 fffffab0f5aa8008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9 
-fffff8800b9c2840 fffff88000c417c3 : fffffab02283b3d0 fffffab02266a010 0000000000000001 fffffab0226a5010 : rosempio!DsmWriteEvent+0x20f93 
-fffff8800b9c2890 fffff88000c3274b : fffffab02283b3d0 fffffab02266a010 0000000000002000 fffffab11c69bab0 : rosempio!DsmWriteEvent+0x20943 
-fffff8800b9c28f0 fffff88001801445 : fffffab02283b3d0 fffffab02266a010 fffffab0226a5010 000000452ed89000 : rosempio!DsmWriteEvent+0x118cb 
-fffff8800b9c2930 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355 
-fffff8800b9c29d0 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26 
-fffff8800b9c2a00 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3
-fffff8800b9c2a80 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341
-fffff8800b9c2b70 fffff88000c42f28 : fffffab02283b3d0 fffffab022579350 fffffab022579350 0000000000000000 : rosempio!DsmWriteEvent+0x317f1
-fffff8800b9c2c00 fffff88000c42df5 : fffffab02283b3d0 fffffab022579350 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8
-fffff8800b9c2c60 fffff88000c43059 : fffffab02283b3d0 fffffab022579350 fffff88005af6390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75
-fffff8800b9c2cc0 fffff88000c41e13 : fffffab02283b3d0 fffffab022579350 fffffab0f6061008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9
-fffff8800b9c2d10 fffff88000c417c3 : fffffab02283b3d0 fffffab022579350 0000000000000001 fffffab020a032d0 : rosempio!DsmWriteEvent+0x20f93
-fffff8800b9c2d60 fffff88000c3274b : fffffab02283b3d0 fffffab022579350 0000000000002000 fffffab11c6a7ab0 : rosempio!DsmWriteEvent+0x20943
-fffff8800b9c2dc0 fffff88001801445 : fffffab02283b3d0 fffffab022579350 fffffab020a032d0 000000452ee04000 : rosempio!DsmWriteEvent+0x118cb
-fffff8800b9c2e00 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355
-fffff8800b9c2ea0 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26
-fffff8800b9c2ed0 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3 
-fffff8800b9c2f50 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341 
-fffff8800b9c3040 fffff88000c42f28 : fffffab02283b3d0 fffffab0226c5820 fffffab0226c5820 0000000000000000 : rosempio!DsmWriteEvent+0x317f1 
-fffff8800b9c30d0 fffff88000c42df5 : fffffab02283b3d0 fffffab0226c5820 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8 
-fffff8800b9c3130 fffff88000c43059 : fffffab02283b3d0 fffffab0226c5820 fffff88003d2e390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75 
-fffff8800b9c3190 fffff88000c41e13 : fffffab02283b3d0 fffffab0226c5820 fffffab0f5aa8008 fffff880`01486c7a : rosempio!DsmWriteEvent+0x221d9
+STACK_TEXT:  
+fffff88002174768 fffff80001cf2f69 : 000000000000007f 0000000000000008 0000000080050033 00000000000406f8 : nt!KeBugCheckEx  
+fffff88002174770 fffff80001cefa4b : 0000000000000000 0000000000000000 0000000000000000 0000000000000000 : nt!KiBugCheckDispatch+0x69  
+fffff880021748b0 fffff88001482416 : 0000000000000000 0000000000000000 0000000000000000 0000000000000000 : nt!KiDoubleFaultAbort+0x28b  
+fffff8800b9c0f10 fffff88001486c7a : fffffab0f6061008 fffffab0227bea10 0000000000000000 0000000000000000 : ql2300+0x69416 <- BSOD 문제가 발생한 위치  
+fffff8800b9c1050 fffff8800136c113 : fffffab021f17600 fffffab0227bea10 0000000000000000 0000000000000000 : ql2300+0x6dc7a  
+fffff8800b9c10d0 fffff80001c0d5f3 : 0000000000000000 0000000000000000 0000000000000000 fffff88005af60b8 : storport!RaidpAdapterContinueScatterGather+0xc3  
+fffff8800b9c1140 fffff8800136be7a : fffff88005af6010 fffffab02493b010 000000000000003c 0000000000000000 : hal!HalBuildScatterGatherList+0x203  
+fffff8800b9c11b0 fffff8800136baf7 : 0000000000000001 fffffab02147fb10 0000000000000001 fffffab02493b088 : storport!RaUnitStartIo+0x28a  
+fffff8800b9c1230 fffff8800136b71d : 000000002493b001 fffff8800138a110 0000000300040000 0000000000000000 : storport!RaUnitScsiIrp+0x397  
+fffff8800b9c12f0 fffff88000c5f273 : 0000000000000000 0000000000000001 fffffab0227bea68 fffffab0258baf08 : storport!RaDriverScsiIrp+0x5d  
+fffff8800b9c1330 fffff88000c5d374 : fffffab021f8f680 fffffab02493b010 0000000000000000 0000000000000000 : rosempio!DsmWriteEvent+0x3e3f3  
+fffff8800b9c13f0 fffff88000c39fc4 : fffffab021f8f680 fffffab02493b010 fffffab02493b010 fffffab020906010 : rosempio!DsmWriteEvent+0x3c4f4  
+fffff8800b9c1670 fffff88000c39649 : fffffab021f8f680 fffffab02493b010 fffffab0258baf08 0000000000000000 : rosempio!DsmWriteEvent+0x19144  
+fffff8800b9c16d0 fffff88000c39ea8 : fffffab021f8f680 fffffab02493b010 0000000000000000 fffffab0227bea68 : rosempio!DsmWriteEvent+0x187c9  
+fffff8800b9c1790 fffff88000c3272e : fffffab021f8f680 fffffab02493b010 0000000100000000 0000000000000000 : rosempio!DsmWriteEvent+0x19028  
+fffff8800b9c17f0 fffff88000c525db : fffffab021f8f680 fffffab02493b010 fffff8800b9c1888 0000000000000001 : rosempio!DsmWriteEvent+0x118ae  
+fffff8800b9c1830 fffff88000c42f28 : fffffab02283b3d0 fffffab02493b010 fffffab02493b010 0000000000000000 : rosempio!DsmWriteEvent+0x3175b  
+fffff8800b9c18c0 fffff88000c42df5 : fffffab02283b3d0 fffffab02493b010 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8  
+fffff8800b9c1920 fffff88000c43059 : fffffab02283b3d0 fffffab02493b010 fffff88005af6390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75  
+fffff8800b9c1980 fffff88000c41e13 : fffffab02283b3d0 fffffab02493b010 fffffab0f6061008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9  
+fffff8800b9c19d0 fffff88000c417c3 : fffffab02283b3d0 fffffab02493b010 0000000000000001 fffffab0227be8f0 : rosempio!DsmWriteEvent+0x20f93  
+fffff8800b9c1a20 fffff88000c3274b : fffffab02283b3d0 fffffab02493b010 0000000000002000 fffffab11c6ae010 : rosempio!DsmWriteEvent+0x20943  
+fffff8800b9c1a80 fffff88001801445 : fffffab02283b3d0 fffffab02493b010 fffffab0227be8f0 0000004530035000 : rosempio!DsmWriteEvent+0x118cb  
+fffff8800b9c1ac0 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355  
+fffff8800b9c1b60 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26  
+fffff8800b9c1b90 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3  
+fffff8800b9c1c10 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341  
+fffff8800b9c1d00 fffff88000c42f28 : fffffab02283b3d0 fffffab020906010 fffffab020906010 0000000000000000 : rosempio!DsmWriteEvent+0x317f1   
+fffff8800b9c1d90 fffff88000c42df5 : fffffab02283b3d0 fffffab020906010 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8  
+fffff8800b9c1df0 fffff88000c43059 : fffffab02283b3d0 fffffab020906010 fffff88003d2e390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75  
+fffff8800b9c1e50 fffff88000c41e13 : fffffab02283b3d0 fffffab020906010 fffffab0f5aa8008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9  
+fffff8800b9c1ea0 fffff88000c417c3 : fffffab02283b3d0 fffffab020906010 0000000000000001 fffffab0249685f0 : rosempio!DsmWriteEvent+0x20f93  
+fffff8800b9c1ef0 fffff88000c3274b : fffffab02283b3d0 fffffab020906010 0000000000002000 fffffab11c695ab0 : rosempio!DsmWriteEvent+0x20943  
+fffff8800b9c1f50 fffff88001801445 : fffffab02283b3d0 fffffab020906010 fffffab0249685f0 000000452f09f000 : rosempio!DsmWriteEvent+0x118cb  
+fffff8800b9c1f90 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355  
+fffff8800b9c2030 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26  
+fffff8800b9c2060 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3  
+fffff8800b9c20e0 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341 
+fffff8800b9c21d0 fffff88000c42f28 : fffffab02283b3d0 fffffab02498d990 fffffab02498d990 0000000000000000 : rosempio!DsmWriteEvent+0x317f1  
+fffff8800b9c2260 fffff88000c42df5 : fffffab02283b3d0 fffffab02498d990 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8  
+fffff8800b9c22c0 fffff88000c43059 : fffffab02283b3d0 fffffab02498d990 fffff88005af6390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75  
+fffff8800b9c2320 fffff88000c41e13 : fffffab02283b3d0 fffffab02498d990 fffffab0f6061008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9  
+fffff8800b9c2370 fffff88000c417c3 : fffffab02283b3d0 fffffab02498d990 0000000000000001 fffffab02498de60 : rosempio!DsmWriteEvent+0x20f93  
+fffff8800b9c23c0 fffff88000c3274b : fffffab02283b3d0 fffffab02498d990 0000000000002000 fffffab11c693010 : rosempio!DsmWriteEvent+0x20943  
+fffff8800b9c2420 fffff88001801445 : fffffab02283b3d0 fffffab02498d990 fffffab02498de60 000000452ec8b000 : rosempio!DsmWriteEvent+0x118cb  
+fffff8800b9c2460 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355  
+fffff8800b9c2500 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26  
+fffff8800b9c2530 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3  
+fffff8800b9c25b0 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341  
+fffff8800b9c26a0 fffff88000c42f28 : fffffab02283b3d0 fffffab02266a010 fffffab02266a010 0000000000000000 : rosempio!DsmWriteEvent+0x317f1   
+fffff8800b9c2730 fffff88000c42df5 : fffffab02283b3d0 fffffab02266a010 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8  
+fffff8800b9c2790 fffff88000c43059 : fffffab02283b3d0 fffffab02266a010 fffff88003d2e390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75  
+fffff8800b9c27f0 fffff88000c41e13 : fffffab02283b3d0 fffffab02266a010 fffffab0f5aa8008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9  
+fffff8800b9c2840 fffff88000c417c3 : fffffab02283b3d0 fffffab02266a010 0000000000000001 fffffab0226a5010 : rosempio!DsmWriteEvent+0x20f93  
+fffff8800b9c2890 fffff88000c3274b : fffffab02283b3d0 fffffab02266a010 0000000000002000 fffffab11c69bab0 : rosempio!DsmWriteEvent+0x20943  
+fffff8800b9c28f0 fffff88001801445 : fffffab02283b3d0 fffffab02266a010 fffffab0226a5010 000000452ed89000 : rosempio!DsmWriteEvent+0x118cb  
+fffff8800b9c2930 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355  
+fffff8800b9c29d0 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26  
+fffff8800b9c2a00 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3  
+fffff8800b9c2a80 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341  
+fffff8800b9c2b70 fffff88000c42f28 : fffffab02283b3d0 fffffab022579350 fffffab022579350 0000000000000000 : rosempio!DsmWriteEvent+0x317f1  
+fffff8800b9c2c00 fffff88000c42df5 : fffffab02283b3d0 fffffab022579350 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8  
+fffff8800b9c2c60 fffff88000c43059 : fffffab02283b3d0 fffffab022579350 fffff88005af6390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75  
+fffff8800b9c2cc0 fffff88000c41e13 : fffffab02283b3d0 fffffab022579350 fffffab0f6061008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9  
+fffff8800b9c2d10 fffff88000c417c3 : fffffab02283b3d0 fffffab022579350 0000000000000001 fffffab020a032d0 : rosempio!DsmWriteEvent+0x20f93  
+fffff8800b9c2d60 fffff88000c3274b : fffffab02283b3d0 fffffab022579350 0000000000002000 fffffab11c6a7ab0 : rosempio!DsmWriteEvent+0x20943  
+fffff8800b9c2dc0 fffff88001801445 : fffffab02283b3d0 fffffab022579350 fffffab020a032d0 000000452ee04000 : rosempio!DsmWriteEvent+0x118cb  
+fffff8800b9c2e00 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355  
+fffff8800b9c2ea0 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26  
+fffff8800b9c2ed0 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3  
+fffff8800b9c2f50 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341  
+fffff8800b9c3040 fffff88000c42f28 : fffffab02283b3d0 fffffab0226c5820 fffffab0226c5820 0000000000000000 : rosempio!DsmWriteEvent+0x317f1   
+fffff8800b9c30d0 fffff88000c42df5 : fffffab02283b3d0 fffffab0226c5820 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8  
+fffff8800b9c3130 fffff88000c43059 : fffffab02283b3d0 fffffab0226c5820 fffff88003d2e390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75  
+fffff8800b9c3190 fffff88000c41e13 : fffffab02283b3d0 fffffab0226c5820 fffffab0f5aa8008 fffff880`01486c7a : rosempio!DsmWriteEvent+0x221d9  
 
 STACK_COMMAND: kb
 
@@ -163,64 +163,62 @@ FAILURE_ID_HASH: {0f9ebaaf-2e04-8097-fea0-1da0b10cd026}
 !analyze -v 명령을 사용하면 이렇게 친절하게 분석을 해주네요.
 
 일단 이거만 봐서는 잘 모르겠고 현재 스레드의 상태를 확인해 보도록 하겠습니다.
-
  
-
-kd> !thread
-THREAD fffffab0f950db50 Cid 0004.144c Teb: 0000000000000000 Win32Thread: 0000000000000000 RUNNING on processor 4
-Not impersonating
-DeviceMap fffff8a000008710
-Owning Process fffffab0205a5b00 Image: System
-Attached Process N/A Image: N/A
-Wait Start TickCount 5466514 Ticks: 0
-Context Switch Count 83790 IdealProcessor: 4
-UserTime 00:00:00.000
-KernelTime 00:00:00.000
-Win32 Start Address rosempio!DsmWriteEvent (0xfffff88000c41c50)
-Stack Init fffff8800b9c6c70 Current fffff8800b9c1a50
-Base fffff8800b9c7000 Limit fffff8800b9c1000 Call 0
-Priority 8 BasePriority 8 UnusualBoost 0 ForegroundBoost 0 IoPriority 2 PagePriority 5
-Child-SP RetAddr : Args to Child : Call Site
-fffff88002174768 fffff80001cf2f69 : 000000000000007f 0000000000000008 0000000080050033 00000000000406f8 : nt!KeBugCheckEx
-fffff88002174770 fffff80001cefa4b : 0000000000000000 0000000000000000 0000000000000000 0000000000000000 : nt!KiBugCheckDispatch+0x69
-fffff880021748b0 fffff88001482416 : 0000000000000000 0000000000000000 0000000000000000 0000000000000000 : nt!KiDoubleFaultAbort+0x28b (TrapFrame @ fffff880021748b0) 
-fffff8800b9c0f10 fffff88001486c7a : fffffab0f6061008 fffffab0227bea10 0000000000000000 0000000000000000 : ql2300+0x69416 
-fffff8800b9c1050 fffff8800136c113 : fffffab021f17600 fffffab0227bea10 0000000000000000 0000000000000000 : ql2300+0x6dc7a 
-fffff8800b9c10d0 fffff80001c0d5f3 : 0000000000000000 0000000000000000 0000000000000000 fffff88005af60b8 : storport!RaidpAdapterContinueScatterGather+0xc3 
-fffff8800b9c1140 fffff8800136be7a : fffff88005af6010 fffffab02493b010 000000000000003c 0000000000000000 : hal!HalBuildScatterGatherList+0x203 
-fffff8800b9c11b0 fffff8800136baf7 : 0000000000000001 fffffab02147fb10 0000000000000001 fffffab02493b088 : storport!RaUnitStartIo+0x28a 
-fffff8800b9c1230 fffff8800136b71d : 000000002493b001 fffff8800138a110 0000000300040000 0000000000000000 : storport!RaUnitScsiIrp+0x397 
-fffff8800b9c12f0 fffff88000c5f273 : 0000000000000000 0000000000000001 fffffab0227bea68 fffffab0258baf08 : storport!RaDriverScsiIrp+0x5d 
-fffff8800b9c1330 fffff88000c5d374 : fffffab021f8f680 fffffab02493b010 0000000000000000 0000000000000000 : rosempio!DsmWriteEvent+0x3e3f3 
-fffff8800b9c13f0 fffff88000c39fc4 : fffffab021f8f680 fffffab02493b010 fffffab02493b010 fffffab020906010 : rosempio!DsmWriteEvent+0x3c4f4 
-fffff8800b9c1670 fffff88000c39649 : fffffab021f8f680 fffffab02493b010 fffffab0258baf08 0000000000000000 : rosempio!DsmWriteEvent+0x19144 
-fffff8800b9c16d0 fffff88000c39ea8 : fffffab021f8f680 fffffab02493b010 0000000000000000 fffffab0227bea68 : rosempio!DsmWriteEvent+0x187c9 
-fffff8800b9c1790 fffff88000c3272e : fffffab021f8f680 fffffab02493b010 0000000100000000 0000000000000000 : rosempio!DsmWriteEvent+0x19028 
-fffff8800b9c17f0 fffff88000c525db : fffffab021f8f680 fffffab02493b010 fffff8800b9c1888 0000000000000001 : rosempio!DsmWriteEvent+0x118ae 
-fffff8800b9c1830 fffff88000c42f28 : fffffab02283b3d0 fffffab02493b010 fffffab02493b010 0000000000000000 : rosempio!DsmWriteEvent+0x3175b 
-fffff8800b9c18c0 fffff88000c42df5 : fffffab02283b3d0 fffffab02493b010 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8 
-fffff8800b9c1920 fffff88000c43059 : fffffab02283b3d0 fffffab02493b010 fffff88005af6390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75 
-fffff8800b9c1980 fffff88000c41e13 : fffffab02283b3d0 fffffab02493b010 fffffab0f6061008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9 
-fffff8800b9c19d0 fffff88000c417c3 : fffffab02283b3d0 fffffab02493b010 0000000000000001 fffffab0227be8f0 : rosempio!DsmWriteEvent+0x20f93 
-fffff8800b9c1a20 fffff88000c3274b : fffffab02283b3d0 fffffab02493b010 0000000000002000 fffffab11c6ae010 : rosempio!DsmWriteEvent+0x20943 
-fffff8800b9c1a80 fffff88001801445 : fffffab02283b3d0 fffffab02493b010 fffffab0227be8f0 0000004530035000 : rosempio!DsmWriteEvent+0x118cb 
-fffff8800b9c1ac0 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355 
-fffff8800b9c1b60 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26 
-fffff8800b9c1b90 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3
-fffff8800b9c1c10 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341
-fffff8800b9c1d00 fffff88000c42f28 : fffffab02283b3d0 fffffab020906010 fffffab020906010 0000000000000000 : rosempio!DsmWriteEvent+0x317f1
-fffff8800b9c1d90 fffff88000c42df5 : fffffab02283b3d0 fffffab020906010 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8
-fffff8800b9c1df0 fffff88000c43059 : fffffab02283b3d0 fffffab020906010 fffff88003d2e390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75
-fffff8800b9c1e50 fffff88000c41e13 : fffffab02283b3d0 fffffab020906010 fffffab0f5aa8008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9
-fffff8800b9c1ea0 fffff88000c417c3 : fffffab02283b3d0 fffffab020906010 0000000000000001 fffffab0249685f0 : rosempio!DsmWriteEvent+0x20f93
-fffff8800b9c1ef0 fffff88000c3274b : fffffab02283b3d0 fffffab020906010 0000000000002000 fffffab11c695ab0 : rosempio!DsmWriteEvent+0x20943
-fffff8800b9c1f50 fffff88001801445 : fffffab02283b3d0 fffffab020906010 fffffab0249685f0 000000452f09f000 : rosempio!DsmWriteEvent+0x118cb
-fffff8800b9c1f90 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355
-fffff8800b9c2030 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26
-fffff8800b9c2060 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3 
-fffff8800b9c20e0 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341 
-fffff8800b9c21d0 fffff88000c42f28 : fffffab02283b3d0 fffffab02498d990 fffffab02498d990 0000000000000000 : rosempio!DsmWriteEvent+0x317f1 
-fffff8800b9c2260 fffff88000c42df5 : fffffab02283b3d0 fffffab02498d990 fffff88000000000 00000000`00000000 : rosempio!DsmWriteEvent+0x220a8
+kd> !thread  
+THREAD fffffab0f950db50 Cid 0004.144c Teb: 0000000000000000 Win32Thread: 0000000000000000 RUNNING on processor 4  
+Not impersonating  
+DeviceMap fffff8a000008710  
+Owning Process fffffab0205a5b00 Image: System  
+Attached Process N/A Image: N/A  
+Wait Start TickCount 5466514 Ticks: 0  
+Context Switch Count 83790 IdealProcessor: 4  
+UserTime 00:00:00.000  
+KernelTime 00:00:00.000  
+Win32 Start Address rosempio!DsmWriteEvent (0xfffff88000c41c50)  
+Stack Init fffff8800b9c6c70 Current fffff8800b9c1a50  
+Base fffff8800b9c7000 Limit fffff8800b9c1000 Call 0  
+Priority 8 BasePriority 8 UnusualBoost 0 ForegroundBoost 0 IoPriority 2 PagePriority 5  
+Child-SP RetAddr : Args to Child : Call Site  
+fffff88002174768 fffff80001cf2f69 : 000000000000007f 0000000000000008 0000000080050033 00000000000406f8 : nt!KeBugCheckEx  
+fffff88002174770 fffff80001cefa4b : 0000000000000000 0000000000000000 0000000000000000 0000000000000000 : nt!KiBugCheckDispatch+0x69  
+fffff880021748b0 fffff88001482416 : 0000000000000000 0000000000000000 0000000000000000 0000000000000000 : nt!KiDoubleFaultAbort+0x28b (TrapFrame @ fffff880021748b0)  
+fffff8800b9c0f10 fffff88001486c7a : fffffab0f6061008 fffffab0227bea10 0000000000000000 0000000000000000 : ql2300+0x69416  
+fffff8800b9c1050 fffff8800136c113 : fffffab021f17600 fffffab0227bea10 0000000000000000 0000000000000000 : ql2300+0x6dc7a  
+fffff8800b9c10d0 fffff80001c0d5f3 : 0000000000000000 0000000000000000 0000000000000000 fffff88005af60b8 : storport!RaidpAdapterContinueScatterGather+0xc3  
+fffff8800b9c1140 fffff8800136be7a : fffff88005af6010 fffffab02493b010 000000000000003c 0000000000000000 : hal!HalBuildScatterGatherList+0x203  
+fffff8800b9c11b0 fffff8800136baf7 : 0000000000000001 fffffab02147fb10 0000000000000001 fffffab02493b088 : storport!RaUnitStartIo+0x28a  
+fffff8800b9c1230 fffff8800136b71d : 000000002493b001 fffff8800138a110 0000000300040000 0000000000000000 : storport!RaUnitScsiIrp+0x397  
+fffff8800b9c12f0 fffff88000c5f273 : 0000000000000000 0000000000000001 fffffab0227bea68 fffffab0258baf08 : storport!RaDriverScsiIrp+0x5d  
+fffff8800b9c1330 fffff88000c5d374 : fffffab021f8f680 fffffab02493b010 0000000000000000 0000000000000000 : rosempio!DsmWriteEvent+0x3e3f3  
+fffff8800b9c13f0 fffff88000c39fc4 : fffffab021f8f680 fffffab02493b010 fffffab02493b010 fffffab020906010 : rosempio!DsmWriteEvent+0x3c4f4  
+fffff8800b9c1670 fffff88000c39649 : fffffab021f8f680 fffffab02493b010 fffffab0258baf08 0000000000000000 : rosempio!DsmWriteEvent+0x19144  
+fffff8800b9c16d0 fffff88000c39ea8 : fffffab021f8f680 fffffab02493b010 0000000000000000 fffffab0227bea68 : rosempio!DsmWriteEvent+0x187c9  
+fffff8800b9c1790 fffff88000c3272e : fffffab021f8f680 fffffab02493b010 0000000100000000 0000000000000000 : rosempio!DsmWriteEvent+0x19028  
+fffff8800b9c17f0 fffff88000c525db : fffffab021f8f680 fffffab02493b010 fffff8800b9c1888 0000000000000001 : rosempio!DsmWriteEvent+0x118ae  
+fffff8800b9c1830 fffff88000c42f28 : fffffab02283b3d0 fffffab02493b010 fffffab02493b010 0000000000000000 : rosempio!DsmWriteEvent+0x3175b  
+fffff8800b9c18c0 fffff88000c42df5 : fffffab02283b3d0 fffffab02493b010 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8  
+fffff8800b9c1920 fffff88000c43059 : fffffab02283b3d0 fffffab02493b010 fffff88005af6390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75  
+fffff8800b9c1980 fffff88000c41e13 : fffffab02283b3d0 fffffab02493b010 fffffab0f6061008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9  
+fffff8800b9c19d0 fffff88000c417c3 : fffffab02283b3d0 fffffab02493b010 0000000000000001 fffffab0227be8f0 : rosempio!DsmWriteEvent+0x20f93  
+fffff8800b9c1a20 fffff88000c3274b : fffffab02283b3d0 fffffab02493b010 0000000000002000 fffffab11c6ae010 : rosempio!DsmWriteEvent+0x20943  
+fffff8800b9c1a80 fffff88001801445 : fffffab02283b3d0 fffffab02493b010 fffffab0227be8f0 0000004530035000 : rosempio!DsmWriteEvent+0x118cb  
+fffff8800b9c1ac0 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355  
+fffff8800b9c1b60 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26  
+fffff8800b9c1b90 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3  
+fffff8800b9c1c10 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341  
+fffff8800b9c1d00 fffff88000c42f28 : fffffab02283b3d0 fffffab020906010 fffffab020906010 0000000000000000 : rosempio!DsmWriteEvent+0x317f1  
+fffff8800b9c1d90 fffff88000c42df5 : fffffab02283b3d0 fffffab020906010 fffff88000000000 0000000000000000 : rosempio!DsmWriteEvent+0x220a8  
+fffff8800b9c1df0 fffff88000c43059 : fffffab02283b3d0 fffffab020906010 fffff88003d2e390 0000000000000000 : rosempio!DsmWriteEvent+0x21f75  
+fffff8800b9c1e50 fffff88000c41e13 : fffffab02283b3d0 fffffab020906010 fffffab0f5aa8008 fffff88001486c7a : rosempio!DsmWriteEvent+0x221d9  
+fffff8800b9c1ea0 fffff88000c417c3 : fffffab02283b3d0 fffffab020906010 0000000000000001 fffffab0249685f0 : rosempio!DsmWriteEvent+0x20f93  
+fffff8800b9c1ef0 fffff88000c3274b : fffffab02283b3d0 fffffab020906010 0000000000002000 fffffab11c695ab0 : rosempio!DsmWriteEvent+0x20943  
+fffff8800b9c1f50 fffff88001801445 : fffffab02283b3d0 fffffab020906010 fffffab0249685f0 000000452f09f000 : rosempio!DsmWriteEvent+0x118cb  
+fffff8800b9c1f90 fffff88001813f06 : fffffab0f9504010 fffffab02283b3d0 fffffab000080000 fffffab000000001 : CLASSPNP!ServiceTransferRequest+0x355  
+fffff8800b9c2030 fffff88001805bbc : fffffab0f950db50 fffff8800216b101 fffffab0f950dc10 0000000000000000 : CLASSPNP!ClasspServiceIdleRequest+0x26  
+fffff8800b9c2060 fffff80001c8f801 : 0000000000000000 0000000000000000 0000000000000000 0000000000002000 : CLASSPNP! ?? ::FNODOBFM::string'+0x4bb3  
+fffff8800b9c20e0 fffff88000c52671 : fffffab02200aa10 fffffab000000100 0000000000000000 0000000000000000 : nt!IopfCompleteRequest+0x341  
+fffff8800b9c21d0 fffff88000c42f28 : fffffab02283b3d0 fffffab02498d990 fffffab02498d990 0000000000000000 : rosempio!DsmWriteEvent+0x317f1  
+fffff8800b9c2260 fffff88000c42df5 : fffffab02283b3d0 fffffab02498d990 fffff88000000000 00000000`00000000 : rosempio!DsmWriteEvent+0x220a8  
  
 
 여기서 가장 중요하게 봐야 하는거는
@@ -239,22 +237,21 @@ Base fffff8800b9c7000 Limit fffff8800b9c1000
 그렇다면 현재 스택 정보를 저장한 레지스터 상태를 봐야 합니다.
 
 
-kd>.trap fffff880021748b0 
-NOTE: The trap frame does not contain all registers. Some register values may be zeroed or incorrect. 
-rax=0000000000000002 rbx=0000000000000000 rcx=0000000000000001 rdx=0000000000000001 
-rsi=0000000000000000 rdi=0000000000000000 rip=fffff88001482416 rsp=fffff8800b9c0f10 rbp=0000000000000200 
-r8=fffffab0f615a084 r9=0000000000000000 r10=fffff88005af60b8 r11=0000000000000000 r12=0000000000000000 
-r13=0000000000000000 r14=0000000000000000 r15=0000000000000000 
-iopl=0 nv up ei pl nz na pe nc ql2300+0x69416: fffff88001482416 899424c0000000 
-mov dword ptr [rsp+0C0h],edx ss:0018:fffff880`0b9c0fd0=????????
+kd>.trap fffff880021748b0  
+NOTE: The trap frame does not contain all registers. Some register values may be zeroed or incorrect.  
+rax=0000000000000002 rbx=0000000000000000 rcx=0000000000000001 rdx=0000000000000001  
+rsi=0000000000000000 rdi=0000000000000000 rip=fffff88001482416 rsp=fffff8800b9c0f10 rbp=0000000000000200  
+r8=fffffab0f615a084 r9=0000000000000000 r10=fffff88005af60b8 r11=0000000000000000 r12=0000000000000000  
+r13=0000000000000000 r14=0000000000000000 r15=0000000000000000  
+iopl=0 nv up ei pl nz na pe nc ql2300+0x69416: fffff88001482416 899424c0000000  
+mov dword ptr [rsp+0C0h],edx ss:0018:fffff880`0b9c0fd0=???????? 
  
 
 ESP는 64bit에서 rsp로 통합되어 사용되니 rsp를 확인하면 됩니다. 
 
-Stack Init fffff8800b9c6c70 Current fffff8800b9c1a50
-Base fffff8800b9c7000 Limit fffff8800b9c1000
-
-rsp=fffff8800b9c0f10
+Stack Init fffff8800b9c6c70 Current fffff8800b9c1a50  
+Base fffff8800b9c7000 Limit fffff8800b9c1000  
+rsp=fffff8800b9c0f10  
 
 여기서 rsp 값을 확인 하면 (fffff8800b9c0f10) 로 이 값이 범위를 벗어나는 것으로 보여지면서 스택 오버플로우가 의심되는것으로 보여지네요.
 
