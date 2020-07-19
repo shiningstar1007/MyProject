@@ -18,27 +18,27 @@ BUGCHECK_STR: 0x7f_8 이 나오면 스택 오버플로우 일 수 있다고 MSDN
 
  
 
-UNEXPECTED_KERNEL_MODE_TRAP (7f) <- BSOD가 발생한 코드
-This means a trap occurred in kernel mode, and it's a trap of a kind
-that the kernel isn't allowed to have/catch (bound trap) or that
-is always instant death (double fault). The first number in the
-bugcheck params is the number of the trap (8 = double fault, etc)
-Consult an Intel x86 family manual to learn more about what these
-traps are. Here is a portion of those codes:
-If kv shows a taskGate
-use .tss on the part before the colon, then kv.
-Else if kv shows a trapframe
-use .trap on that value
-Else
-.trap on the appropriate frame will show where the trap was taken
-(on x86, this will be the ebp that goes with the procedure KiTrap)
-Endif
-kb will then show the corrected stack.
-Arguments:
-Arg1: 0000000000000008, EXCEPTION_DOUBLE_FAULT
-Arg2: 0000000080050033
-Arg3: 00000000000406f8
-Arg4: fffff88001482416
+UNEXPECTED_KERNEL_MODE_TRAP (7f) <- BSOD가 발생한 코드  
+This means a trap occurred in kernel mode, and it's a trap of a kind  
+that the kernel isn't allowed to have/catch (bound trap) or that  
+is always instant death (double fault). The first number in the  
+bugcheck params is the number of the trap (8 = double fault, etc)  
+Consult an Intel x86 family manual to learn more about what these  
+traps are. Here is a portion of those codes:  
+If kv shows a taskGate  
+use .tss on the part before the colon, then kv.  
+Else if kv shows a trapframe  
+use .trap on that value  
+Else  
+.trap on the appropriate frame will show where the trap was taken  
+(on x86, this will be the ebp that goes with the procedure KiTrap)  
+Endif  
+kb will then show the corrected stack.  
+Arguments:  
+Arg1: 0000000000000008, EXCEPTION_DOUBLE_FAULT  
+Arg2: 0000000080050033  
+Arg3: 00000000000406f8  
+Arg4: fffff88001482416  
 
 Debugging Details:
 BUGCHECK_STR: 0x7f_8
@@ -160,8 +160,7 @@ FAILURE_ID_HASH: {0f9ebaaf-2e04-8097-fea0-1da0b10cd026}
 
  
 
-!analyze -v 명령을 사용하면 이렇게 친절하게 분석을 해주네요.
-
+!analyze -v 명령을 사용하면 이렇게 친절하게 분석을 해주네요.  
 일단 이거만 봐서는 잘 모르겠고 현재 스레드의 상태를 확인해 보도록 하겠습니다.
  
 kd> !thread  
@@ -223,9 +222,8 @@ fffff8800b9c2260 fffff88000c42df5 : fffffab02283b3d0 fffffab02498d990 fffff88000
 
 여기서 가장 중요하게 봐야 하는거는
 
-Stack Init fffff8800b9c6c70 Current fffff8800b9c1a50
-Base fffff8800b9c7000 Limit fffff8800b9c1000
-
+Stack Init fffff8800b9c6c70 Current fffff8800b9c1a50  
+Base fffff8800b9c7000 Limit fffff8800b9c1000  
 입니다. 이거는 스택 범위 값을 나타냅니다.
 
 보통은 스레드가 실행되면 ESP 레지스터 값은 항상 Stack Init (fffff8800b9c6c70)과 Limit (fffff8800b9c1000)
