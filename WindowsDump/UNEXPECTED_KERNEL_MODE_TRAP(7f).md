@@ -216,12 +216,15 @@ rsp=fffff8800b9c0f10
  
 
 kd> kf 100
----
-Memory:" " "8" "140" "984c660" "140"
-Child-SP:"fffff88002174768" "fffff88002174770" "fffff880021748b0" "fffff8800b9c0f10" "fffff8800b9c1050"
-RetAddr:"fffff80001cf2f69" "fffff80001cefa4b" "fffff88001482416" "fffff88001486c7a" "fffff8800136c113"
-Call Site: "nt!KeBugCheckEx" "nt!KiBugCheckDispatch+0x69" "nt!KiDoubleFaultAbort+0x28b" "ql2300+0x69416" "ql2300+0x6dc7a"
----
+
+|  <center>Memory</center> |  <center>Child-SP</center> |  <center>RetAddr</center> |  <center>Call Site</center> |
+|:--------:|:--------:|:--------:|:--------:|
+|**<center> </center>** | <center>fffff88002174768</center> |*<center>fffff80001cf2f69</center>* |*<center>nt!KeBugCheckEx</center>* |
+|**<center>8</center>** | <center>fffff88002174770</center> |*<center>fffff80001cefa4b</center>* |*<center>nt!KiBugCheckDispatch+0x69</center>* |
+|**<center>140</center>** | <center>fffff880021748b0</center> |*<center>fffff88001482416</center>* |*<center>nt!KiDoubleFaultAbort+0x28b</center>* |
+|**<center>984c660</center>** | <center>fffff8800b9c0f10</center> |*<center>fffff88001486c7a</center>* |*<center>ql2300+0x69416</center>* |
+|**<center>140</center>** | <center>fffff8800b9c1050</center> |*<center>fffff8800136c113</center>* |*<center>ql2300+0x6dc7a</center>* |
+
 
 ql2300+69416 여기서 보니까 스택 메모리를 무려 984c660이나 사용을 하네요...
 
