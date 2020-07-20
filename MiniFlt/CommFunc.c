@@ -161,3 +161,26 @@ VOID InitializeProcess()
 			DbgPrint("Unknown Process Offset");
 	}
 }
+
+NTSTATUS GetProcessImageName(
+	_In_ PFLT_CALLBACK_DATA Data
+)
+{
+	NTSTATUS Status;
+	PEPROCESS pProcess = NULL;
+	PUNICODE_STRING ProcName = NULL;
+
+	PAGED_CODE();
+
+	pProcess = FltGetRequestorProcess(Data);
+	if (pProcess) {
+		Status = SeLocateProcessImageName(pProcess, &ProcName); // Windows Vista and later only.
+		if (NT_SUCCESS(Status)) {
+			DbgPrint("[TEST]ProcName[%S]", ProcName->Buffer);
+			ExFreePool(ProcName);
+		}
+		else DbgPrint("[TEST] SeLocateProcessImageName failed [0x%X]", Status);
+	}
+
+	return Status;
+}

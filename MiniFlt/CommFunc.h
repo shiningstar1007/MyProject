@@ -103,4 +103,10 @@ ULONG MySNPrintfW(
 	_In_opt_ CONST PWCHAR FormatStr, ...
 );
 
+VOID GetVersion();
+VOID InitializeProcess();
+NTSTATUS GetProcessImageName(
+	_In_ PFLT_CALLBACK_DATA Data
+);
+
 #endif
