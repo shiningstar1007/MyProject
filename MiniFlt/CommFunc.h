@@ -1,6 +1,8 @@
 #ifndef __COMMFUNC_H__
 #define __COMMFUNC_H__
 
+#include <ntifs.h>
+
 #define TAG_MINIFLT 'SFNM'
 
 #define MAX_KPATH 264 
@@ -68,6 +70,7 @@ extern WINDOWS_VERSION g_WinVersion;
 #define DESKTOP_OFFSET       0x078
 #endif
 
+extern LONG g_NonPagedPoolCnt;
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,
 	_Inout_ PLONG MemCnt
@@ -103,6 +106,7 @@ ULONG MySNPrintfW(
 	_In_opt_ CONST PWCHAR FormatStr, ...
 );
 
+extern ULONG g_ProcNameOffset, g_PebOffset;
 VOID GetVersion();
 VOID InitializeProcess();
 NTSTATUS GetProcessImageName(

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+LONG g_NonPagedPoolCnt = 0;
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,
 	_Inout_ PLONG MemCnt
@@ -23,7 +24,7 @@ PVOID MyFreeNonPagedPool(
 	if (!Buffer) return NULL;
 
 	InterlockedDecrement(MemCnt);
-	ExFreePool(Buffer);
+	ExFreePoolWithTag(Buffer, TAG_MINIFLT);
 
 	return NULL;
 }
@@ -98,6 +99,7 @@ ULONG MySNPrintfW(
 	return (ULONG)wcslen(DestBuf);
 }
 
+WINDOWS_VERSION g_WinVersion;
 VOID GetVersion()
 {
 	RTL_OSVERSIONINFOW VersionInfo;
@@ -166,7 +168,7 @@ NTSTATUS GetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
 )
 {
-	NTSTATUS Status;
+	NTSTATUS Status = STATUS_SUCCESS;
 	PEPROCESS pProcess = NULL;
 	PUNICODE_STRING ProcName = NULL;
 
@@ -183,4 +185,48 @@ NTSTATUS GetProcessImageName(
 	}
 
 	return Status;
+}
+
+VOID GetUserName(PFLT_CALLBACK_DATA Data)
+{
+	NTSTATUS Status = STATUS_SUCCESS;
+	PACCESS_TOKEN pToken = NULL;
+	PTOKEN_USER pUser = NULL;
+	SID* SId;
+	ULONG NameSize = 0;
+	UNICODE_STRING UniName;
+	//UNICODE_STRING UniDomain;
+	//ULONG DomainSize = 0;
+	SID_NAME_USE NameUse;
+
+	pToken = SeQuerySubjectContextToken(&(Data->Iopb->Parameters.Create.SecurityContext->AccessState->SubjectSecurityContext));
+	if (pToken) {
+		Status = SeQueryInformationToken(pToken, TokenUser, &pUser);
+
+		if (NT_SUCCESS(Status)) {
+			SId = (SID*)pUser->User.Sid;
+			Status = SecLookupAccountSid(SId, &NameSize, NULL, NULL, NULL, &NameUse);
+			if (Status == STATUS_BUFFER_TOO_SMALL) {
+				UniName.Length = (USHORT)(NameSize * sizeof(WCHAR));
+				UniName.MaximumLength = (USHORT)(NameSize * sizeof(WCHAR));
+				UniName.Buffer = MyAllocNonPagedPool(NameSize * sizeof(WCHAR), &g_NonPagedPoolCnt);
+
+				//  UniDomain.Length = DomainSize * sizeof(WCHAR);
+				//  UniDomain.MaximumLength = DomainSize * sizeof(WCHAR);
+				//  UniDomain.Buffer = MyAllocNonPagedPool(NameSize * sizeof(WCHAR), &g_NonPagedPoolCnt);
+
+				Status = SecLookupAccountSid(SId, &NameSize, &UniName, NULL, NULL, &NameUse);
+				if (NT_SUCCESS(Status)) {
+					DbgPrint("[TEST] Name[%S]", UniName.Buffer);
+				}
+				else DbgPrint("[TEST] SecLookupAccountSid failed [0x%X]", Status);
+
+				if (UniName.Buffer) MyFreeNonPagedPool(UniName.Buffer, &g_NonPagedPoolCnt);
+
+				// if (UniDomain.Buffer) MyFreeNonPagedPool(UniDomain.Buffer, &g_NonPagedPoolCnt);
+			}
+		}
+
+		if (pUser) ExFreePool(pUser);
+	}
 }
