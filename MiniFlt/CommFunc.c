@@ -164,6 +164,71 @@ VOID InitializeProcess()
 	}
 }
 
+QUERY_INFO_PROCESS ZwQueryInformationProcess = NULL;
+NTSTATUS ZwGetProcessImageName(
+	_In_ PFLT_CALLBACK_DATA Data
+)
+{
+	NTSTATUS Status = STATUS_SUCCESS;
+	ULONG BufLen = 0;
+	HANDLE hProcess = NULL;
+	PEPROCESS pProcess = NULL;
+	PUNICODE_STRING ProcName;
+	PVOID Buffer = NULL;
+
+	PAGED_CODE();
+
+	pProcess = FltGetRequestorProcess(Data);
+	if (pProcess) {
+		Status = ObOpenObjectByPointer(pProcess, OBJ_KERNEL_HANDLE, NULL, GENERIC_READ, 0, KernelMode, &hProcess);
+		if (!NT_SUCCESS(Status)) {
+			DbgPrint("[TEST] ObOpenObjectByPointer failed [0x%X]", Status);
+			return Status;
+		}
+
+		if (!ZwQueryInformationProcess) {
+			UNICODE_STRING RoutineName;
+			RtlInitUnicodeString(&RoutineName, L"ZwQueryInformationProcess");
+
+			ZwQueryInformationProcess = (QUERY_INFO_PROCESS)MmGetSystemRoutineAddress(&RoutineName);
+
+			if (!ZwQueryInformationProcess) {
+				ZwClose(hProcess);
+				return STATUS_UNSUCCESSFUL;
+			}
+		}
+
+		Status = ZwQueryInformationProcess(hProcess, ProcessImageFileName, NULL, 0, &BufLen);
+		if (Status != STATUS_INFO_LENGTH_MISMATCH) {
+			DbgPrint("[TEST] ZwQueryInformationProcess failed #1[0x%X]", Status);
+			ZwClose(hProcess);
+			return Status;
+		}
+
+		Buffer = MyAllocNonPagedPool(BufLen, &g_NonPagedPoolCnt);
+		if (!Buffer) {
+			ZwClose(hProcess);
+			return STATUS_INSUFFICIENT_RESOURCES;
+		}
+
+		Status = ZwQueryInformationProcess(hProcess, ProcessImageFileName, Buffer, BufLen, &BufLen);
+		if (NT_SUCCESS(Status))
+		{
+			ProcName = (PUNICODE_STRING)Buffer;
+
+			DbgPrint("[TEST] FullPath[%S]", ProcName->Buffer);
+		}
+		else DbgPrint("[TEST] ZwQueryInformationProcess failed #2[0x%X]", Status);
+
+		MyFreeNonPagedPool(Buffer, &g_NonPagedPoolCnt);
+
+		ZwClose(hProcess);
+	}
+	else DbgPrint("[TEST] FltGetRequestorProcess failed");
+
+	return Status;
+}
+
 NTSTATUS GetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
 )

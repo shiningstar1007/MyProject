@@ -31,6 +31,14 @@ typedef enum {
 
 extern WINDOWS_VERSION g_WinVersion;
 
+typedef NTSTATUS(*QUERY_INFO_PROCESS) (
+	__in HANDLE ProcessHandle,
+	__in PROCESSINFOCLASS ProcessInformationClass,
+	__out_bcount(ProcessInformationLength) PVOID ProcessInformation,
+	__in ULONG ProcessInformationLength,
+	__out_opt PULONG ReturnLength
+);
+
 #define NT_PROCNAMELEN 16
 #define SYSNAMEW L"System"
 #define SYSNAME  "System"
@@ -109,8 +117,14 @@ ULONG MySNPrintfW(
 extern ULONG g_ProcNameOffset, g_PebOffset;
 VOID GetVersion();
 VOID InitializeProcess();
+NTSTATUS ZwGetProcessImageName(
+	_In_ PFLT_CALLBACK_DATA Data
+);
+
 NTSTATUS GetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
 );
+
+
 
 #endif
