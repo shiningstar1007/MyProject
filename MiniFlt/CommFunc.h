@@ -125,6 +125,14 @@ NTSTATUS GetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
 );
 
+VOID GetUserName(
+	_In_ PFLT_CALLBACK_DATA Data
+);
+
+VOID GetGroupName(
+	_In_ PFLT_CALLBACK_DATA Data
+);
+
 
 
 #endif

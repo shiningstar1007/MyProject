@@ -252,7 +252,9 @@ NTSTATUS GetProcessImageName(
 	return Status;
 }
 
-VOID GetUserName(PFLT_CALLBACK_DATA Data)
+VOID GetUserName(
+	_In_ PFLT_CALLBACK_DATA Data
+)
 {
 	NTSTATUS Status = STATUS_SUCCESS;
 	PACCESS_TOKEN pToken = NULL;
@@ -293,5 +295,51 @@ VOID GetUserName(PFLT_CALLBACK_DATA Data)
 		}
 
 		if (pUser) ExFreePool(pUser);
+	}
+}
+
+VOID GetGroupName(
+	_In_ PFLT_CALLBACK_DATA Data
+)
+{
+	NTSTATUS Status = STATUS_SUCCESS;
+	PACCESS_TOKEN pToken = NULL;
+	PTOKEN_GROUPS pGroups = NULL;
+	SID* SId;
+	ULONG NameSize = 0;
+	UNICODE_STRING UniName;
+	//UNICODE_STRING UniDomain;
+	//ULONG DomainSize = 0;
+	SID_NAME_USE NameUse;
+
+	pToken = SeQuerySubjectContextToken(&(Data->Iopb->Parameters.Create.SecurityContext->AccessState->SubjectSecurityContext));
+	if (pToken) {
+		Status = SeQueryInformationToken(pToken, TokenGroups, &pGroups);
+
+		if (NT_SUCCESS(Status)) {
+			SId = (SID*)pGroups->Groups->Sid;
+			Status = SecLookupAccountSid(SId, &NameSize, NULL, NULL, NULL, &NameUse);
+			if (Status == STATUS_BUFFER_TOO_SMALL) {
+				UniName.Length = (USHORT)(NameSize * sizeof(WCHAR));
+				UniName.MaximumLength = (USHORT)(NameSize * sizeof(WCHAR));
+				UniName.Buffer = MyAllocNonPagedPool(NameSize * sizeof(WCHAR), &g_NonPagedPoolCnt);
+
+				//  UniDomain.Length = DomainSize * sizeof(WCHAR);
+				//  UniDomain.MaximumLength = DomainSize * sizeof(WCHAR);
+				//  UniDomain.Buffer = MyAllocNonPagedPool(NameSize * sizeof(WCHAR), &g_NonPagedPoolCnt);
+
+				Status = SecLookupAccountSid(SId, &NameSize, &UniName, NULL, NULL, &NameUse);
+				if (NT_SUCCESS(Status)) {
+					DbgPrint("[TEST] GroupName[%S]", UniName.Buffer);
+				}
+				else DbgPrint("[TEST] SecLookupAccountSid failed [0x%X]", Status);
+
+				if (UniName.Buffer) MyFreeNonPagedPool(UniName.Buffer, &g_NonPagedPoolCnt);
+
+				// if (UniDomain.Buffer) MyFreeNonPagedPool(UniDomain.Buffer, &g_NonPagedPoolCnt);
+			}
+		}
+
+		if (pGroups) ExFreePool(pGroups);
 	}
 }
