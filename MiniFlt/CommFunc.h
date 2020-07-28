@@ -78,6 +78,15 @@ typedef NTSTATUS(*QUERY_INFO_PROCESS) (
 #define DESKTOP_OFFSET       0x078
 #endif
 
+typedef unsigned int UINT;
+typedef char CHAR, * PCHAR;
+typedef unsigned char UCHAR, * PUCHAR;
+typedef unsigned short USHORT;
+typedef short SHORT, WORD;
+typedef unsigned long ULONG, * PULONG, DWORD;
+typedef unsigned char BYTE, * PBYTE;
+typedef long BOOL, * PBOOL;
+
 extern LONG g_NonPagedPoolCnt;
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,

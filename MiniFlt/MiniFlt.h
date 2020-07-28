@@ -1,6 +1,7 @@
 #ifndef __MINIFLT_H__
 #define __MINIFLT_H__
 
+
 //  Enabled warnings
 
 #pragma warning(error:4100)     //  Enable-Unreferenced formal parameter
@@ -12,22 +13,29 @@
 #include <dontuse.h>
 #include <suppress.h>
 
+#include "CommFunc.h"
+
 #define TAG_CONTEXT       'FMTC'
+#define MIN_SECTOR_SIZE 0x200
 
 typedef enum {
-	DVT_FIXED = 0,
-	DVT_REMOVABLE,
-	DVT_NETWORK,
-	DVT_UNKNOWN
-} DRIVE_TYPE, * PDRIVE_TYPE;
+	DRIVE_FIXED = 0,
+	DRIVE_NETWORK,
+	DRIVE_REMOVABLE,
+	DRIVE_UNKNOWN
+} DRIVE_TYPE, *PDRIVE_TYPE;
 
 typedef struct _VOLUME_CONTEXT {
-	UNICODE_STRING Name;
+	UNICODE_STRING VolumeName;
 	ULONG SectorSize;
 
-	FLT_FILESYSTEM_TYPE FSType;
-	DRIVE_TYPE DrvType;
-} VOLUME_CONTEXT, * PVOLUME_CONTEXT;
+	FLT_FILESYSTEM_TYPE FileSystemType;
+	DRIVE_TYPE DriveType;
+} VOLUME_CONTEXT, *PVOLUME_CONTEXT;
+
+typedef struct _MYMINIFLT_DATA {
+	BOOL bInitialize;
+} MYMINIFLT_DATA, *PMYMINIFLT_DATA;
 
 
 #endif __MINIFLT_H__
