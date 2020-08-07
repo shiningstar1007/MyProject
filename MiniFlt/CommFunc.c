@@ -343,3 +343,66 @@ VOID GetGroupName(
 		if (pGroups) ExFreePool(pGroups);
 	}
 }
+
+PVOID MyQueryInformationToken(
+	_In_opt_ PACCESS_TOKEN AccessToken,
+	_In_ TOKEN_INFORMATION_CLASS TokenInfoClass,
+	_In_ ULONG MinSize
+)
+{
+	NTSTATUS Status;
+	HANDLE hToken = 0;
+	PVOID Buffer = NULL;
+	ULONG BufSize = 0;
+
+	if (AccessToken == NULL) return NULL;
+
+	__try {
+		Status = ObOpenObjectByPointer(AccessToken, OBJ_KERNEL_HANDLE, NULL, TOKEN_QUERY, NULL, KernelMode,
+			&hToken);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		Status = STATUS_UNHANDLED_EXCEPTION;
+	}
+
+	ObDereferenceObject(AccessToken);
+	if (Status != STATUS_SUCCESS) return NULL;
+
+	Status = ZwQueryInformationToken(hToken, TokenInfoClass, NULL, BufSize, &BufSize);
+	if (Status == STATUS_BUFFER_TOO_SMALL) {
+		if (BufSize < MinSize) BufSize = MinSize;
+
+		Buffer = MyAllocNonPagedPool(BufSize, &g_NonPagedPoolCnt);
+		if (Buffer != NULL) {
+			Status = ZwQueryInformationToken(hToken, TokenInfoClass, Buffer, BufSize, &BufSize);
+			if (Status != STATUS_SUCCESS) {
+				MyFreeNonPagedPool(Buffer, &g_NonPagedPoolCnt);
+				Buffer = NULL;
+			}
+		}
+	}
+
+	ZwClose(hToken);
+
+	return Buffer;
+}
+
+BOOL CheckLocalUser()
+{
+	BOOLEAN CopyOnOpen, EffectiveOnly, bLocalUser = TRUE;
+	SECURITY_IMPERSONATION_LEVEL Level;
+	PTOKEN_SOURCE pToKenSource = NULL;
+	ULONG MinSize = sizeof(TOKEN_SOURCE);
+	PACCESS_TOKEN AccessToken = PsReferenceImpersonationToken(PsGetCurrentThread(),
+		&CopyOnOpen, &EffectiveOnly, &Level);
+
+	if (AccessToken == NULL) AccessToken = PsReferencePrimaryToken(PsGetCurrentProcess());
+
+	pToKenSource = (PTOKEN_SOURCE)MyQueryInformationToken(AccessToken, TokenSource, MinSize);
+	if (pToKenSource != NULL) {
+		bLocalUser = !_strnicmp(pToKenSource->SourceName, "NTLMSSP", 7) ? FALSE : TRUE;
+		MyFreeNonPagedPool(pToKenSource, &g_NonPagedPoolCnt);
+	}
+
+	return bLocalUser;
+}

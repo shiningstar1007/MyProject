@@ -142,6 +142,14 @@ VOID GetGroupName(
 	_In_ PFLT_CALLBACK_DATA Data
 );
 
+PVOID MyQueryInformationToken(
+	_In_opt_ PACCESS_TOKEN AccessToken,
+	_In_ TOKEN_INFORMATION_CLASS TokenInfoClass,
+	_In_ ULONG MinSize
+);
+
+BOOL CheckLocalUser();
+
 
 
 #endif
