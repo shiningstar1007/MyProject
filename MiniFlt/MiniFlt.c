@@ -59,6 +59,62 @@ MiniFltPreCleanup(
 #pragma alloc_text(PAGE, MiniFltInstanceSetup)
 #endif
 
+PVOID g_RegHandle = NULL;
+OB_PREOP_CALLBACK_STATUS ObPreCallBack(
+	PVOID RegContext, 
+	POB_PRE_OPERATION_INFORMATION ObPreOperInfo
+)
+{
+	CHAR ProcName[MAX_KPATH] = { 0 };
+	PEPROCESS pEProc = (PEPROCESS)ObPreOperInfo->Object;
+
+	UNREFERENCED_PARAMETER(RegContext);
+
+	if (KeGetCurrentIrql() != PASSIVE_LEVEL) DbgPrint("KeGetCurrentIrql[0x%X]", KeGetCurrentIrql());
+
+	MyStrNCopy(ProcName, (PCHAR)pEProc + g_ProcNameOffset, MAX_KPATH);
+	if (*ProcName) {
+		if (!_stricmp("notepad.exe", ProcName)) {
+			if (ObPreOperInfo->Operation == OB_OPERATION_HANDLE_CREATE) {
+				if (ObPreOperInfo->Parameters->CreateHandleInformation.DesiredAccess & PROCESS_TERMINATE) {
+					ObPreOperInfo->Parameters->CreateHandleInformation.DesiredAccess &= ~PROCESS_TERMINATE;
+					DbgPrint("[TEST] Set Protect Process");
+				}
+			}
+		}
+	}
+	else DbgPrint("[TEST] Failed to Get Process Name");
+
+	return OB_PREOP_SUCCESS;
+}
+
+NTSTATUS StartProtectProcess()
+{
+	NTSTATUS Status = STATUS_UNSUCCESSFUL;
+	OB_CALLBACK_REGISTRATION ObCBReg = { 0 };
+	OB_OPERATION_REGISTRATION ObOperReg = { 0 };
+
+	ObOperReg.ObjectType = PsProcessType;
+	ObOperReg.PreOperation = ObPreCallBack;
+	ObOperReg.Operations = OB_OPERATION_HANDLE_CREATE;
+
+	ObCBReg.Version = OB_FLT_REGISTRATION_VERSION;
+	ObCBReg.OperationRegistrationCount = 1;
+	ObCBReg.OperationRegistration = &ObOperReg;
+	RtlInitUnicodeString(&ObCBReg.Altitude, L"370071");
+	ObCBReg.RegistrationContext = NULL;
+
+	Status = ObRegisterCallbacks(&ObCBReg, &g_RegHandle);
+
+	DbgPrint("ObRegisterCallbacks Status[0x%X]", Status);
+	return Status;
+}
+
+VOID StopProtectProcess()
+{
+	if (g_RegHandle != NULL) ObUnRegisterCallbacks(g_RegHandle);
+}
+
 
 FLT_OPERATION_REGISTRATION Callbacks[] = {
     { IRP_MJ_CREATE,

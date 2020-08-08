@@ -18,6 +18,9 @@
 #define TAG_CONTEXT       'FMTC'
 #define MIN_SECTOR_SIZE 0x200
 
+#define PROCESS_TERMINATE 0x1
+#define ACTIVE_PROCESS_LINKS 0x2e8
+
 typedef enum {
 	DRIVE_FIXED = 0,
 	DRIVE_NETWORK,
