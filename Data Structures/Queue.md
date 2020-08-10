@@ -21,7 +21,7 @@
 메모리를 효율적으로 사용할 수 있도록 해줍니다.  
 이것을 원형 큐(Circular Queue) 라고 합니다.  
 
-![이미지](./images/circular_queue_arr.jpg)
+![이미지](./images/circular_queue.jpg)
 
 그렇다면 이제 원형 큐를 프로그램 C언어로 표현을 해보도록 하겠습니다.  
 
