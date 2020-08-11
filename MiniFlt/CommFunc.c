@@ -159,6 +159,10 @@ VOID InitializeProcess()
 		case PROC_OFFSET_WS2019_x64:
 			g_PebOffset = PEB_OFFSET_WS2016_x64;
 			break;
+		case PROC_OFFSET_WS2019_x64_2004:
+			g_PebOffset = PEB_OFFSET_WS2019_x64;
+			break;
+
 		default:
 			DbgPrint("Unknown Process Offset");
 	}
