@@ -8,7 +8,7 @@ TEB역시 각각의 Thread 당 하나씩 TEB 구조체가 생성되어 이미지
 
 ![이미지](./images/TEB.jpg)  
 
-TEB 구조체 역시 OS가 출시 될 때마다 거의 변경되고.. MSDN에도 변경될 수 있다고 써놨네요..
+TEB 구조체 역시 OS가 출시 될 때마다 거의 변경되고.. MSDN에도 변경될 수 있다고 써놨네요..  
 그렇지만 여기서 중요하게 봐야 할 2가지가 있는데 바로 TIB와 PEB입니다.  
 
 ## TIB(Thread Information Block)
