@@ -410,3 +410,29 @@ BOOL CheckLocalUser()
 
 	return bLocalUser;
 }
+
+ULONG GetAction(
+	_In_ ACCESS_MASK AccessMask
+)
+{
+	ACCESS_MASK TmpAccessMask;
+	ULONG Action = 0;
+
+	if ((AccessMask == FILE_ANY_ACCESS) || (AccessMask == FILE_ALL_ACCESS)) {
+		Action = ACT_READ | ACT_WRITE | ACT_TRAVERSE;
+	}
+	else if (AccessMask & DELETE) Action = ACT_DELETE;
+	else {
+		TmpAccessMask = FILE_READ_ACCESS | FILE_READ_EA | FILE_READ_ATTRIBUTES | GENERIC_READ;
+		if (AccessMask & TmpAccessMask) Action |= ACT_READ;
+
+		TmpAccessMask = FILE_WRITE_ACCESS | FILE_APPEND_DATA | FILE_WRITE_EA |
+			FILE_WRITE_ATTRIBUTES | GENERIC_WRITE;
+		if (AccessMask & TmpAccessMask) Action |= ACT_WRITE;
+
+		TmpAccessMask = FILE_LIST_DIRECTORY | FILE_TRAVERSE;
+		if (AccessMask & TmpAccessMask) Action |= ACT_TRAVERSE;
+	}
+
+	return Action;
+}

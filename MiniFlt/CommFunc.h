@@ -89,6 +89,13 @@ typedef unsigned long ULONG, * PULONG, DWORD;
 typedef unsigned char BYTE, * PBYTE;
 typedef long BOOL, * PBOOL;
 
+#define ACT_READ     0x00000001
+#define ACT_WRITE    0x00000002
+#define ACT_TRAVERSE 0x00000004
+#define ACT_DELETE   0x00000008
+#define ACT_CREATE   0x00000010
+#define ACT_ALL      0xFFFFFFFF
+
 extern LONG g_NonPagedPoolCnt;
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,
@@ -151,6 +158,10 @@ PVOID MyQueryInformationToken(
 );
 
 BOOL CheckLocalUser();
+
+ULONG GetAction(
+	_In_ ACCESS_MASK AccessMask
+);
 
 
 
