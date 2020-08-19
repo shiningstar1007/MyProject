@@ -21,7 +21,9 @@ OllyDbg툴을 이용하여 helloworld.exe 파일을 디버깅 해보겠습니다
 - OllyDbg -  
 ☞ http://www.ollydbg.de/  
 
-```helloworld.c 소스코드  
+```c
+helloworld.c 소스코드    
+
 int main(){  
 
  printf("Hello World!!\n");  
@@ -46,12 +48,12 @@ int main(){
 아주 간단한 코드이고 나머지는 여러분들이 직접 찾아 보시기를 권합니다. 남이 알려주는것 보다 자신이 직접 찾아보고  
 공부해야 자신의 지식이 된다고 저는 생각합니다.
  
-`어셈블 기본 코드`
-`CALL XX : XX 주소의 함수를 호출`
-`JMP XX : XX 주소로 이동`
-`PUSH XX : 스택에 XX 저장`
-`MOV XX,YY : XX에 YY를 저장(이동)`
-`RETN : 스택에 저장된 복귀 주소로 이동`
+`어셈블 기본 코드`  
+`CALL XX : XX 주소의 함수를 호출`  
+`JMP XX : XX 주소로 이동`  
+`PUSH XX : 스택에 XX 저장`  
+`MOV XX,YY : XX에 YY를 저장(이동)`  
+`RETN : 스택에 저장된 복귀 주소로 이동`  
 
 다음 OllyDbg 명령에 대해서 간단히 설명을 짚고 넘어가도록 하겟습니다.  
 기본적인 단축키는 크게 4개를 사용합니다.  
