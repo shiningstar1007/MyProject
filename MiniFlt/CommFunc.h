@@ -96,6 +96,17 @@ typedef long BOOL, * PBOOL;
 #define ACT_CREATE   0x00000010
 #define ACT_ALL      0xFFFFFFFF
 
+typedef enum _MY_COMMAND {
+	SET_COMMAND,
+	GET_COMMAND
+} MY_COMMAND;
+
+typedef struct _COMMAND_DATA {
+	MY_COMMAND Command;
+	ULONG Reserved;  // Alignment on IA64
+	UCHAR Data[];
+} COMMAND_DATA, * PCOMMAND_DATA;
+
 extern LONG g_NonPagedPoolCnt;
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,
@@ -163,6 +174,31 @@ ULONG GetAction(
 	_In_ ACCESS_MASK AccessMask
 );
 
+NTSTATUS MiniFltConnect(
+	_In_ PFLT_PORT ClientPort,
+	_In_ PVOID ServerPortCookie,
+	_In_reads_bytes_(SizeOfContext) PVOID ConnectionContext,
+	_In_ ULONG SizeOfContext,
+	_Flt_ConnectionCookie_Outptr_ PVOID* ConnectionCookie
+);
+
+VOID MiniFltDisconnect(
+	_In_opt_ PVOID ConnectionCookie
+);
+
+NTSTATUS MiniFltMessage(
+	_In_ PVOID ConnectionCookie,
+	_In_reads_bytes_opt_(InBufSize) PVOID InBuf,
+	_In_ ULONG InBufSize,
+	_Out_writes_bytes_to_opt_(OutBufSize, *RetLen) PVOID OutBuf,
+	_In_ ULONG OutBufSize,
+	_Out_ PULONG RetLen
+);
+
+LONG MiniFltExceptionFilter(
+	_In_ PEXCEPTION_POINTERS ExceptionPointer,
+	_In_ BOOL AccessingUserBuffer
+);
 
 
 #endif

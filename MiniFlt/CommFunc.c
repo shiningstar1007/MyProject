@@ -436,3 +436,85 @@ ULONG GetAction(
 
 	return Action;
 }
+
+NTSTATUS MiniFltConnect(
+	_In_ PFLT_PORT ClientPort,
+	_In_ PVOID ServerPortCookie,
+	_In_reads_bytes_(SizeOfContext) PVOID ConnectionContext,
+	_In_ ULONG SizeOfContext,
+	_Flt_ConnectionCookie_Outptr_ PVOID* ConnectionCookie
+)
+{
+	PAGED_CODE();
+
+	UNREFERENCED_PARAMETER(ServerPortCookie);
+	UNREFERENCED_PARAMETER(ConnectionContext);
+	UNREFERENCED_PARAMETER(SizeOfContext);
+	UNREFERENCED_PARAMETER(ConnectionCookie);
+
+	//ClientPort = ClientPort;
+	return STATUS_SUCCESS;
+}
+
+VOID MiniFltDisconnect(
+	_In_opt_ PVOID ConnectionCookie
+)
+{
+	PAGED_CODE();
+	UNREFERENCED_PARAMETER(ConnectionCookie);
+
+	//FltCloseClientPort(Filter, ClientPort);
+}
+
+NTSTATUS MiniFltMessage(
+	_In_ PVOID ConnectionCookie,
+	_In_reads_bytes_opt_(InBufSize) PVOID InBuf,
+	_In_ ULONG InBufSize,
+	_Out_writes_bytes_to_opt_(OutBufSize, *RetLen) PVOID OutBuf,
+	_In_ ULONG OutBufSize,
+	_Out_ PULONG RetLen
+)
+{
+	MY_COMMAND Command;
+	PWCHAR Data;
+	NTSTATUS Status = STATUS_SUCCESS;
+
+	PAGED_CODE();
+
+	UNREFERENCED_PARAMETER(ConnectionCookie);
+	UNREFERENCED_PARAMETER(OutBufSize);
+
+	*RetLen = 0;
+
+	if ((InBuf != NULL) && (InBufSize >= (FIELD_OFFSET(COMMAND_DATA, Command) + sizeof(MY_COMMAND)))) {
+		__try {
+			Command = ((PCOMMAND_DATA)InBuf)->Command;
+			Data = (PWCHAR)((PCOMMAND_DATA)InBuf)->Data;
+		}
+		__except (PsKeExceptionFilter(GetExceptionInformation(), TRUE)) {
+			return GetExceptionCode();
+		}
+
+		switch (Command) {
+		case SET_COMMAND: break;
+
+		case GET_COMMAND: break;
+		
+		}
+	}
+	else Status = STATUS_INVALID_PARAMETER;
+
+	return Status;
+}
+
+LONG MiniFltExceptionFilter(
+	_In_ PEXCEPTION_POINTERS ExceptionPointer,
+	_In_ BOOL AccessingUserBuffer
+)
+{
+	NTSTATUS Status = ExceptionPointer->ExceptionRecord->ExceptionCode;
+
+	if (!FsRtlIsNtstatusExpected(Status) && !AccessingUserBuffer) return EXCEPTION_CONTINUE_SEARCH;
+
+	return EXCEPTION_EXECUTE_HANDLER;
+}
