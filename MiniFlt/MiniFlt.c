@@ -395,6 +395,42 @@ MiniFltInstanceQueryTeardown (
   return STATUS_SUCCESS;
 }
 
+ULONGLONG GetFileId(
+	_In_ PCFLT_RELATED_OBJECTS FltObjects
+)
+{
+	NTSTATUS Status;
+	FLT_FILESYSTEM_TYPE Type;
+	FILE_REFERENCE FileRef = { 0 };
+
+	Status = FltGetFileSystemType(FltObjects->Instance, &Type);
+	if (NT_SUCCESS(Status)) {
+		if (Type == FLT_FSTYPE_REFS) {
+			FILE_ID_INFORMATION FileIdInfo;
+
+			Status = FltQueryInformationFile(FltObjects->Instance, FltObjects->FileObject, &FileIdInfo,
+				sizeof(FILE_ID_INFORMATION), FileIdInformation, NULL);
+
+			if (NT_SUCCESS(Status)) {
+				RtlCopyMemory(&FileRef.FileId128, &FileIdInfo.FileId, sizeof(FileRef.FileId128));
+			}
+		}
+		else {
+			FILE_INTERNAL_INFORMATION FileInternalInfo;
+
+			Status = FltQueryInformationFile(FltObjects->Instance, FltObjects->FileObject, &FileInternalInfo,
+				sizeof(FILE_INTERNAL_INFORMATION), FileInternalInformation, NULL);
+
+			if (NT_SUCCESS(Status)) {
+				FileRef.FileId64.Value = FileInternalInfo.IndexNumber.QuadPart;
+				FileRef.FileId64.UpperZeroes = 0LL;
+			}
+		}
+	}
+
+	return FileRef.FileId64.Value;
+}
+
 FLT_PREOP_CALLBACK_STATUS
 MiniFltPreCreate(
   _Inout_ PFLT_CALLBACK_DATA Data,

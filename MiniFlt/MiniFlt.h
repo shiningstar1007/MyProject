@@ -40,6 +40,19 @@ typedef struct _MYMINIFLT_DATA {
 	BOOL bInitialize;
 } MYMINIFLT_DATA, *PMYMINIFLT_DATA;
 
+typedef union _FILE_REFERENCE {
+	struct {
+		ULONGLONG Value;
+		ULONGLONG UpperZeroes;
+	} FileId64;
+
+	FILE_ID_128 FileId128;
+} FILE_REFERENCE, * PFILE_REFERENCE;
+
+ULONGLONG GetFileId(
+	_In_ PCFLT_RELATED_OBJECTS FltObjects
+);
+
 
 #endif __MINIFLT_H__
 
