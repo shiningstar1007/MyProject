@@ -518,3 +518,74 @@ LONG MiniFltExceptionFilter(
 
 	return EXCEPTION_EXECUTE_HANDLER;
 }
+
+ULONG MyWideCharToChar(
+	_In_opt_ PWCHAR pWBuf,
+	_Out_opt_ PCHAR pBuf,
+	_In_ ULONG MaxLen
+)
+{
+	ULONG SourceLen;
+	UNICODE_STRING UniStr;
+	ANSI_STRING AnStr;
+
+	if (!pWBuf || !pBuf) return 0;
+
+	*pBuf = 0;
+
+	RtlInitUnicodeString(&UniStr, pWBuf);
+	RtlUnicodeStringToAnsiString(&AnStr, &UniStr, TRUE);
+
+	SourceLen = MyStrNCopy(pBuf, AnStr.Buffer, MaxLen);
+	RtlFreeAnsiString(&AnStr);
+
+	return SourceLen;
+}
+
+ULONG MyCharToWideChar(
+	_In_opt_ PCHAR pBuf,
+	_Out_opt_ PWCHAR pWBuf,
+	_In_ ULONG MaxLen
+)
+{
+	ULONG SourceLen;
+	UNICODE_STRING UniStr;
+	ANSI_STRING AnStr;
+
+	if (!pBuf || !pWBuf) return 0;
+
+	*pWBuf = 0;
+
+	RtlInitAnsiString(&AnStr, pBuf);
+	RtlAnsiStringToUnicodeString(&UniStr, &AnStr, TRUE);
+
+	SourceLen = MyStrNCopyW(pWBuf, UniStr.Buffer, UniStr.Length / 2, MaxLen);
+	RtlFreeUnicodeString(&UniStr);
+
+	return SourceLen;
+}
+
+BOOL CheckRecycle(
+	_In_opt_ PWCHAR ObjPathW,
+	_In_opt_ PCHAR ObjPath
+)
+{
+	BOOL bRet = FALSE;
+	PWCHAR TmpPathW = NULL;
+
+	if (!ObjPathW) {
+		if (!ObjPath) return FALSE;
+
+		TmpPathW = MyAllocNonPagedPool(NonPagedPool, MAX_KPATH * 2, &g_NonPagedPoolCnt);
+		if (TmpPathW) MyCharToWideChar(ObjPath, TmpPathW, MAX_KPATH);
+		else return FALSE;
+
+		ObjPathW = TmpPathW;
+	}
+
+	if (!_wcsnicmp(ObjPathW, L"$RECYCLE", 8)) bRet = TRUE;
+
+	MyFreeNonPagedPool(TmpPathW, &g_NonPagedPoolCnt);
+
+	return bRet;
+}

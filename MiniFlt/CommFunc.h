@@ -200,5 +200,22 @@ LONG MiniFltExceptionFilter(
 	_In_ BOOL AccessingUserBuffer
 );
 
+ULONG MyWideCharToChar(
+	_In_opt_ PWCHAR pWBuf,
+	_Out_opt_ PCHAR pBuf,
+	_In_ ULONG MaxLen
+);
+
+ULONG MyCharToWideChar(
+	_In_opt_ PCHAR pBuf,
+	_Out_opt_ PWCHAR pWBuf,
+	_In_ ULONG MaxLen
+);
+
+BOOL CheckRecycle(
+	_In_opt_ PWCHAR ObjPathW,
+	_In_opt_ PCHAR ObjPath
+);
+
 
 #endif
