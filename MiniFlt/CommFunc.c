@@ -411,6 +411,27 @@ BOOL CheckLocalUser()
 	return bLocalUser;
 }
 
+BOOL CheckLocalUserOnlyCreate(
+	_In_ PFLT_CALLBACK_DATA Data
+)
+{
+	NTSTATUS Status = STATUS_SUCCESS;
+	PACCESS_TOKEN pToken = NULL;
+	PTOKEN_SOURCE pSource = NULL;
+	BOOL bLocalUser = TRUE;
+
+	pToken = SeQuerySubjectContextToken(&(Data->Iopb->Parameters.Create.SecurityContext->AccessState->SubjectSecurityContext));
+	if (pToken) {
+		Status = SeQueryInformationToken(pToken, TokenSource, &pSource);
+
+		if (NT_SUCCESS(Status)) {
+			bLocalUser = !_strnicmp(pSource->SourceName, "NTLMSSP", 7);
+		}
+
+		if (pSource != NULL) ExFreePool(pSource);
+	}
+}
+
 ULONG GetAction(
 	_In_ ACCESS_MASK AccessMask
 )

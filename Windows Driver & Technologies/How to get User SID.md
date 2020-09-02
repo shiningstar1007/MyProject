@@ -47,7 +47,12 @@ VOID GetUserSID(
 PFLT_CALLBACK_DATA 내 SubjectContext를 넘겨주면 됩니다.  
 이 후 AccessToken 을 획득 하면 이 후 SeQueryInformationToken API를 호출하는데  
 TOKEN_USER 구조체 변수를 포인터로 선언해서 파라미터로 함께 넘겨주면 됩니다.  
+그리고 2번째 인자값으로는 TokenUser 를 넘겨주면 됩니다.  
 그래서 성공하면 SeQueryInformationToken API 내에서 버퍼를 할당하여  
 정보를 넘겨주게 됨으로써 User SID를 획득 할 수 있습니다.  
 그리고 SeQueryInformationToken API를 호출한 쪽에서는   
 반드시 넘겨 받은 TokenInformation을 해제 해줘야 합니다.  
+
+그리고 여기서 한가지 더!  
+만약 그룹 SID를 구하고 싶을 경우에는  SeQueryInformationToken API 를 호출 할 때  
+2번째 인자값을 TokenGroup 로 넘겨주시면 획득을 하실 수 있습니다.  
