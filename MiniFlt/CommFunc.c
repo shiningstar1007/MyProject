@@ -256,6 +256,44 @@ NTSTATUS GetProcessImageName(
 	return Status;
 }
 
+DEFINE_GUID(GUID_ECP_SRV_OPEN,
+	0xbebfaebc,
+	0xaabf,
+	0x489d,
+	0x9d, 0x2c, 0xe9, 0xe3, 0x61, 0x10, 0x28, 0x53);
+
+NTSTATUS GetSharedRemoteIP(
+	_In_ PFLT_FILTER Filter,
+	_Inout_ PFLT_CALLBACK_DATA Data
+)
+{
+	NTSTATUS Status;
+	PECP_LIST pEcpList = NULL;
+	PSRV_OPEN_ECP_CONTEXT ECPContext = NULL;
+	GUID LpcGUID = GUID_ECP_SRV_OPEN;
+	ULONG ContextSize, IPAddr;
+	PSOCKADDR_IN SockAddr;
+
+	Status = FltGetEcpListFromCallbackData(Filter, Data, &pEcpList);
+	if (NT_SUCCESS(Status)) {
+		if (pEcpList) {
+			Status = FltFindExtraCreateParameter(Filter, pEcpList, &LpcGUID, &ECPContext, &ContextSize);
+			if (NT_SUCCESS(Status)) {
+				if (ECPContext) {
+					DbgPrint("[TEST] FltGetNextExtraCreateParameter Success");
+					SockAddr = (PSOCKADDR_IN)ECPContext->SocketAddress;
+					IPAddr = SockAddr->sin_addr.S_un.S_addr;
+					DbgPrint("[TEST] ECPContext IP[%u.%u.%u.%u],Port[%d]", (UCHAR)IPAddr, (IPAddr >> 8) & 0x00ff, (IPAddr >> 16) & 0x0000ff, (IPAddr >> 24) & 0x000000ff, SockAddr->sin_port);
+				}
+			}
+			else DbgPrint("[TEST] FltGetNextExtraCreateParameter failed [0x%X]", Status);
+		}
+	}
+	else DbgPrint("[TEST] FltGetEcpListFromCallbackData failed [0x%X]", Status);
+
+	return Status;
+}
+
 VOID GetUserName(
 	_In_ PFLT_CALLBACK_DATA Data
 )

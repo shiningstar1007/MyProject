@@ -2,6 +2,7 @@
 #define __COMMFUNC_H__
 
 #include <ntifs.h>
+#include <ws2def.h>
 
 #define TAG_MINIFLT 'SFNM'
 
