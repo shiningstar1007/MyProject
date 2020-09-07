@@ -431,6 +431,38 @@ ULONGLONG GetFileId(
 	return FileRef.FileId64.Value;
 }
 
+PCHAR MakeFilePath(
+	_In_ PVOLUME_CONTEXT pVolContext,
+	_In_ PFLT_FILE_NAME_INFORMATION NameInfo
+)
+{
+	ULONG Len = 0;
+	PWCHAR UACPath = NULL;
+	WCHAR ObjPathW[MAX_KPATH] = { 0 };
+	PCHAR ObjPath = MyAllocNonPagedPool(MAX_KPATH, &g_NonPagedPoolCnt);
+
+	if (!ObjPath) return NULL;
+
+	memset(ObjPath, 0, sizeof(ObjPath));
+
+	Len += MyStrNCopyW(ObjPathW + Len, pVolContext->VolumeName.Buffer,
+		pVolContext->VolumeName.Length / 2, MAX_KPATH - Len);
+
+	if (!NameInfo->ParentDir.Buffer || NameInfo->ParentDir.Length > 260) {
+		Len += MyStrNCopyW(ObjPathW + Len, L"\\", 1, MAX_KPATH - Len);
+	}
+	else {
+		Len += MyStrNCopyW(ObjPathW + Len, NameInfo->ParentDir.Buffer,
+			NameInfo->ParentDir.Length / 2, MAX_KPATH - Len);
+		Len += MyStrNCopyW(ObjPathW + Len, NameInfo->FinalComponent.Buffer,
+			NameInfo->FinalComponent.Length / 2, MAX_KPATH - Len);
+	}
+
+	MyWideCharToChar(ObjPathW, ObjPath, MAX_KPATH);
+
+	return ObjPath;
+}
+
 FLT_PREOP_CALLBACK_STATUS
 MiniFltPreCreate(
   _Inout_ PFLT_CALLBACK_DATA Data,
