@@ -463,6 +463,76 @@ PCHAR MakeFilePath(
 	return ObjPath;
 }
 
+PCHAR MakeFilePathByFileObj(
+	_In_ PVOLUME_CONTEXT	pVolContext,
+	_In_ PFILE_OBJECT FileObject,
+	_In_ PCHAR CallFuncName
+)
+{
+	WCHAR ObjPathW[MAX_KPATH], * pBuf, * pDrive;
+	PCHAR ObjPath;
+	ULONG Len = 0;
+
+	if (!FileObject || !FileObject->FileName.Buffer || FileObject->FileName.Length == 0) return NULL;
+
+	ObjPath = MyAllocNonPagedPool(MAX_KPATH, &g_NonPagedPoolCnt);
+	if (!ObjPath) return NULL;
+
+	MyStrNCopyW(ObjPathW, FileObject->FileName.Buffer, FileObject->FileName.Length / 2, MAX_KPATH);
+	if (pVolContext->DriveType == DRIVE_NETWORK) {
+		//2008: \;LanmanRedirector\;Z:0000000000028ab3\192.168.150.202\D$\desktop.ini
+		//2012: \;Z:0000000000027a36\192.168.150.202\Enc
+		pBuf = wcschr(ObjPathW, L':');
+		if (pBuf && (pBuf + 1)) {
+			pBuf = wcschr(pBuf, L'\\');
+			if (pBuf && (pBuf + 1)) {
+				Len = MySNPrintfW(ObjPathW, MAX_KPATH, L"\\"); // prefix '\'
+				MyStrNCopyW(ObjPathW + Len, pBuf, -1, MAX_KPATH - Len);
+			}
+		}
+		else {
+			Len = MySNPrintfW(ObjPathW, MAX_KPATH, L"\\"); // prefix '\'
+			MyStrNCopyW(ObjPathW + Len, ObjPathW, -1, MAX_KPATH - Len);
+		}
+	}
+	else {
+		if (!_wcsicmp(FileObject->FileName.Buffer, L"\\Device")) {
+			pBuf = wcschr(ObjPathW, L'\\');
+			if (pBuf && (pBuf + 1)) {
+				pBuf = wcschr(pBuf + 1, L'\\');
+				if (pBuf) {
+					pDrive = wcschr(pBuf, L':');
+					if (!pDrive) Len = MyStrNCopyW(ObjPathW, pVolContext->VolumeName.Buffer, pVolContext->VolumeName.Length / 2, MAX_KPATH);
+
+					MyStrNCopyW(ObjPathW + Len, pBuf, -1, MAX_KPATH - Len);
+				}
+			}
+		}
+		else {
+			if (pVolContext->VolumeName.Length / 2 >= (USHORT)strlen("X:") && pVolContext->VolumeName.Buffer[1] == L':') {
+				pDrive = wcschr(ObjPathW, L':');
+				if (!pDrive) {
+					Len = MyStrNCopyW(ObjPathW, pVolContext->VolumeName.Buffer, pVolContext->VolumeName.Length / 2, MAX_KPATH);
+					if (Len > 2) Len += MySNPrintfW(ObjPathW + Len, MAX_KPATH - Len, L"\\");
+				}
+
+				MyStrNCopyW(ObjPathW + Len, ObjPathW, -1, MAX_KPATH);
+			}
+		}
+	}
+
+	if (ObjPathW[0] != 0) {
+		MyWideCharToChar(ObjPathW, ObjPath, MAX_KPATH);
+	}
+	else
+	{
+		MyFreeNonPagedPool(ObjPath, &g_NonPagedPoolCnt);
+		ObjPath = NULL;
+	}
+
+	return ObjPath;
+}
+
 FLT_PREOP_CALLBACK_STATUS
 MiniFltPreCreate(
   _Inout_ PFLT_CALLBACK_DATA Data,
