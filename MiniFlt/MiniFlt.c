@@ -438,29 +438,29 @@ PCHAR MakeFilePath(
 {
 	ULONG Len = 0;
 	PWCHAR UACPath = NULL;
-	WCHAR ObjPathW[MAX_KPATH] = { 0 };
-	PCHAR ObjPath = MyAllocNonPagedPool(MAX_KPATH, &g_NonPagedPoolCnt);
+	WCHAR FilePathW[MAX_KPATH] = { 0 };
+	PCHAR FilePath = MyAllocNonPagedPool(MAX_KPATH, &g_NonPagedPoolCnt);
 
-	if (!ObjPath) return NULL;
+	if (!FilePath) return NULL;
 
-	memset(ObjPath, 0, sizeof(ObjPath));
+	memset(FilePath, 0, MAX_KPATH);
 
-	Len += MyStrNCopyW(ObjPathW + Len, pVolContext->VolumeName.Buffer,
+	Len += MyStrNCopyW(FilePathW + Len, pVolContext->VolumeName.Buffer,
 		pVolContext->VolumeName.Length / 2, MAX_KPATH - Len);
 
 	if (!NameInfo->ParentDir.Buffer || NameInfo->ParentDir.Length > 260) {
-		Len += MyStrNCopyW(ObjPathW + Len, L"\\", 1, MAX_KPATH - Len);
+		Len += MyStrNCopyW(FilePathW + Len, L"\\", 1, MAX_KPATH - Len);
 	}
 	else {
-		Len += MyStrNCopyW(ObjPathW + Len, NameInfo->ParentDir.Buffer,
+		Len += MyStrNCopyW(FilePathW + Len, NameInfo->ParentDir.Buffer,
 			NameInfo->ParentDir.Length / 2, MAX_KPATH - Len);
-		Len += MyStrNCopyW(ObjPathW + Len, NameInfo->FinalComponent.Buffer,
+		Len += MyStrNCopyW(FilePathW + Len, NameInfo->FinalComponent.Buffer,
 			NameInfo->FinalComponent.Length / 2, MAX_KPATH - Len);
 	}
 
-	MyWideCharToChar(ObjPathW, ObjPath, MAX_KPATH);
+	MyWideCharToChar(FilePathW, FilePath, MAX_KPATH);
 
-	return ObjPath;
+	return FilePath;
 }
 
 PCHAR MakeFilePathByFileObj(
@@ -469,68 +469,107 @@ PCHAR MakeFilePathByFileObj(
 	_In_ PCHAR CallFuncName
 )
 {
-	WCHAR ObjPathW[MAX_KPATH], * pBuf, * pDrive;
-	PCHAR ObjPath;
+	WCHAR FilePathW[MAX_KPATH], * pBuf, * pDrive;
+	PCHAR FilePath;
 	ULONG Len = 0;
 
 	if (!FileObject || !FileObject->FileName.Buffer || FileObject->FileName.Length == 0) return NULL;
 
-	ObjPath = MyAllocNonPagedPool(MAX_KPATH, &g_NonPagedPoolCnt);
-	if (!ObjPath) return NULL;
+	FilePath = MyAllocNonPagedPool(MAX_KPATH, &g_NonPagedPoolCnt);
+	if (!FilePath) return NULL;
 
-	MyStrNCopyW(ObjPathW, FileObject->FileName.Buffer, FileObject->FileName.Length / 2, MAX_KPATH);
+	MyStrNCopyW(FilePathW, FileObject->FileName.Buffer, FileObject->FileName.Length / 2, MAX_KPATH);
 	if (pVolContext->DriveType == DRIVE_NETWORK) {
 		//2008: \;LanmanRedirector\;Z:0000000000028ab3\192.168.150.202\D$\desktop.ini
 		//2012: \;Z:0000000000027a36\192.168.150.202\Enc
-		pBuf = wcschr(ObjPathW, L':');
+		pBuf = wcschr(FilePathW, L':');
 		if (pBuf && (pBuf + 1)) {
 			pBuf = wcschr(pBuf, L'\\');
 			if (pBuf && (pBuf + 1)) {
-				Len = MySNPrintfW(ObjPathW, MAX_KPATH, L"\\"); // prefix '\'
-				MyStrNCopyW(ObjPathW + Len, pBuf, -1, MAX_KPATH - Len);
+				Len = MySNPrintfW(FilePathW, MAX_KPATH, L"\\"); // prefix '\'
+				MyStrNCopyW(FilePathW + Len, pBuf, -1, MAX_KPATH - Len);
 			}
 		}
 		else {
-			Len = MySNPrintfW(ObjPathW, MAX_KPATH, L"\\"); // prefix '\'
-			MyStrNCopyW(ObjPathW + Len, ObjPathW, -1, MAX_KPATH - Len);
+			Len = MySNPrintfW(FilePathW, MAX_KPATH, L"\\"); // prefix '\'
+			MyStrNCopyW(FilePathW + Len, FilePathW, -1, MAX_KPATH - Len);
 		}
 	}
 	else {
 		if (!_wcsicmp(FileObject->FileName.Buffer, L"\\Device")) {
-			pBuf = wcschr(ObjPathW, L'\\');
+			pBuf = wcschr(FilePathW, L'\\');
 			if (pBuf && (pBuf + 1)) {
 				pBuf = wcschr(pBuf + 1, L'\\');
 				if (pBuf) {
 					pDrive = wcschr(pBuf, L':');
-					if (!pDrive) Len = MyStrNCopyW(ObjPathW, pVolContext->VolumeName.Buffer, pVolContext->VolumeName.Length / 2, MAX_KPATH);
+					if (!pDrive) Len = MyStrNCopyW(FilePathW, pVolContext->VolumeName.Buffer, pVolContext->VolumeName.Length / 2, MAX_KPATH);
 
-					MyStrNCopyW(ObjPathW + Len, pBuf, -1, MAX_KPATH - Len);
+					MyStrNCopyW(FilePathW + Len, pBuf, -1, MAX_KPATH - Len);
 				}
 			}
 		}
 		else {
 			if (pVolContext->VolumeName.Length / 2 >= (USHORT)strlen("X:") && pVolContext->VolumeName.Buffer[1] == L':') {
-				pDrive = wcschr(ObjPathW, L':');
+				pDrive = wcschr(FilePathW, L':');
 				if (!pDrive) {
-					Len = MyStrNCopyW(ObjPathW, pVolContext->VolumeName.Buffer, pVolContext->VolumeName.Length / 2, MAX_KPATH);
-					if (Len > 2) Len += MySNPrintfW(ObjPathW + Len, MAX_KPATH - Len, L"\\");
+					Len = MyStrNCopyW(FilePathW, pVolContext->VolumeName.Buffer, pVolContext->VolumeName.Length / 2, MAX_KPATH);
+					if (Len > 2) Len += MySNPrintfW(FilePathW + Len, MAX_KPATH - Len, L"\\");
 				}
 
-				MyStrNCopyW(ObjPathW + Len, ObjPathW, -1, MAX_KPATH);
+				MyStrNCopyW(FilePathW + Len, FilePathW, -1, MAX_KPATH);
 			}
 		}
 	}
 
-	if (ObjPathW[0] != 0) {
-		MyWideCharToChar(ObjPathW, ObjPath, MAX_KPATH);
+	if (FilePathW[0] != 0) {
+		MyWideCharToChar(FilePathW, FilePath, MAX_KPATH);
 	}
 	else
 	{
-		MyFreeNonPagedPool(ObjPath, &g_NonPagedPoolCnt);
-		ObjPath = NULL;
+		MyFreeNonPagedPool(FilePath, &g_NonPagedPoolCnt);
+		FilePath = NULL;
 	}
 
-	return ObjPath;
+	return FilePath;
+}
+
+PCHAR GetNewFilePath(
+	_In_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects
+)
+{
+	NTSTATUS Status;
+	PVOLUME_CONTEXT	pVolContext = NULL;
+	PFILE_RENAME_INFORMATION RenameInfo;
+	PFLT_FILE_NAME_INFORMATION NameInfo = NULL;
+	PCHAR NewFilePath = NULL;
+
+	if (KeGetCurrentIrql() > APC_LEVEL) return NULL;
+
+	Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &pVolContext);
+	if (!NT_SUCCESS(Status)) return NULL;
+
+	if (pVolContext->VolumeName.Length / 2 >= (USHORT)strlen("X:") && pVolContext->VolumeName.Buffer[1] == L':') {
+		RenameInfo = (PFILE_RENAME_INFORMATION)Data->Iopb->Parameters.SetFileInformation.InfoBuffer;
+		Status = FltGetDestinationFileNameInformation(Data->Iopb->TargetInstance, Data->Iopb->TargetFileObject,
+			RenameInfo->RootDirectory, RenameInfo->FileName, RenameInfo->FileNameLength,
+			FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_ALWAYS_ALLOW_CACHE_LOOKUP, &NameInfo);
+		if (NT_SUCCESS(Status)) {
+			Status = FltParseFileNameInformation(NameInfo);
+			if (NT_SUCCESS(Status)) NewFilePath = MakeFilePath(pVolContext, NameInfo, NULL);
+			else DbgPrint("NewFilePath FltParseFileNameInformation Fail (Status = 0x%X)", Status);
+		}
+		else DbgPrint("NewFilePath FltGetFileNameInformation Fail (Status = %p)", Status);
+
+		if (NameInfo) FltReleaseFileNameInformation(NameInfo);
+	}
+
+	if (pVolContext != NULL) {
+
+		FltReleaseContext(pVolContext);
+	}
+
+	return NewFilePath;
 }
 
 FLT_PREOP_CALLBACK_STATUS
