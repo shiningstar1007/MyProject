@@ -99,6 +99,49 @@ ULONG MySNPrintfW(
 	return (ULONG)wcslen(DestBuf);
 }
 
+PVOID QueryToken(
+	_In_opt_ PACCESS_TOKEN AccessToken,
+	_In_ TOKEN_INFORMATION_CLASS TokenClass,
+	_In_ ULONG MinSize
+)
+{
+	HANDLE hToken = 0;
+	NTSTATUS Status;
+	PVOID Buffer = NULL;
+	ULONG BufSize = 0;
+
+	if (!AccessToken) return NULL;
+
+	__try {
+		Status = ObOpenObjectByPointer(AccessToken, OBJ_KERNEL_HANDLE, NULL, TOKEN_QUERY, NULL, KernelMode,
+			&hToken);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		Status = STATUS_UNHANDLED_EXCEPTION;
+	}
+
+	ObDereferenceObject(AccessToken);
+	if (Status != STATUS_SUCCESS) return NULL;
+
+	Status = ZwQueryInformationToken(hToken, TokenClass, NULL, BufSize, &BufSize);
+	if (Status == STATUS_BUFFER_TOO_SMALL) {
+		if (BufSize < MinSize) BufSize = MinSize;
+
+		Buffer = MyAllocNonPagedPool(NonPagedPool, BufSize, &g_NonPagedPoolCnt);
+		if (Buffer) {
+			Status = ZwQueryInformationToken(hToken, TokenClass, Buffer, BufSize, &BufSize);
+			if (Status != STATUS_SUCCESS) {
+				MyFreeNonPagedPool(Buffer, &g_NonPagedPoolCnt);
+				Buffer = NULL;
+			}
+		}
+	}
+
+	ZwClose(hToken);
+
+	return Buffer;
+}
+
 WINDOWS_VERSION g_WinVersion;
 VOID GetVersion()
 {
