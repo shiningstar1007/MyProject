@@ -97,6 +97,13 @@ typedef long BOOL, * PBOOL;
 #define ACT_CREATE   0x00000010
 #define ACT_ALL      0xFFFFFFFF
 
+typedef struct _USERSID {
+	BYTE                    Revision;
+	BYTE                    SubAuthorityCount;
+	SID_IDENTIFIER_AUTHORITY IdentifierAuthority;
+	DWORD                    SubAuthority[5];
+} USERSID, * PUSERSID;
+
 typedef enum _MY_COMMAND {
 	SET_COMMAND,
 	GET_COMMAND
@@ -165,7 +172,7 @@ VOID GetGroupName(
 
 PVOID MyQueryInformationToken(
 	_In_opt_ PACCESS_TOKEN AccessToken,
-	_In_ TOKEN_INFORMATION_CLASS TokenInfoClass,
+	_In_ TOKEN_INFORMATION_CLASS TokenClass,
 	_In_ ULONG MinSize
 );
 
