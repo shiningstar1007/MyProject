@@ -176,6 +176,14 @@ PVOID MyQueryInformationToken(
 	_In_ ULONG MinSize
 );
 
+VOID GetUserSId(
+	_Out_opt_ PUSERSID UserSId
+);
+
+ULONG GetGroupSId(
+	_Out_ PUSERSID GroupSId
+);
+
 BOOL CheckLocalUser();
 
 ULONG GetAction(

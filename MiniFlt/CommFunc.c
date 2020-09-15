@@ -447,6 +447,37 @@ VOID GetUserSId(
 	}
 }
 
+ULONG GetGroupSId(
+	_Out_ PUSERSID GroupSId
+)
+{
+	PTOKEN_GROUPS pTokenGroup = NULL;
+	ULONG MinSize = sizeof(USERSID) + sizeof(TOKEN_USER);
+	PACCESS_TOKEN AccessToken = PsReferencePrimaryToken(PsGetCurrentProcess());
+	ULONG GroupCount = 0;
+
+	if (!AccessToken) return NULL;
+
+	pTokenGroup = (PTOKEN_GROUPS)MyQueryInformationToken(AccessToken, TokenGroups, MinSize);
+	if (pTokenGroup) {
+		if (GroupSId == NULL) {
+			GroupSId = MyAllocNonPagedPool(sizeof(USERSID) * pTokenGroup->GroupCount, &g_NonPagedPoolCnt);
+			if (GroupSId) {
+				GroupCount = pTokenGroup->GroupCount;
+				memset(GroupCount, 0, sizeof(USERSID) * GroupCount);
+				for (int i = 0; i < pTokenGroup->GroupCount; i++) {
+					memcpy(&GroupSId[i], pTokenGroup->Groups[i].Sid, sizeof(USERSID));
+				}
+			}
+		}
+
+		MyFreeNonPagedPool(pTokenGroup, &g_NonPagedPoolCnt);
+	}
+
+	return GroupCount;
+}
+
+
 BOOL CheckLocalUser()
 {
 	BOOLEAN CopyOnOpen, EffectiveOnly, bLocalUser = TRUE;
