@@ -168,6 +168,27 @@ VOID InitializeProcess()
 	}
 }
 
+VOID GetProcName(
+	_In_opt_ PEPROCESS pProcess,
+	_Out_opt_ PCHAR ProcName
+)
+{
+	if (!ProcName) return;
+
+	if (pProcess && g_ProcNameOffset > 0) {
+		__try {
+			MyStrNCopy(ProcName, (PCHAR)pProcess + g_ProcNameOffset, NT_PROCNAMELEN - 1);
+			ProcName[NT_PROCNAMELEN - 1] = 0;
+
+			return;
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+		}
+	}
+
+	MyStrNCopy(ProcName, SYSNAME, NT_PROCNAMELEN);
+}
+
 QUERY_INFO_PROCESS ZwQueryInformationProcess = NULL;
 NTSTATUS ZwGetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
