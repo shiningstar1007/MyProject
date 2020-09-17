@@ -154,6 +154,17 @@ ULONG MySNPrintfW(
 extern ULONG g_ProcNameOffset, g_PebOffset;
 VOID GetVersion();
 VOID InitializeProcess();
+
+VOID GetProcName(
+	_In_opt_ PEPROCESS pProcess,
+	_Out_opt_ PCHAR ProcName
+);
+
+ULONG GetProcessFullPath(
+	_In_opt_ PEPROCESS pProcess,
+	_Out_opt_ PWCHAR ProcPathW
+);
+
 NTSTATUS ZwGetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
 );

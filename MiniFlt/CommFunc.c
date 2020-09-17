@@ -189,6 +189,55 @@ VOID GetProcName(
 	MyStrNCopy(ProcName, SYSNAME, NT_PROCNAMELEN);
 }
 
+ULONG GetProcessFullPath(
+	_In_opt_ PEPROCESS pProcess,
+	_Out_opt_ PWCHAR ProcPathW
+)
+{
+	ULONG_PTR ProcAddress = (ULONG_PTR)pProcess;
+	ULONG Len = 0;
+	CHAR ProcName[NT_PROCNAMELEN];
+	PWCHAR TmpPathW = ProcPathW;
+	PUNICODE_STRING pUniStr;
+
+	GetProcName(pProcess, ProcName);
+	if (!_stricmp(ProcName, SYSNAME)) {
+		if (ProcPathW) Len = MySNPrintfW(ProcPathW, MAX_KPATH, L"%s", SYSNAMEW);
+
+		return Len;
+	}
+
+	if (!TmpPathW) TmpPathW = MyAllocNonPagedPool(NonPagedPool, MAX_KPATH * sizeof(WCHAR), &g_NonPagedPoolCnt);
+
+	if (TmpPathW) *TmpPathW = 0;
+	else return 0;
+
+	__try {
+		do {
+			if ((ProcAddress == 0) || (ProcAddress == -1)) break;
+			ProcAddress += g_PebOffset;
+			if ((ProcAddress = *(ULONG_PTR*)ProcAddress) == 0) break;
+			if ((ProcAddress == 0) || (ProcAddress == -1)) break;
+
+			ProcAddress += PARAMETERS_OFFSET;
+			if ((ProcAddress = *(ULONG_PTR*)ProcAddress) == 0) break;
+			if ((ProcAddress == 0) || (ProcAddress == -1)) break;
+
+			pUniStr = (PUNICODE_STRING)(ProcAddress + IMAGEPATH_OFFSET);
+			MyStrNCopyW(TmpPathW, pUniStr->Buffer, (pUniStr->Length / 2), MAX_KPATH);
+
+		} while (FALSE);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		Len = 0;
+	}
+
+	if (TmpPathW != ProcPathW) MyFreeNonPagedPool(TmpPathW, &g_NonPagedPoolCnt);
+
+	return Len;
+}
+
+
 QUERY_INFO_PROCESS ZwQueryInformationProcess = NULL;
 NTSTATUS ZwGetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
