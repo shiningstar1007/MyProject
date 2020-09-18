@@ -767,3 +767,34 @@ BOOL CheckRecycle(
 
 	return bRet;
 }
+
+NTSTATUS ReadRegDWORD(
+	_In_ PUNICODE_STRING KeyName,
+	_In_ PCWSTR ValName,
+	_Out_ PULONG RetVal
+)
+{
+	NTSTATUS Status;
+	OBJECT_ATTRIBUTES ObjAttr;
+	HANDLE RegKey;
+	UCHAR Buffer[sizeof(KEY_VALUE_PARTIAL_INFORMATION) + sizeof(LONG)];
+	ULONG RetLen;
+	UNICODE_STRING UniValName;
+
+	RtlInitUnicodeString(&UniValName, ValName);
+
+	InitializeObjectAttributes(&ObjAttr, KeyName, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
+	Status = ZwOpenKey(&RegKey, KEY_READ, &ObjAttr);
+	if (!NT_SUCCESS(Status)) {
+		DbgPrint("ReadRegDWORD : ZwOpenKey failed:0x%X", Status);
+
+		return Status;
+	}
+
+	Status = ZwQueryValueKey(RegKey, &UniValName, KeyValuePartialInformation, Buffer, sizeof(Buffer), &RetLen);
+	if (NT_SUCCESS(Status)) *RetVal = *((PULONG) & (((PKEY_VALUE_PARTIAL_INFORMATION)Buffer)->Data));
+
+	ZwClose(RegKey);
+
+	return Status;
+}
