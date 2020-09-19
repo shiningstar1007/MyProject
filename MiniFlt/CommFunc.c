@@ -798,3 +798,57 @@ NTSTATUS ReadRegDWORD(
 
 	return Status;
 }
+
+NTSTATUS ReadRegStringA(
+	_In_ PUNICODE_STRING KeyName,
+	_In_ PCWSTR ValName,
+	_Out_ PCHAR RetVal,
+	_In_ ULONG ValLen,
+	_Out_ PULONG ActualLen
+)
+{
+	NTSTATUS Status = STATUS_SUCCESS;
+	OBJECT_ATTRIBUTES ObjAttr;
+	HANDLE RegKey = NULL;
+	UNICODE_STRING UniValName, UniVal;
+	ANSI_STRING AnsiVal;
+	PKEY_VALUE_PARTIAL_INFORMATION PartialInfo = NULL;
+	ULONG RetLen;
+	ULONG Len = sizeof(KEY_VALUE_PARTIAL_INFORMATION) + ValLen * sizeof(WCHAR);
+
+	PartialInfo = (PKEY_VALUE_PARTIAL_INFORMATION)MyAllocNonPagedPool(Len, &g_NonPagedPoolCnt);
+	if (!PartialInfo) return STATUS_INSUFFICIENT_RESOURCES;
+
+	InitializeObjectAttributes(&ObjAttr, KeyName, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
+	Status = ZwOpenKey(&RegKey, KEY_READ, &ObjAttr);
+	if (!NT_SUCCESS(Status)) {
+		DbgPrint("ZwOpenKey failed : 0x%X", Status);
+		MyFreeNonPagedPool(PartialInfo, &g_NonPagedPoolCnt);
+
+		return Status;
+	}
+
+	RtlInitUnicodeString(&UniValName, ValName);
+	Status = ZwQueryValueKey(RegKey, &UniValName, KeyValuePartialInformation, PartialInfo, Len, &RetLen);
+	if (NT_SUCCESS(Status)) {
+		if ((ValLen * sizeof(WCHAR)) >= PartialInfo->DataLength) {
+			*(PWCHAR)(PartialInfo->Data + PartialInfo->DataLength) = UNICODE_NULL;
+			RtlInitUnicodeString(&UniVal, (PWCHAR)(PartialInfo->Data));
+			RtlUnicodeStringToAnsiString(&AnsiVal, &UniVal, TRUE);
+
+			RtlCopyMemory(RetVal, AnsiVal.Buffer, AnsiVal.Length);
+			RetVal[AnsiVal.Length] = ANSI_NULL;
+
+			if (ActualLen) *ActualLen = AnsiVal.Length;
+		}
+	}
+	else DbgPrint("ZwQueryValueKey failed : 0x%X", Status);
+
+	if (RegKey) ZwClose(RegKey);
+
+	if (AnsiVal.Buffer) RtlFreeAnsiString(&AnsiVal);
+
+	if (PartialInfo) PsKeFreePool(PartialInfo, &g_NonPagedPoolCnt);
+
+	return Status;
+}
