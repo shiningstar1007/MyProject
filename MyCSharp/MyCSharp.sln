@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCSharpService", "MyCSharp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCSharpHost", "MyCSharpHost\MyCSharpHost.csproj", "{F0E80A84-389D-4CF7-BD58-9F04B2C08976}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCSharpClient", "MyCSharpClient\MyCSharpClient.csproj", "{8B717458-FCCB-478D-A089-62825FC187CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyCSharpDLL", "MyCSharpDLL\MyCSharpDLL.csproj", "{28A7E04C-24A3-4227-A4AD-64E17F7FB5F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{F0E80A84-389D-4CF7-BD58-9F04B2C08976}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0E80A84-389D-4CF7-BD58-9F04B2C08976}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0E80A84-389D-4CF7-BD58-9F04B2C08976}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B717458-FCCB-478D-A089-62825FC187CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B717458-FCCB-478D-A089-62825FC187CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B717458-FCCB-478D-A089-62825FC187CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B717458-FCCB-478D-A089-62825FC187CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28A7E04C-24A3-4227-A4AD-64E17F7FB5F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28A7E04C-24A3-4227-A4AD-64E17F7FB5F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28A7E04C-24A3-4227-A4AD-64E17F7FB5F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28A7E04C-24A3-4227-A4AD-64E17F7FB5F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
