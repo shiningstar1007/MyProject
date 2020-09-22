@@ -7,9 +7,20 @@ using System.Timers;
 using System.IO;
 using System.Security.AccessControl;
 
-namespace MyCSharpService
+namespace MyCSharpService.Service
 {
-    class MyCSharpService
+
+    [ServiceContract()]
+    public interface IMyCSharpService
     {
+        [OperationContract()]
+        string testFunc();
+    }
+    class MyCSharpService : IMyCSharpService
+    {
+        public string testFunc()
+        {
+            return "testFunc";
+        }
     }
 }

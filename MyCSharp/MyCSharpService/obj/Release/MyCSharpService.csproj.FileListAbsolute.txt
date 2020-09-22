@@ -1,0 +1,6 @@
+E:\sourcecode\github\MyCSharp\MyCSharpService\bin\Release\MyCSharpService.dll
+E:\sourcecode\github\MyCSharp\MyCSharpService\bin\Release\MyCSharpService.pdb
+E:\sourcecode\github\MyCSharp\MyCSharpService\obj\Release\MyCSharpService.csproj.CoreCompileInputs.cache
+E:\sourcecode\github\MyCSharp\MyCSharpService\obj\Release\MyCSharpService.dll
+E:\sourcecode\github\MyCSharp\MyCSharpService\obj\Release\MyCSharpService.pdb
+E:\sourcecode\github\MyCSharp\MyCSharpService\obj\Release\MyCSharpService.csprojAssemblyReference.cache

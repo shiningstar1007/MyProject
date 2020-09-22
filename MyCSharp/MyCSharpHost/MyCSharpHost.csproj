@@ -47,5 +47,11 @@
   <ItemGroup>
     <Compile Include="MyCSharpHost.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MyCSharpService\MyCSharpService.csproj">
+      <Project>{2315e0b1-d043-4581-990b-c411f452a6be}</Project>
+      <Name>MyCSharpService</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
