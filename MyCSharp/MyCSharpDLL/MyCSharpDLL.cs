@@ -9,7 +9,7 @@ using System.Security.AccessControl;
 using System.Windows;
 using System.ServiceModel.Description;
 using System.ServiceModel;
-using MyCSharpService.Service;
+using MyCSharp.Service;
 
 namespace MyCSharpDLL
 {

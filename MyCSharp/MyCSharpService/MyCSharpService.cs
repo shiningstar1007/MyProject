@@ -7,7 +7,7 @@ using System.Timers;
 using System.IO;
 using System.Security.AccessControl;
 
-namespace MyCSharpService.Service
+namespace MyCSharp.Service
 {
 
     [ServiceContract()]
@@ -16,7 +16,8 @@ namespace MyCSharpService.Service
         [OperationContract()]
         string testFunc();
     }
-    class MyCSharpService : IMyCSharpService
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+    public class MyCSharpService : IMyCSharpService
     {
         public string testFunc()
         {

@@ -1,0 +1,12 @@
+E:\sourcecode\github\MyCSharp\MyCSharpHost\bin\Release\MyCSharpHost.exe.config
+E:\sourcecode\github\MyCSharp\MyCSharpHost\bin\Release\MyCSharpHost.exe
+E:\sourcecode\github\MyCSharp\MyCSharpHost\bin\Release\MyCSharpHost.pdb
+E:\sourcecode\github\MyCSharp\MyCSharpHost\bin\Release\MyCSharpService.dll
+E:\sourcecode\github\MyCSharp\MyCSharpHost\bin\Release\MyCSharpService.pdb
+E:\sourcecode\github\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.csprojAssemblyReference.cache
+E:\sourcecode\github\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.MyCSharpHost.resources
+E:\sourcecode\github\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.csproj.GenerateResource.cache
+E:\sourcecode\github\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.csproj.CoreCompileInputs.cache
+E:\sourcecode\github\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.csproj.CopyComplete
+E:\sourcecode\github\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.exe
+E:\sourcecode\github\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.pdb
