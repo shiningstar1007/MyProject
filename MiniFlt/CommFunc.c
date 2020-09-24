@@ -852,3 +852,52 @@ NTSTATUS ReadRegStringA(
 
 	return Status;
 }
+
+NTSTATUS GetRegSubKeyName(
+	_In_ PUNICODE_STRING RootKeyName,
+	_In_ ULONG Index,
+	_In_ PUNICODE_STRING KeyName
+)
+{
+	OBJECT_ATTRIBUTES ObjAttr;
+	HANDLE RegKey = NULL;
+	PKEY_BASIC_INFORMATION KeyInfo = NULL;
+	ULONG Len;
+	NTSTATUS Status;
+
+	InitializeObjectAttributes(&ObjAttr, RootKeyName, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
+	Status = ZwOpenKey(&RegKey, KEY_READ, &ObjAttr);
+	if (!NT_SUCCESS(Status)) return Status;
+
+	Len = sizeof(KEY_BASIC_INFORMATION) + (MAX_KPATH * sizeof(WCHAR));
+	KeyInfo = MyAllocNonPagedPool(Len, &g_NonPagedPoolCnt);
+	if (KeyInfo == NULL) {
+		ZwClose(RegKey);
+		return STATUS_INSUFFICIENT_RESOURCES;
+	}
+
+	Status = ZwEnumerateKey(RegKey, Index, KeyBasicInformation, KeyInfo, Len, &Len);
+	if (!NT_SUCCESS(Status))
+	{
+		if (Status != STATUS_NO_MORE_ENTRIES) DbgPrint("ZwEnumerateKey failed : 0x%X", Status);
+	}
+	else {
+		size_t cbToCopy = (size_t)KeyInfo->NameLength;
+
+		Status = RtlUnicodeStringCopy(KeyName, RootKeyName);
+		if (NT_SUCCESS(Status)) {
+			Status = RtlUnicodeStringCatString(KeyName, L"\\");
+			if (NT_SUCCESS(Status)) {
+				Status = RtlUnicodeStringCbCatStringN(KeyName, KeyInfo->Name, cbToCopy);
+			}
+			else DbgPrint("RtlUnicodeStringCatString failed : 0x%X", Status);
+		}
+		else DbgPrint("RtlUnicodeStringCopy failed : 0x%X", Status);
+	}
+
+	if (KeyInfo != NULL) MyFreeNonPagedPool(KeyInfo, &g_NonPagedPoolCnt);
+
+	if (RegKey != NULL) ZwClose(RegKey);
+
+	return Status;
+}
