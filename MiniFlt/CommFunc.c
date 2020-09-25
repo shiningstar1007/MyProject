@@ -901,3 +901,64 @@ NTSTATUS GetRegSubKeyName(
 
 	return Status;
 }
+
+NTSTATUS PsKeReadRegEnumString(
+	_In_ PUNICODE_STRING RootKeyName,
+	_In_ PCWSTR ValName
+)
+{
+	NTSTATUS Status;
+	UNICODE_STRING SubKeyName;
+	OBJECT_ATTRIBUTES ObjAttr;
+	ULONG Index = 0;
+	PKEY_VALUE_PARTIAL_INFORMATION ValInfo = NULL;
+	ULONG ValLen;
+	HANDLE Key;
+
+	SubKeyName.Buffer = (PWCHAR)MyAllocNonPagedPool(MAX_KPATH * sizeof(WCHAR), &g_NonPagedPoolCnt);
+	SubKeyName.MaximumLength = MAX_KPATH * sizeof(WCHAR);
+	if (SubKeyName.Buffer == NULL) return STATUS_INSUFFICIENT_RESOURCES;
+
+	ValLen = sizeof(KEY_VALUE_PARTIAL_INFORMATION) + (MAX_KPATH * sizeof(WCHAR));
+	ValInfo = MyAllocNonPagedPool(ValLen, &g_NonPagedPoolCnt);
+	if (ValInfo == NULL) {
+		DbgPrint("ValInfo allocation failed");
+		MyFreeNonPagedPool(SubKeyName.Buffer, &g_NonPagedPoolCnt);
+		return STATUS_INSUFFICIENT_RESOURCES;
+	}
+
+	for (;;) {
+		Key = NULL;
+
+		Status = GetRegSubKeyName(RootKeyName, Index, &SubKeyName);
+		if (!NT_SUCCESS(Status)) {
+			if (Status == STATUS_NO_MORE_ENTRIES) Status = STATUS_SUCCESS;
+
+			break;
+		}
+
+		InitializeObjectAttributes(&ObjAttr, &SubKeyName, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
+		Status = ZwOpenKey(&Key, KEY_READ, &ObjAttr);
+		if (NT_SUCCESS(Status)) {
+			UNICODE_STRING UniValName;
+			ULONG RetLen;
+
+			RtlInitUnicodeString(&UniValName, ValName);
+			Status = ZwQueryValueKey(Key, &UniValName, KeyValuePartialInformation, ValInfo, ValLen, &RetLen);
+			if (NT_SUCCESS(Status)) {
+				DbgPrint("Data[%S]", (PWCHAR)ValInfo->Data);
+			}
+
+			ZwClose(Key);
+		}
+		else DbgPrint("ZwOpenKey failed 0x:%X", Status);
+
+		Index++;
+	}
+
+	if (SubKeyName.Buffer != NULL) MyFreeNonPagedPool(SubKeyName.Buffer, &g_NonPagedPoolCnt);
+
+	if (ValInfo != NULL) MyFreeNonPagedPool(ValInfo, &g_NonPagedPoolCnt);
+
+	return Status;
+}
