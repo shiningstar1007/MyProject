@@ -431,6 +431,88 @@ ULONGLONG GetFileId(
 	return FileRef.FileId64.Value;
 }
 
+PCHAR GetObjectInfo(
+	_In_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_In_ PCHAR CallFuncName
+)
+{
+	NTSTATUS Status;
+	PVOLUME_CONTEXT	pVolContext = NULL;
+	PFLT_FILE_NAME_INFORMATION pFullNameInfo = NULL;
+	PCHAR FileName = NULL;
+
+	if (KeGetCurrentIrql() > APC_LEVEL) return NULL;
+
+	Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &pVolContext);
+	if (!NT_SUCCESS(Status)) {
+		DbgPrint("%s FltGetVolumeContext Fail (Status=0x%X)", CallFuncName, Status);
+
+		return NULL;
+	}
+
+	if (pVolContext->VolumeName.Length / 2 >= (USHORT)strlen("X:") && pVolContext->VolumeName.Buffer[1] == L':') {
+		if (pVolContext->DriveType != DRIVE_NETWORK)
+		{
+			Status = FltGetFileNameInformation(Data,
+				FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_ALWAYS_ALLOW_CACHE_LOOKUP, &pFullNameInfo);
+			if (NT_SUCCESS(Status))
+			{
+				Status = FltParseFileNameInformation(pFullNameInfo);
+				if (NT_SUCCESS(Status))
+				{
+					FileName = MakeFilePath(pVolContext, pFullNameInfo, NULL);
+				}
+				else {
+					DbgPrint("%s FltParseFileNameInformation Fail (DriveType=%d)(Status=0x%X)",
+						CallFuncName, pVolContext->DriveType, Status);
+				}
+			}
+		}
+	}
+	else if (pVolContext->DriveType == DRIVE_NETWORK && FltObjects->FileObject &&
+		FltObjects->FileObject->FileName.Length / 2 >= 4) {
+		WCHAR *pSep, FileNameW[MAX_KPATH] = { 0 }, DrvName[3] = { 0 };
+
+		MyStrNCopyW(FileNameW, FltObjects->FileObject->FileName.Buffer, FltObjects->FileObject->FileName.Length / 2, MAX_KPATH);
+		//2008: \;LanmanRedirector\;Z:0000000000028ab3\192.168.150.202\D$\desktop.ini
+		//2012: \;Z:0000000000027a36\192.168.150.202\Enc
+		pSep = wcschr(FileNameW, L':');
+		if (pSep && pSep - FileNameW > 2) {
+			MyStrNCopyW(DrvName, pSep - 1, -1, 3); //Copy Z:
+		}
+		Status = FltGetFileNameInformation(Data,
+			FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_ALWAYS_ALLOW_CACHE_LOOKUP, &pFullNameInfo);
+		if (NT_SUCCESS(Status)) {
+			Status = FltParseFileNameInformation(pFullNameInfo);
+			if (NT_SUCCESS(Status)) FileName = MakeFilePath(pVolContext, pFullNameInfo, NULL);
+			else {
+				DbgPrint("%s FltParseFileNameInformation Fail (DriveType=%d)(Status=0x%X)",
+					CallFuncName, pVolContext->DriveType, Status);
+			}
+		}
+	}
+
+	if (FileName == NULL) {
+		FileName = MakeFilePathByFileObj(pVolContext, FltObjects->FileObject, CallFuncName);
+		if (FileName == NULL) {
+			DbgPrint("%s MakeFilePathByFileObj failed (DriveType=%d)",CallFuncName, pVolContext->DriveType);
+		}
+	}
+
+	if (pFullNameInfo != NULL) {
+
+		FltReleaseFileNameInformation(pFullNameInfo);
+	}
+
+	if (pVolContext != NULL) {
+
+		FltReleaseContext(pVolContext);
+	}
+
+	return FileName;
+}
+
 PCHAR MakeFilePath(
 	_In_ PVOLUME_CONTEXT pVolContext,
 	_In_ PFLT_FILE_NAME_INFORMATION NameInfo
@@ -480,8 +562,7 @@ PCHAR MakeFilePathByFileObj(
 
 	MyStrNCopyW(FilePathW, FileObject->FileName.Buffer, FileObject->FileName.Length / 2, MAX_KPATH);
 	if (pVolContext->DriveType == DRIVE_NETWORK) {
-		//2008: \;LanmanRedirector\;Z:0000000000028ab3\192.168.150.202\D$\desktop.ini
-		//2012: \;Z:0000000000027a36\192.168.150.202\Enc
+		//2012: \;Z:0000000000027a36\192.168.150.202\TestDir
 		pBuf = wcschr(FilePathW, L':');
 		if (pBuf && (pBuf + 1)) {
 			pBuf = wcschr(pBuf, L'\\');
@@ -579,10 +660,18 @@ MiniFltPreCreate(
   _Flt_CompletionContext_Outptr_ PVOID* CompletionContext
 )
 {
-  UNREFERENCED_PARAMETER(Data);
-  UNREFERENCED_PARAMETER(FltObjects);
   UNREFERENCED_PARAMETER(CompletionContext);
   FLT_PREOP_CALLBACK_STATUS Status = FLT_PREOP_SYNCHRONIZE;
+	ULONG Action, Options = Data->Iopb->Parameters.Create.Options;
+	PCHAR FileName;
+	PVOLUME_CONTEXT pVolContext;
+
+	if (FlagOn(Data->Iopb->OperationFlags, SL_OPEN_PAGING_FILE) || FlagOn(FltObjects->FileObject->Flags, FO_VOLUME_OPEN))
+		return FLT_PREOP_SUCCESS_NO_CALLBACK;
+
+	Action = GetAction(Data->Iopb->Parameters.Create.SecurityContext->DesiredAccess);
+	if (!(Options & FILE_DELETE_ON_CLOSE) || Action != ACTION_DELETE) return Status;
+
 
   return Status;
 }
