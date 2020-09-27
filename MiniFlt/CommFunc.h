@@ -112,7 +112,7 @@ typedef enum _MY_COMMAND {
 typedef struct _COMMAND_DATA {
 	MY_COMMAND Command;
 	ULONG Reserved;  // Alignment on IA64
-	UCHAR Data[];
+	PUCHAR Data;
 } COMMAND_DATA, * PCOMMAND_DATA;
 
 extern LONG g_NonPagedPoolCnt;
@@ -169,11 +169,11 @@ NTSTATUS ZwGetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
 );
 
-NTSTATUS GetProcessImageName(
+PCHAR GetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
 );
 
-VOID GetUserName(
+PCHAR GetUserName(
 	_In_ PFLT_CALLBACK_DATA Data
 );
 

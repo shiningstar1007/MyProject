@@ -21,6 +21,12 @@
 #define PROCESS_TERMINATE 0x1
 #define ACTIVE_PROCESS_LINKS 0x2e8
 
+typedef struct _MINIFLT_INFO {
+	PCHAR UserName[MAX_NAME];
+	PCHAR FileName[MAX_KPATH];
+	PCHAR ProcName[MAX_KPATH];
+} MINIFLT_INFO, *PMINIFLT_INFO;
+
 typedef enum {
 	DRIVE_FIXED = 0,
 	DRIVE_NETWORK,
@@ -52,6 +58,29 @@ typedef union _FILE_REFERENCE {
 ULONGLONG GetFileId(
 	_In_ PCFLT_RELATED_OBJECTS FltObjects
 );
+
+NTSTATUS GetFileName(
+	_In_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Inout_ PMINIFLT_INFO MiniFltInfo,
+	_In_ PCHAR CallFuncName
+);
+
+PCHAR MakeFileName(
+	_In_ PVOLUME_CONTEXT pVolContext,
+	_In_ PFLT_FILE_NAME_INFORMATION NameInfo
+);
+
+PCHAR MakeFileNameByFileObj(
+	_In_ PVOLUME_CONTEXT	pVolContext,
+	_In_ PFILE_OBJECT FileObject
+);
+
+PCHAR GetNewFilePath(
+	_In_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects
+);
+
 
 
 #endif __MINIFLT_H__

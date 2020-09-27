@@ -207,7 +207,7 @@ ULONG GetProcessFullPath(
 		return Len;
 	}
 
-	if (!TmpPathW) TmpPathW = MyAllocNonPagedPool(NonPagedPool, MAX_KPATH * sizeof(WCHAR), &g_NonPagedPoolCnt);
+	if (!TmpPathW) TmpPathW = MyAllocNonPagedPool(MAX_KPATH * sizeof(WCHAR), &g_NonPagedPoolCnt);
 
 	if (TmpPathW) *TmpPathW = 0;
 	else return 0;
@@ -303,27 +303,31 @@ NTSTATUS ZwGetProcessImageName(
 	return Status;
 }
 
-NTSTATUS GetProcessImageName(
+PCHAR GetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
 )
 {
-	NTSTATUS Status = STATUS_SUCCESS;
+	NTSTATUS Status;
 	PEPROCESS pProcess = NULL;
-	PUNICODE_STRING ProcName = NULL;
+	PUNICODE_STRING pUniString = NULL;
+	PCHAR ProcName = NULL;
 
 	PAGED_CODE();
 
 	pProcess = FltGetRequestorProcess(Data);
 	if (pProcess) {
-		Status = SeLocateProcessImageName(pProcess, &ProcName); // Windows Vista and later only.
+		Status = SeLocateProcessImageName(pProcess, &pUniString); // Windows Vista and later only.
 		if (NT_SUCCESS(Status)) {
-			DbgPrint("[TEST]ProcName[%S]", ProcName->Buffer);
-			ExFreePool(ProcName);
+			ProcName = MyAllocNonPagedPool(pUniString->Length / 2, &g_NonPagedPoolCnt);
+			if (ProcName != NULL) {
+				MyWideCharToChar(pUniString->Buffer, ProcName, pUniString->Length / 2);
+			}
+			ExFreePool(pUniString);
 		}
-		else DbgPrint("[TEST] SeLocateProcessImageName failed [0x%X]", Status);
+		else DbgPrint("SeLocateProcessImageName failed [0x%X]", Status);
 	}
 
-	return Status;
+	return ProcName;
 }
 
 DEFINE_GUID(GUID_ECP_SRV_OPEN,
@@ -364,7 +368,7 @@ NTSTATUS GetSharedRemoteIP(
 	return Status;
 }
 
-VOID GetUserName(
+PCHAR GetUserName(
 	_In_ PFLT_CALLBACK_DATA Data
 )
 {
@@ -377,6 +381,7 @@ VOID GetUserName(
 	//UNICODE_STRING UniDomain;
 	//ULONG DomainSize = 0;
 	SID_NAME_USE NameUse;
+	PCHAR UserName = NULL;
 
 	pToken = SeQuerySubjectContextToken(&(Data->Iopb->Parameters.Create.SecurityContext->AccessState->SubjectSecurityContext));
 	if (pToken) {
@@ -396,7 +401,10 @@ VOID GetUserName(
 
 				Status = SecLookupAccountSid(SId, &NameSize, &UniName, NULL, NULL, &NameUse);
 				if (NT_SUCCESS(Status)) {
-					DbgPrint("[TEST] Name[%S]", UniName.Buffer);
+					UserName = MyAllocNonPagedPool(NameSize, &g_NonPagedPoolCnt);
+					if (UserName != NULL) {
+						MyWideCharToChar(UniName.Buffer, UserName, NameSize);
+					}
 				}
 				else DbgPrint("[TEST] SecLookupAccountSid failed [0x%X]", Status);
 
@@ -408,6 +416,8 @@ VOID GetUserName(
 
 		if (pUser) ExFreePool(pUser);
 	}
+
+	return UserName;
 }
 
 VOID GetGroupName(
@@ -526,7 +536,7 @@ ULONG GetGroupSId(
 	PACCESS_TOKEN AccessToken = PsReferencePrimaryToken(PsGetCurrentProcess());
 	ULONG GroupCount = 0;
 
-	if (!AccessToken) return NULL;
+	if (!AccessToken) return GroupCount;
 
 	pTokenGroup = (PTOKEN_GROUPS)MyQueryInformationToken(AccessToken, TokenGroups, MinSize);
 	if (pTokenGroup) {
@@ -534,8 +544,8 @@ ULONG GetGroupSId(
 			GroupSId = MyAllocNonPagedPool(sizeof(USERSID) * pTokenGroup->GroupCount, &g_NonPagedPoolCnt);
 			if (GroupSId) {
 				GroupCount = pTokenGroup->GroupCount;
-				memset(GroupCount, 0, sizeof(USERSID) * GroupCount);
-				for (int i = 0; i < pTokenGroup->GroupCount; i++) {
+				memset(GroupSId, 0, (size_t)(sizeof(USERSID) * GroupCount));
+				for (ULONG i = 0; i < pTokenGroup->GroupCount; i++) {
 					memcpy(&GroupSId[i], pTokenGroup->Groups[i].Sid, sizeof(USERSID));
 				}
 			}
@@ -669,7 +679,7 @@ NTSTATUS MiniFltMessage(
 			Command = ((PCOMMAND_DATA)InBuf)->Command;
 			Data = (PWCHAR)((PCOMMAND_DATA)InBuf)->Data;
 		}
-		__except (PsKeExceptionFilter(GetExceptionInformation(), TRUE)) {
+		__except (MiniFltExceptionFilter(GetExceptionInformation(), TRUE)) {
 			return GetExceptionCode();
 		}
 
@@ -754,7 +764,7 @@ BOOL CheckRecycle(
 	if (!ObjPathW) {
 		if (!ObjPath) return FALSE;
 
-		TmpPathW = MyAllocNonPagedPool(NonPagedPool, MAX_KPATH * 2, &g_NonPagedPoolCnt);
+		TmpPathW = MyAllocNonPagedPool(MAX_KPATH * 2, &g_NonPagedPoolCnt);
 		if (TmpPathW) MyCharToWideChar(ObjPath, TmpPathW, MAX_KPATH);
 		else return FALSE;
 
@@ -848,7 +858,7 @@ NTSTATUS ReadRegStringA(
 
 	if (AnsiVal.Buffer) RtlFreeAnsiString(&AnsiVal);
 
-	if (PartialInfo) PsKeFreePool(PartialInfo, &g_NonPagedPoolCnt);
+	if (PartialInfo) MyFreeNonPagedPool(PartialInfo, &g_NonPagedPoolCnt);
 
 	return Status;
 }

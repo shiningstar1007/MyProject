@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 
 PFLT_FILTER g_hFilter;
-MYMINIFLT_DATA g_MyMiniFlt;
+NPAGED_LOOKASIDE_LIST g_MiniFltLookaside;
 
 DRIVER_INITIALIZE DriverEntry;
 NTSTATUS
@@ -200,6 +200,7 @@ DriverEntry (
     UNREFERENCED_PARAMETER( RegistryPath );
 
 
+		ExInitializeNPagedLookasideList(&g_MiniFltLookaside, NULL, NULL, 0, sizeof(MINIFLT_INFO), TAG_MINIFLT, 0);
 
     status = FltRegisterFilter( DriverObject,
                                 &FilterRegistration,
@@ -229,6 +230,7 @@ MiniFltUnload (
 
   PAGED_CODE();
 
+	ExDeleteNPagedLookasideList(&g_MiniFltLookaside);
 
   FltUnregisterFilter(g_hFilter);
 
@@ -431,24 +433,25 @@ ULONGLONG GetFileId(
 	return FileRef.FileId64.Value;
 }
 
-PCHAR GetObjectInfo(
+NTSTATUS GetFileName(
 	_In_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Inout_ PMINIFLT_INFO MiniFltInfo,
 	_In_ PCHAR CallFuncName
 )
 {
-	NTSTATUS Status;
+	NTSTATUS Status = STATUS_SUCCESS;
 	PVOLUME_CONTEXT	pVolContext = NULL;
 	PFLT_FILE_NAME_INFORMATION pFullNameInfo = NULL;
 	PCHAR FileName = NULL;
 
-	if (KeGetCurrentIrql() > APC_LEVEL) return NULL;
+	if (KeGetCurrentIrql() > APC_LEVEL) return Status;
 
 	Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &pVolContext);
 	if (!NT_SUCCESS(Status)) {
 		DbgPrint("%s FltGetVolumeContext Fail (Status=0x%X)", CallFuncName, Status);
 
-		return NULL;
+		return Status;
 	}
 
 	if (pVolContext->VolumeName.Length / 2 >= (USHORT)strlen("X:") && pVolContext->VolumeName.Buffer[1] == L':') {
@@ -461,7 +464,7 @@ PCHAR GetObjectInfo(
 				Status = FltParseFileNameInformation(pFullNameInfo);
 				if (NT_SUCCESS(Status))
 				{
-					FileName = MakeFilePath(pVolContext, pFullNameInfo, NULL);
+					FileName = MakeFileName(pVolContext, pFullNameInfo);
 				}
 				else {
 					DbgPrint("%s FltParseFileNameInformation Fail (DriveType=%d)(Status=0x%X)",
@@ -485,7 +488,7 @@ PCHAR GetObjectInfo(
 			FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_ALWAYS_ALLOW_CACHE_LOOKUP, &pFullNameInfo);
 		if (NT_SUCCESS(Status)) {
 			Status = FltParseFileNameInformation(pFullNameInfo);
-			if (NT_SUCCESS(Status)) FileName = MakeFilePath(pVolContext, pFullNameInfo, NULL);
+			if (NT_SUCCESS(Status)) FileName = MakeFileName(pVolContext, pFullNameInfo);
 			else {
 				DbgPrint("%s FltParseFileNameInformation Fail (DriveType=%d)(Status=0x%X)",
 					CallFuncName, pVolContext->DriveType, Status);
@@ -494,124 +497,120 @@ PCHAR GetObjectInfo(
 	}
 
 	if (FileName == NULL) {
-		FileName = MakeFilePathByFileObj(pVolContext, FltObjects->FileObject, CallFuncName);
+		FileName = MakeFileNameByFileObj(pVolContext, FltObjects->FileObject);
 		if (FileName == NULL) {
 			DbgPrint("%s MakeFilePathByFileObj failed (DriveType=%d)",CallFuncName, pVolContext->DriveType);
 		}
 	}
 
-	if (pFullNameInfo != NULL) {
+	if (pFullNameInfo != NULL) FltReleaseFileNameInformation(pFullNameInfo);
 
-		FltReleaseFileNameInformation(pFullNameInfo);
+	if (pVolContext != NULL) FltReleaseContext(pVolContext);
+
+	if (FileName != NULL) {
+		MyStrNCopy(MiniFltInfo->FileName, FileName, MAX_KPATH);
+		MyFreeNonPagedPool(FileName, &g_NonPagedPoolCnt);
 	}
 
-	if (pVolContext != NULL) {
-
-		FltReleaseContext(pVolContext);
-	}
-
-	return FileName;
+	return Status;
 }
 
-PCHAR MakeFilePath(
+PCHAR MakeFileName(
 	_In_ PVOLUME_CONTEXT pVolContext,
 	_In_ PFLT_FILE_NAME_INFORMATION NameInfo
 )
 {
 	ULONG Len = 0;
-	PWCHAR UACPath = NULL;
-	WCHAR FilePathW[MAX_KPATH] = { 0 };
-	PCHAR FilePath = MyAllocNonPagedPool(MAX_KPATH, &g_NonPagedPoolCnt);
+	WCHAR FileNameW[MAX_KPATH] = { 0 };
+	PCHAR FileName = MyAllocNonPagedPool(MAX_KPATH, &g_NonPagedPoolCnt);
 
-	if (!FilePath) return NULL;
+	if (!FileName) return NULL;
 
-	memset(FilePath, 0, MAX_KPATH);
+	memset(FileName, 0, MAX_KPATH);
 
-	Len += MyStrNCopyW(FilePathW + Len, pVolContext->VolumeName.Buffer,
+	Len += MyStrNCopyW(FileNameW + Len, pVolContext->VolumeName.Buffer,
 		pVolContext->VolumeName.Length / 2, MAX_KPATH - Len);
 
 	if (!NameInfo->ParentDir.Buffer || NameInfo->ParentDir.Length > 260) {
-		Len += MyStrNCopyW(FilePathW + Len, L"\\", 1, MAX_KPATH - Len);
+		Len += MyStrNCopyW(FileNameW + Len, L"\\", 1, MAX_KPATH - Len);
 	}
 	else {
-		Len += MyStrNCopyW(FilePathW + Len, NameInfo->ParentDir.Buffer,
+		Len += MyStrNCopyW(FileNameW + Len, NameInfo->ParentDir.Buffer,
 			NameInfo->ParentDir.Length / 2, MAX_KPATH - Len);
-		Len += MyStrNCopyW(FilePathW + Len, NameInfo->FinalComponent.Buffer,
+		Len += MyStrNCopyW(FileNameW + Len, NameInfo->FinalComponent.Buffer,
 			NameInfo->FinalComponent.Length / 2, MAX_KPATH - Len);
 	}
 
-	MyWideCharToChar(FilePathW, FilePath, MAX_KPATH);
+	MyWideCharToChar(FileNameW, FileName, MAX_KPATH);
 
-	return FilePath;
+	return FileName;
 }
 
-PCHAR MakeFilePathByFileObj(
+PCHAR MakeFileNameByFileObj(
 	_In_ PVOLUME_CONTEXT	pVolContext,
-	_In_ PFILE_OBJECT FileObject,
-	_In_ PCHAR CallFuncName
+	_In_ PFILE_OBJECT FileObject
 )
 {
-	WCHAR FilePathW[MAX_KPATH], * pBuf, * pDrive;
-	PCHAR FilePath;
+	WCHAR FileNameW[MAX_KPATH], * pBuf, * pDrive;
+	PCHAR FileName;
 	ULONG Len = 0;
 
 	if (!FileObject || !FileObject->FileName.Buffer || FileObject->FileName.Length == 0) return NULL;
 
-	FilePath = MyAllocNonPagedPool(MAX_KPATH, &g_NonPagedPoolCnt);
-	if (!FilePath) return NULL;
+	FileName = MyAllocNonPagedPool(MAX_KPATH, &g_NonPagedPoolCnt);
+	if (!FileName) return NULL;
 
-	MyStrNCopyW(FilePathW, FileObject->FileName.Buffer, FileObject->FileName.Length / 2, MAX_KPATH);
+	MyStrNCopyW(FileNameW, FileObject->FileName.Buffer, FileObject->FileName.Length / 2, MAX_KPATH);
 	if (pVolContext->DriveType == DRIVE_NETWORK) {
 		//2012: \;Z:0000000000027a36\192.168.150.202\TestDir
-		pBuf = wcschr(FilePathW, L':');
+		pBuf = wcschr(FileNameW, L':');
 		if (pBuf && (pBuf + 1)) {
 			pBuf = wcschr(pBuf, L'\\');
 			if (pBuf && (pBuf + 1)) {
-				Len = MySNPrintfW(FilePathW, MAX_KPATH, L"\\"); // prefix '\'
-				MyStrNCopyW(FilePathW + Len, pBuf, -1, MAX_KPATH - Len);
+				Len = MySNPrintfW(FileNameW, MAX_KPATH, L"\\"); // prefix '\'
+				MyStrNCopyW(FileNameW + Len, pBuf, -1, MAX_KPATH - Len);
 			}
 		}
 		else {
-			Len = MySNPrintfW(FilePathW, MAX_KPATH, L"\\"); // prefix '\'
-			MyStrNCopyW(FilePathW + Len, FilePathW, -1, MAX_KPATH - Len);
+			Len = MySNPrintfW(FileNameW, MAX_KPATH, L"\\"); // prefix '\'
+			MyStrNCopyW(FileNameW + Len, FileNameW, -1, MAX_KPATH - Len);
 		}
 	}
 	else {
 		if (!_wcsicmp(FileObject->FileName.Buffer, L"\\Device")) {
-			pBuf = wcschr(FilePathW, L'\\');
+			pBuf = wcschr(FileNameW, L'\\');
 			if (pBuf && (pBuf + 1)) {
 				pBuf = wcschr(pBuf + 1, L'\\');
 				if (pBuf) {
 					pDrive = wcschr(pBuf, L':');
-					if (!pDrive) Len = MyStrNCopyW(FilePathW, pVolContext->VolumeName.Buffer, pVolContext->VolumeName.Length / 2, MAX_KPATH);
+					if (!pDrive) Len = MyStrNCopyW(FileNameW, pVolContext->VolumeName.Buffer, pVolContext->VolumeName.Length / 2, MAX_KPATH);
 
-					MyStrNCopyW(FilePathW + Len, pBuf, -1, MAX_KPATH - Len);
+					MyStrNCopyW(FileNameW + Len, pBuf, -1, MAX_KPATH - Len);
 				}
 			}
 		}
 		else {
 			if (pVolContext->VolumeName.Length / 2 >= (USHORT)strlen("X:") && pVolContext->VolumeName.Buffer[1] == L':') {
-				pDrive = wcschr(FilePathW, L':');
+				pDrive = wcschr(FileNameW, L':');
 				if (!pDrive) {
-					Len = MyStrNCopyW(FilePathW, pVolContext->VolumeName.Buffer, pVolContext->VolumeName.Length / 2, MAX_KPATH);
-					if (Len > 2) Len += MySNPrintfW(FilePathW + Len, MAX_KPATH - Len, L"\\");
+					Len = MyStrNCopyW(FileNameW, pVolContext->VolumeName.Buffer, pVolContext->VolumeName.Length / 2, MAX_KPATH);
+					if (Len > 2) Len += MySNPrintfW(FileNameW + Len, MAX_KPATH - Len, L"\\");
 				}
 
-				MyStrNCopyW(FilePathW + Len, FilePathW, -1, MAX_KPATH);
+				MyStrNCopyW(FileNameW + Len, FileNameW, -1, MAX_KPATH);
 			}
 		}
 	}
 
-	if (FilePathW[0] != 0) {
-		MyWideCharToChar(FilePathW, FilePath, MAX_KPATH);
+	if (FileNameW[0] != 0) {
+		MyWideCharToChar(FileNameW, FileName, MAX_KPATH);
 	}
-	else
-	{
-		MyFreeNonPagedPool(FilePath, &g_NonPagedPoolCnt);
-		FilePath = NULL;
+	else {
+		MyFreeNonPagedPool(FileName, &g_NonPagedPoolCnt);
+		FileName = NULL;
 	}
 
-	return FilePath;
+	return FileName;
 }
 
 PCHAR GetNewFilePath(
@@ -637,7 +636,7 @@ PCHAR GetNewFilePath(
 			FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_ALWAYS_ALLOW_CACHE_LOOKUP, &NameInfo);
 		if (NT_SUCCESS(Status)) {
 			Status = FltParseFileNameInformation(NameInfo);
-			if (NT_SUCCESS(Status)) NewFilePath = MakeFilePath(pVolContext, NameInfo, NULL);
+			if (NT_SUCCESS(Status)) NewFilePath = MakeFileName(pVolContext, NameInfo);
 			else DbgPrint("NewFilePath FltParseFileNameInformation Fail (Status = 0x%X)", Status);
 		}
 		else DbgPrint("NewFilePath FltGetFileNameInformation Fail (Status = %p)", Status);
@@ -661,10 +660,10 @@ MiniFltPreCreate(
 )
 {
   UNREFERENCED_PARAMETER(CompletionContext);
+	NTSTATUS NtStatus;
   FLT_PREOP_CALLBACK_STATUS Status = FLT_PREOP_SYNCHRONIZE;
 	ULONG Action, Options = Data->Iopb->Parameters.Create.Options;
-	PCHAR FileName;
-	PVOLUME_CONTEXT pVolContext;
+	PMINIFLT_INFO MiniFltInfo;
 
 	if (FlagOn(Data->Iopb->OperationFlags, SL_OPEN_PAGING_FILE) || FlagOn(FltObjects->FileObject->Flags, FO_VOLUME_OPEN))
 		return FLT_PREOP_SUCCESS_NO_CALLBACK;
@@ -672,6 +671,12 @@ MiniFltPreCreate(
 	Action = GetAction(Data->Iopb->Parameters.Create.SecurityContext->DesiredAccess);
 	if (!(Options & FILE_DELETE_ON_CLOSE) || Action != ACTION_DELETE) return Status;
 
+	MiniFltInfo = ExAllocateFromNPagedLookasideList(&g_MiniFltLookaside);
+	if (MiniFltInfo == NULL) return Status;
+
+	NtStatus = GetFileName(Data, FltObjects, MiniFltInfo, "MiniFltPreCreate");
+
+	ExFreeToNPagedLookasideList(&g_MiniFltLookaside, MiniFltInfo);
 
   return Status;
 }
