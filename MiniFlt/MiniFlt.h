@@ -59,10 +59,9 @@ ULONGLONG GetFileId(
 	_In_ PCFLT_RELATED_OBJECTS FltObjects
 );
 
-NTSTATUS GetFileName(
+PMINIFLT_INFO GetMiniFltInfo(
 	_In_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
-	_Inout_ PMINIFLT_INFO MiniFltInfo,
 	_In_ PCHAR CallFuncName
 );
 
@@ -76,7 +75,7 @@ PCHAR MakeFileNameByFileObj(
 	_In_ PFILE_OBJECT FileObject
 );
 
-PCHAR GetNewFilePath(
+PMINIFLT_INFO GetNewMiniFltInfo(
 	_In_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects
 );

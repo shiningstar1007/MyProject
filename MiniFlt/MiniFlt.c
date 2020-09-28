@@ -433,10 +433,9 @@ ULONGLONG GetFileId(
 	return FileRef.FileId64.Value;
 }
 
-NTSTATUS GetFileName(
+PMINIFLT_INFO GetMiniFltInfo(
 	_In_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
-	_Inout_ PMINIFLT_INFO MiniFltInfo,
 	_In_ PCHAR CallFuncName
 )
 {
@@ -444,6 +443,7 @@ NTSTATUS GetFileName(
 	PVOLUME_CONTEXT	pVolContext = NULL;
 	PFLT_FILE_NAME_INFORMATION pFullNameInfo = NULL;
 	PCHAR FileName = NULL;
+	PMINIFLT_INFO MiniFltInfo = NULL;
 
 	if (KeGetCurrentIrql() > APC_LEVEL) return Status;
 
@@ -508,11 +508,15 @@ NTSTATUS GetFileName(
 	if (pVolContext != NULL) FltReleaseContext(pVolContext);
 
 	if (FileName != NULL) {
-		MyStrNCopy(MiniFltInfo->FileName, FileName, MAX_KPATH);
+		MiniFltInfo = ExAllocateFromNPagedLookasideList(&g_MiniFltLookaside);
+		if (MiniFltInfo != NULL) {
+			MyStrNCopy(MiniFltInfo->FileName, FileName, MAX_KPATH);
+		}
+
 		MyFreeNonPagedPool(FileName, &g_NonPagedPoolCnt);
 	}
 
-	return Status;
+	return MiniFltInfo;
 }
 
 PCHAR MakeFileName(
@@ -613,7 +617,7 @@ PCHAR MakeFileNameByFileObj(
 	return FileName;
 }
 
-PCHAR GetNewFilePath(
+PMINIFLT_INFO GetNewMiniFltInfo(
 	_In_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects
 )
@@ -623,6 +627,7 @@ PCHAR GetNewFilePath(
 	PFILE_RENAME_INFORMATION RenameInfo;
 	PFLT_FILE_NAME_INFORMATION NameInfo = NULL;
 	PCHAR NewFilePath = NULL;
+	PMINIFLT_INFO MiniFltInfo = NULL;
 
 	if (KeGetCurrentIrql() > APC_LEVEL) return NULL;
 
@@ -637,19 +642,25 @@ PCHAR GetNewFilePath(
 		if (NT_SUCCESS(Status)) {
 			Status = FltParseFileNameInformation(NameInfo);
 			if (NT_SUCCESS(Status)) NewFilePath = MakeFileName(pVolContext, NameInfo);
-			else DbgPrint("NewFilePath FltParseFileNameInformation Fail (Status = 0x%X)", Status);
+			else DbgPrint("NewFilePath FltParseFileNameInformation Fail (Status=0x%X)", Status);
 		}
-		else DbgPrint("NewFilePath FltGetFileNameInformation Fail (Status = %p)", Status);
+		else DbgPrint("NewFilePath FltGetFileNameInformation Fail (Status=0x%X)", Status);
 
 		if (NameInfo) FltReleaseFileNameInformation(NameInfo);
 	}
 
-	if (pVolContext != NULL) {
+	if (pVolContext != NULL) FltReleaseContext(pVolContext);
 
-		FltReleaseContext(pVolContext);
+	if (NewFilePath != NULL) {
+		MiniFltInfo = ExAllocateFromNPagedLookasideList(&g_MiniFltLookaside);
+		if (MiniFltInfo != NULL) {
+			MyStrNCopy(MiniFltInfo->FileName, NewFilePath, MAX_KPATH);
+		}
+
+		MyFreeNonPagedPool(NewFilePath, &g_NonPagedPoolCnt);
 	}
 
-	return NewFilePath;
+	return MiniFltInfo;
 }
 
 FLT_PREOP_CALLBACK_STATUS
@@ -660,7 +671,6 @@ MiniFltPreCreate(
 )
 {
   UNREFERENCED_PARAMETER(CompletionContext);
-	NTSTATUS NtStatus;
   FLT_PREOP_CALLBACK_STATUS Status = FLT_PREOP_SYNCHRONIZE;
 	ULONG Action, Options = Data->Iopb->Parameters.Create.Options;
 	PMINIFLT_INFO MiniFltInfo;
@@ -671,12 +681,10 @@ MiniFltPreCreate(
 	Action = GetAction(Data->Iopb->Parameters.Create.SecurityContext->DesiredAccess);
 	if (!(Options & FILE_DELETE_ON_CLOSE) || Action != ACTION_DELETE) return Status;
 
-	MiniFltInfo = ExAllocateFromNPagedLookasideList(&g_MiniFltLookaside);
-	if (MiniFltInfo == NULL) return Status;
 
-	NtStatus = GetFileName(Data, FltObjects, MiniFltInfo, "MiniFltPreCreate");
+	MiniFltInfo = GetMiniFltInfo(Data, FltObjects, MiniFltInfo, "MiniFltPreCreate");
 
-	ExFreeToNPagedLookasideList(&g_MiniFltLookaside, MiniFltInfo);
+	if (MiniFltInfo != NULL) ExFreeToNPagedLookasideList(&g_MiniFltLookaside, MiniFltInfo);
 
   return Status;
 }
@@ -711,4 +719,39 @@ MiniFltPreCleanup(
   PAGED_CODE();
 
   return FLT_PREOP_SUCCESS_NO_CALLBACK;
+}
+
+FLT_PREOP_CALLBACK_STATUS MiniFltPreSetInformation(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+)
+{
+	FLT_PREOP_CALLBACK_STATUS RetStatus = FLT_PREOP_SUCCESS_NO_CALLBACK;
+	NTSTATUS Status = STATUS_SUCCESS;
+	PMINIFLT_INFO MiniFltInfo = NULL, NewMiniFltInfo = NULL;
+	PVOLUME_CONTEXT VolumeContext = NULL;
+
+	PAGED_CODE();
+
+	UNREFERENCED_PARAMETER(CompletionContext);
+
+	switch (Data->Iopb->Parameters.SetFileInformation.FileInformationClass) {
+	case FileRenameInformation:
+		Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolumeContext);
+		if (NT_SUCCESS(Status) && VolumeContext->DriveType == DRIVE_FIXED) {
+			MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "PsKePreSetInformation");
+			NewMiniFltInfo = GetNewMiniFltInfo(Data, FltObjects);
+		}
+
+		break;
+	}
+
+	if (MiniFltInfo != NULL) ExFreeToNPagedLookasideList(&g_MiniFltLookaside, MiniFltInfo);
+
+	if (NewMiniFltInfo != NULL) ExFreeToNPagedLookasideList(&g_MiniFltLookaside, NewMiniFltInfo);
+
+	if (VolumeContext != NULL) FltReleaseContext(VolumeContext);
+
+	return RetStatus;
 }
