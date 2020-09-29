@@ -368,8 +368,9 @@ NTSTATUS GetSharedRemoteIP(
 	return Status;
 }
 
-PCHAR GetUserName(
-	_In_ PFLT_CALLBACK_DATA Data
+NTSTATUS GetUserName(
+	_In_ PFLT_CALLBACK_DATA Data,
+	_Inout_ PMINIFLT_INFO MiniFltInfo
 )
 {
 	NTSTATUS Status = STATUS_SUCCESS;
@@ -381,7 +382,6 @@ PCHAR GetUserName(
 	//UNICODE_STRING UniDomain;
 	//ULONG DomainSize = 0;
 	SID_NAME_USE NameUse;
-	PCHAR UserName = NULL;
 
 	pToken = SeQuerySubjectContextToken(&(Data->Iopb->Parameters.Create.SecurityContext->AccessState->SubjectSecurityContext));
 	if (pToken) {
@@ -401,10 +401,7 @@ PCHAR GetUserName(
 
 				Status = SecLookupAccountSid(SId, &NameSize, &UniName, NULL, NULL, &NameUse);
 				if (NT_SUCCESS(Status)) {
-					UserName = MyAllocNonPagedPool(NameSize, &g_NonPagedPoolCnt);
-					if (UserName != NULL) {
-						MyWideCharToChar(UniName.Buffer, UserName, NameSize);
-					}
+					MyWideCharToChar(UniName.Buffer, MiniFltInfo->UserName, NameSize);
 				}
 				else DbgPrint("[TEST] SecLookupAccountSid failed [0x%X]", Status);
 
@@ -417,11 +414,12 @@ PCHAR GetUserName(
 		if (pUser) ExFreePool(pUser);
 	}
 
-	return UserName;
+	return Status;
 }
 
-VOID GetGroupName(
-	_In_ PFLT_CALLBACK_DATA Data
+NTSTATUS GetGroupName(
+	_In_ PFLT_CALLBACK_DATA Data,
+	_Inout_ PMINIFLT_INFO MiniFltInfo
 )
 {
 	NTSTATUS Status = STATUS_SUCCESS;
@@ -452,7 +450,7 @@ VOID GetGroupName(
 
 				Status = SecLookupAccountSid(SId, &NameSize, &UniName, NULL, NULL, &NameUse);
 				if (NT_SUCCESS(Status)) {
-					DbgPrint("[TEST] GroupName[%S]", UniName.Buffer);
+					MyWideCharToChar(UniName.Buffer, MiniFltInfo->GroupName, NameSize);
 				}
 				else DbgPrint("[TEST] SecLookupAccountSid failed [0x%X]", Status);
 
@@ -464,6 +462,8 @@ VOID GetGroupName(
 
 		if (pGroups) ExFreePool(pGroups);
 	}
+
+	return Status;
 }
 
 PVOID MyQueryInformationToken(

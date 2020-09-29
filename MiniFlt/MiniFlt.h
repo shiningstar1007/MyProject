@@ -23,6 +23,7 @@
 
 typedef struct _MINIFLT_INFO {
 	PCHAR UserName[MAX_NAME];
+	PCHAR GroupName[MAX_NAME];
 	PCHAR FileName[MAX_KPATH];
 	PCHAR ProcName[MAX_KPATH];
 } MINIFLT_INFO, *PMINIFLT_INFO;

@@ -682,7 +682,9 @@ MiniFltPreCreate(
 	if (!(Options & FILE_DELETE_ON_CLOSE) || Action != ACTION_DELETE) return Status;
 
 
-	MiniFltInfo = GetMiniFltInfo(Data, FltObjects, MiniFltInfo, "MiniFltPreCreate");
+	MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "MiniFltPreCreate");
+
+	GetUserName(Data, MiniFltInfo);
 
 	if (MiniFltInfo != NULL) ExFreeToNPagedLookasideList(&g_MiniFltLookaside, MiniFltInfo);
 
@@ -737,12 +739,17 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreSetInformation(
 	UNREFERENCED_PARAMETER(CompletionContext);
 
 	switch (Data->Iopb->Parameters.SetFileInformation.FileInformationClass) {
-	case FileRenameInformation:
+	case FileRenameInformation: // rename
 		Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolumeContext);
 		if (NT_SUCCESS(Status) && VolumeContext->DriveType == DRIVE_FIXED) {
 			MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "PsKePreSetInformation");
 			NewMiniFltInfo = GetNewMiniFltInfo(Data, FltObjects);
 		}
+
+		break;
+
+	case FileDispositionInformation: // delete
+		MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "PsKePreSetInformation");
 
 		break;
 	}

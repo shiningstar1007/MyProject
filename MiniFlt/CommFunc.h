@@ -173,12 +173,14 @@ PCHAR GetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
 );
 
-PCHAR GetUserName(
-	_In_ PFLT_CALLBACK_DATA Data
+NTSTATUS GetUserName(
+	_In_ PFLT_CALLBACK_DATA Data,
+	_Inout_ PMINIFLT_INFO MiniFltInfo
 );
 
-VOID GetGroupName(
-	_In_ PFLT_CALLBACK_DATA Data
+NTSTATUS GetGroupName(
+	_In_ PFLT_CALLBACK_DATA Data,
+	_Inout_ PMINIFLT_INFO MiniFltInfo
 );
 
 PVOID MyQueryInformationToken(
