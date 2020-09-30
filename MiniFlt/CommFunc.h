@@ -95,6 +95,7 @@ typedef long BOOL, * PBOOL;
 #define ACTION_TRAVERSE 0x00000004
 #define ACTION_DELETE   0x00000008
 #define ACTION_CREATE   0x00000010
+#define ACTION_EXECUTE  0x00000020
 #define ACTION_ALL      0xFFFFFFFF
 
 typedef struct _USERSID {

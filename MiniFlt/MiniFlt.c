@@ -663,13 +663,13 @@ PMINIFLT_INFO GetNewMiniFltInfo(
 	return MiniFltInfo;
 }
 
-FLT_PREOP_CALLBACK_STATUS
-MiniFltPreCreate(
+FLT_PREOP_CALLBACK_STATUS MiniFltPreCreate(
   _Inout_ PFLT_CALLBACK_DATA Data,
   _In_ PCFLT_RELATED_OBJECTS FltObjects,
   _Flt_CompletionContext_Outptr_ PVOID* CompletionContext
 )
 {
+	PAGED_CODE();
   UNREFERENCED_PARAMETER(CompletionContext);
   FLT_PREOP_CALLBACK_STATUS Status = FLT_PREOP_SYNCHRONIZE;
 	ULONG Action, Options = Data->Iopb->Parameters.Create.Options;
@@ -691,20 +691,42 @@ MiniFltPreCreate(
   return Status;
 }
 
-FLT_POSTOP_CALLBACK_STATUS
-MiniFltPostCreate(
+FLT_POSTOP_CALLBACK_STATUS MiniFltPostCreate(
   _Inout_ PFLT_CALLBACK_DATA Data,
   _In_ PCFLT_RELATED_OBJECTS FltObjects,
   _Inout_opt_ PVOID CbdContext,
   _In_ FLT_POST_OPERATION_FLAGS Flags
 )
 {
-  UNREFERENCED_PARAMETER(Data);
-  UNREFERENCED_PARAMETER(FltObjects);
+	PAGED_CODE();
   UNREFERENCED_PARAMETER(CbdContext);
-  UNREFERENCED_PARAMETER(Flags);
 
-  return FLT_POSTOP_FINISHED_PROCESSING;
+	FLT_PREOP_CALLBACK_STATUS Status = FLT_POSTOP_FINISHED_PROCESSING;
+	ULONG Action, Disp = (Data->Iopb->Parameters.Create.Options >> 24) & 0xFF;
+	PMINIFLT_INFO MiniFltInfo;
+
+	if (FlagOn(Flags, FLTFL_POST_OPERATION_DRAINING) || !NT_SUCCESS(Data->IoStatus.Status)) return Status;
+
+	MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "MiniFltPostCreate");
+	if (MiniFltInfo != NULL) {
+		Action = GetAction(Data->Iopb->Parameters.Create.SecurityContext->DesiredAccess);
+
+		if (Data->IoStatus.Information == FILE_CREATE) {
+			FILE_DISPOSITION_INFORMATION DeleteInfo;
+
+			DeleteInfo.DeleteFile = TRUE;
+			FltSetInformationFile(FltObjects->Instance, FltObjects->FileObject, &DeleteInfo,
+				sizeof(FILE_DISPOSITION_INFORMATION), FileDispositionInformation);
+		}
+
+		FltCancelFileOpen(FltObjects->Instance, FltObjects->FileObject);
+		Data->IoStatus.Status = STATUS_ACCESS_DENIED;
+		Data->IoStatus.Information = 0;
+	}
+
+	if (MiniFltInfo != NULL) ExFreeToNPagedLookasideList(&g_MiniFltLookaside, MiniFltInfo);
+
+	return FLT_POSTOP_FINISHED_PROCESSING;
 }
 
 FLT_PREOP_CALLBACK_STATUS
