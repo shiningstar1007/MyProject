@@ -51,6 +51,12 @@ MiniFltPreCleanup(
   _Flt_CompletionContext_Outptr_ PVOID* CompletionContext
 );
 
+FLT_PREOP_CALLBACK_STATUS MiniFltPreFileMapping(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+);
+
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text(INIT, DriverEntry)
@@ -159,6 +165,11 @@ FLT_OPERATION_REGISTRATION Callbacks[] = {
       FLTFL_OPERATION_REGISTRATION_SKIP_PAGING_IO,
       MiniFltPreCleanup,
       NULL },
+
+		{ IRP_MJ_ACQUIRE_FOR_SECTION_SYNCHRONIZATION, 
+			0, 
+			MiniFltPreFileMapping, 
+			NULL },
 
     { IRP_MJ_OPERATION_END }
 };
@@ -629,6 +640,8 @@ PMINIFLT_INFO GetNewMiniFltInfo(
 	PCHAR NewFilePath = NULL;
 	PMINIFLT_INFO MiniFltInfo = NULL;
 
+	PAGED_CODE();
+
 	if (KeGetCurrentIrql() > APC_LEVEL) return NULL;
 
 	Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &pVolContext);
@@ -669,11 +682,12 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreCreate(
   _Flt_CompletionContext_Outptr_ PVOID* CompletionContext
 )
 {
-	PAGED_CODE();
-  UNREFERENCED_PARAMETER(CompletionContext);
   FLT_PREOP_CALLBACK_STATUS Status = FLT_PREOP_SYNCHRONIZE;
 	ULONG Action, Options = Data->Iopb->Parameters.Create.Options;
 	PMINIFLT_INFO MiniFltInfo;
+	UNREFERENCED_PARAMETER(CompletionContext);
+
+	PAGED_CODE();
 
 	if (FlagOn(Data->Iopb->OperationFlags, SL_OPEN_PAGING_FILE) || FlagOn(FltObjects->FileObject->Flags, FO_VOLUME_OPEN))
 		return FLT_PREOP_SUCCESS_NO_CALLBACK;
@@ -698,8 +712,9 @@ FLT_POSTOP_CALLBACK_STATUS MiniFltPostCreate(
   _In_ FLT_POST_OPERATION_FLAGS Flags
 )
 {
-	PAGED_CODE();
   UNREFERENCED_PARAMETER(CbdContext);
+
+	PAGED_CODE();
 
 	FLT_PREOP_CALLBACK_STATUS Status = FLT_POSTOP_FINISHED_PROCESSING;
 	ULONG Action, Disp = (Data->Iopb->Parameters.Create.Options >> 24) & 0xFF;
@@ -755,10 +770,9 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreSetInformation(
 	NTSTATUS Status = STATUS_SUCCESS;
 	PMINIFLT_INFO MiniFltInfo = NULL, NewMiniFltInfo = NULL;
 	PVOLUME_CONTEXT VolumeContext = NULL;
+	UNREFERENCED_PARAMETER(CompletionContext);
 
 	PAGED_CODE();
-
-	UNREFERENCED_PARAMETER(CompletionContext);
 
 	switch (Data->Iopb->Parameters.SetFileInformation.FileInformationClass) {
 	case FileRenameInformation: // rename
@@ -783,4 +797,37 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreSetInformation(
 	if (VolumeContext != NULL) FltReleaseContext(VolumeContext);
 
 	return RetStatus;
+}
+
+FLT_PREOP_CALLBACK_STATUS MiniFltPreFileMapping(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+)
+{
+	NTSTATUS Status;
+	FS_FILTER_SECTION_SYNC_TYPE SyncType = Data->Iopb->Parameters.AcquireForSectionSynchronization.SyncType;
+	ULONG Option = (PAGE_READONLY | PAGE_READWRITE);
+	ULONG PageProtection = Data->Iopb->Parameters.AcquireForSectionSynchronization.PageProtection;
+	PVOLUME_CONTEXT VolumeContext = NULL;
+	UNREFERENCED_PARAMETER(CompletionContext);
+
+	PAGED_CODE();
+
+	if (SyncType == SyncTypeCreateSection) {
+		Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolumeContext);
+		if (NT_SUCCESS(Status)) {
+
+			if (VolumeContext->DriveType == DRIVE_NETWORK) {
+
+			}
+			else {
+
+			}
+		}
+
+		if (VolumeContext != NULL) FltReleaseContext(VolumeContext);
+	}
+
+	return FLT_PREOP_SUCCESS_NO_CALLBACK;
 }
