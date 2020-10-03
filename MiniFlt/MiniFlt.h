@@ -9,10 +9,6 @@
 #pragma warning(error:4061)     //  Eenable-missing enumeration in switch statement
 #pragma warning(error:4505)     //  Enable-identify dead functions
 
-#include <fltKernel.h>
-#include <dontuse.h>
-#include <suppress.h>
-
 #include "CommFunc.h"
 
 #define TAG_CONTEXT       'FMTC'

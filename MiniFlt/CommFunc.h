@@ -3,6 +3,11 @@
 
 #include <ntifs.h>
 #include <ws2def.h>
+#include <fltKernel.h>
+#include <dontuse.h>
+#include <suppress.h>
+
+#include "MiniFlt.h"
 
 #define TAG_MINIFLT 'SFNM'
 

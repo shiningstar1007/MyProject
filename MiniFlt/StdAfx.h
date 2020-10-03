@@ -12,5 +12,7 @@
 #include "MiniFlt.h"
 #include "CommFunc.h"
 #include "Context.h"
+#include "AccessControl.h"
+#include "ErrorCode.h"
 
 #endif
