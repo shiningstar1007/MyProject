@@ -78,8 +78,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
   <ItemGroup Label="WrappedTaskItems">
+    <ClInclude Include="AccessControl.h" />
     <ClInclude Include="CommFunc.h" />
     <ClInclude Include="Context.h" />
+    <ClInclude Include="ErrorCode.h" />
     <ClInclude Include="MiniFlt.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
@@ -170,6 +172,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AccessControl.c" />
     <ClCompile Include="CommFunc.c" />
     <ClCompile Include="Context.c" />
     <ClCompile Include="MiniFlt.c" />

@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 
+LONG g_ACLNonPagedPoolCnt = 0;
+
 MINICODE ACLEntriesAdd()
 {
 	MINICODE ErrCode;
@@ -32,7 +34,24 @@ MINICODE ACLEntriesList()
 	return ErrCode;
 }
 
-MINICODE ACLObjectAdd()
+PACL_OBJECT g_FirstObject = NULL, g_LastObject = NULL;
+MINICODE ACLObjectAdd(PACL_OBJECT Object)
+{
+	MINICODE ErrCode;
+	PACL_OBJECT ACLObject = MyAllocNonPagedPool(sizeof(ACL_OBJECT), &g_ACLNonPagedPoolCnt);
+
+	if (ACLObject == NULL) return ErrCode;
+	else memcpy(ACLObject, Object, sizeof(ACL_OBJECT));
+
+	if (g_FirstObject == NULL) g_FirstObject = ACLObject;
+	else g_LastObject->NextObjectLink = ACLObject;
+
+	g_LastObject = ACLObject;
+
+	return ErrCode;
+}
+
+MINICODE ACLObjectModify(PACL_OBJECT Object)
 {
 	MINICODE ErrCode;
 
@@ -40,18 +59,28 @@ MINICODE ACLObjectAdd()
 	return ErrCode;
 }
 
-MINICODE ACLObjectModify()
+MINICODE ACLObjectDelete(PACL_OBJECT Object)
 {
 	MINICODE ErrCode;
+	PACL_OBJECT ACLObject, PreACLObject;
 
-
-	return ErrCode;
-}
-
-MINICODE ACLObjectDelete()
-{
-	MINICODE ErrCode;
-
+	for (ACLObject = g_FirstObject; ACLObject; ACLObject = ACLObject->NextObjectLink) {
+		if (!_stricmp(ACLObject->ObjectName, Object->ObjectName)) {
+			if (g_FirstObject == ACLObject) {
+				g_FirstObject = ACLObject->NextObjectLink;
+				if (g_LastObject == ACLObject) {
+					g_LastObject = ACLObject->NextObjectLink;
+				}
+			}
+			else {
+				PreACLObject->NextObjectLink = ACLObject->NextObjectLink;
+				if (g_LastObject == ACLObject) {
+					g_LastObject = PreACLObject;
+				}
+			}
+		}
+		else PreACLObject = ACLObject;
+	}
 
 	return ErrCode;
 }
@@ -59,12 +88,17 @@ MINICODE ACLObjectDelete()
 MINICODE ACLObjectList()
 {
 	MINICODE ErrCode;
+	PACL_OBJECT ACLObject;
 
+	for (ACLObject = g_FirstObject; ACLObject; ACLObject = ACLObject->NextObjectLink) {
+		DbgPrint("ObjectName[%s]", ACLObject->ObjectName);
+	}
 
 	return ErrCode;
 }
 
-MINICODE ACLSubjectAdd()
+PACL_SUBJECT g_FirstSubject = NULL, g_LastSubject = NULL;
+MINICODE ACLSubjectAdd(PACL_SUBJECT Subject)
 {
 	MINICODE ErrCode;
 
@@ -72,7 +106,7 @@ MINICODE ACLSubjectAdd()
 	return ErrCode;
 }
 
-MINICODE ACLSubjectModify()
+MINICODE ACLSubjectModify(PACL_SUBJECT Subject)
 {
 	MINICODE ErrCode;
 
@@ -80,7 +114,7 @@ MINICODE ACLSubjectModify()
 	return ErrCode;
 }
 
-MINICODE ACLSubjectDelete()
+MINICODE ACLSubjectDelete(PACL_SUBJECT Subject)
 {
 	MINICODE ErrCode;
 
