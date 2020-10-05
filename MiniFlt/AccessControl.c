@@ -101,6 +101,15 @@ PACL_SUBJECT g_FirstSubject = NULL, g_LastSubject = NULL;
 MINICODE ACLSubjectAdd(PACL_SUBJECT Subject)
 {
 	MINICODE ErrCode;
+	PACL_SUBJECT ACLSubject = MyAllocNonPagedPool(sizeof(ACL_SUBJECT), &g_ACLNonPagedPoolCnt);
+
+	if (ACLSubject == NULL) return ErrCode;
+	else memcpy(ACLSubject, Subject, sizeof(ACL_SUBJECT));
+
+	if (g_FirstSubject == NULL) g_FirstSubject = ACLSubject;
+	else g_LastSubject->NextSubjectLink = ACLSubject;
+
+	g_LastSubject = ACLSubject;
 
 
 	return ErrCode;
@@ -117,6 +126,25 @@ MINICODE ACLSubjectModify(PACL_SUBJECT Subject)
 MINICODE ACLSubjectDelete(PACL_SUBJECT Subject)
 {
 	MINICODE ErrCode;
+	PACL_SUBJECT ACLSubject, PreACLSubject;
+
+	for (ACLSubject = g_FirstSubject; ACLSubject; ACLSubject = ACLSubject->NextSubjectLink) {
+		if (!_stricmp(ACLSubject->SubjectName, Subject->SubjectName)) {
+			if (g_FirstSubject == ACLSubject) {
+				g_FirstSubject = ACLSubject->NextSubjectLink;
+				if (g_LastSubject == ACLSubject) {
+					g_LastSubject = ACLSubject->NextSubjectLink;
+				}
+			}
+			else {
+				PreACLSubject->NextSubjectLink = ACLSubject->NextSubjectLink;
+				if (g_LastSubject == ACLSubject) {
+					g_LastSubject = PreACLSubject;
+				}
+			}
+		}
+		else PreACLSubject = ACLSubject;
+	}
 
 
 	return ErrCode;
@@ -125,6 +153,11 @@ MINICODE ACLSubjectDelete(PACL_SUBJECT Subject)
 MINICODE ACLSubjectList()
 {
 	MINICODE ErrCode;
+	PACL_SUBJECT ACLSubject;
+
+	for (ACLSubject = g_FirstSubject; ACLSubject; ACLSubject = ACLSubject->NextSubjectLink) {
+		DbgPrint("SubjectName[%s]", ACLSubject->SubjectName);
+	}
 
 
 	return ErrCode;
