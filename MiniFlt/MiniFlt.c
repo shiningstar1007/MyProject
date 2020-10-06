@@ -683,6 +683,7 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreCreate(
 )
 {
   FLT_PREOP_CALLBACK_STATUS Status = FLT_PREOP_SYNCHRONIZE;
+	NTSTATUS NtStatus;
 	ULONG Action, Options = Data->Iopb->Parameters.Create.Options;
 	PMINIFLT_INFO MiniFltInfo;
 	UNREFERENCED_PARAMETER(CompletionContext);
@@ -695,12 +696,13 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreCreate(
 	Action = GetAction(Data->Iopb->Parameters.Create.SecurityContext->DesiredAccess);
 	if (!(Options & FILE_DELETE_ON_CLOSE) || Action != ACTION_DELETE) return Status;
 
-
 	MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "MiniFltPreCreate");
+	if (MiniFltInfo != NULL) {
+		NtStatus = GetUserName(Data, MiniFltInfo);
+		NtStatus = GetProcessImageName(Data, MiniFltInfo);
 
-	GetUserName(Data, MiniFltInfo);
-
-	if (MiniFltInfo != NULL) ExFreeToNPagedLookasideList(&g_MiniFltLookaside, MiniFltInfo);
+		ExFreeToNPagedLookasideList(&g_MiniFltLookaside, MiniFltInfo);
+	}
 
   return Status;
 }
@@ -712,18 +714,20 @@ FLT_POSTOP_CALLBACK_STATUS MiniFltPostCreate(
   _In_ FLT_POST_OPERATION_FLAGS Flags
 )
 {
-  UNREFERENCED_PARAMETER(CbdContext);
-
 	PAGED_CODE();
-
 	FLT_PREOP_CALLBACK_STATUS Status = FLT_POSTOP_FINISHED_PROCESSING;
+	NTSTATUS NtStatus;
 	ULONG Action, Disp = (Data->Iopb->Parameters.Create.Options >> 24) & 0xFF;
-	PMINIFLT_INFO MiniFltInfo;
+	PMINIFLT_INFO MiniFltInfo = (PMINIFLT_INFO)CbdContext;
 
 	if (FlagOn(Flags, FLTFL_POST_OPERATION_DRAINING) || !NT_SUCCESS(Data->IoStatus.Status)) return Status;
 
-	MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "MiniFltPostCreate");
+	if (MiniFltInfo == NULL) MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "MiniFltPostCreate");
+
 	if (MiniFltInfo != NULL) {
+		NtStatus = GetUserName(Data, MiniFltInfo);
+		NtStatus = GetProcessImageName(Data, MiniFltInfo);
+
 		Action = GetAction(Data->Iopb->Parameters.Create.SecurityContext->DesiredAccess);
 
 		if (Data->IoStatus.Information == FILE_CREATE) {

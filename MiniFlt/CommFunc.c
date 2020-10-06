@@ -303,11 +303,12 @@ NTSTATUS ZwGetProcessImageName(
 	return Status;
 }
 
-PCHAR GetProcessImageName(
-	_In_ PFLT_CALLBACK_DATA Data
+NTSTATUS GetProcessImageName(
+	_In_ PFLT_CALLBACK_DATA Data,
+	_Inout_ PMINIFLT_INFO MiniFltInfo
 )
 {
-	NTSTATUS Status;
+	NTSTATUS Status = STATUS_UNSUCCESSFUL;
 	PEPROCESS pProcess = NULL;
 	PUNICODE_STRING pUniString = NULL;
 	PCHAR ProcName = NULL;
@@ -320,14 +321,14 @@ PCHAR GetProcessImageName(
 		if (NT_SUCCESS(Status)) {
 			ProcName = MyAllocNonPagedPool(pUniString->Length / 2, &g_NonPagedPoolCnt);
 			if (ProcName != NULL) {
-				MyWideCharToChar(pUniString->Buffer, ProcName, pUniString->Length / 2);
+				MyWideCharToChar(pUniString->Buffer, MiniFltInfo->ProcName, pUniString->Length / 2);
 			}
 			ExFreePool(pUniString);
 		}
 		else DbgPrint("SeLocateProcessImageName failed [0x%X]", Status);
 	}
 
-	return ProcName;
+	return Status;
 }
 
 DEFINE_GUID(GUID_ECP_SRV_OPEN,

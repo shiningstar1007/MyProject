@@ -175,8 +175,9 @@ NTSTATUS ZwGetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
 );
 
-PCHAR GetProcessImageName(
-	_In_ PFLT_CALLBACK_DATA Data
+NTSTATUS GetProcessImageName(
+	_In_ PFLT_CALLBACK_DATA Data,
+	_Inout_ PMINIFLT_INFO MiniFltInfo
 );
 
 NTSTATUS GetUserName(
