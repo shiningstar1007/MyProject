@@ -1,13 +1,27 @@
 #ifndef __MINIFLT_H__
 #define __MINIFLT_H__
 
-
 //  Enabled warnings
 
 #pragma warning(error:4100)     //  Enable-Unreferenced formal parameter
 #pragma warning(error:4101)     //  Enable-Unreferenced local variable
 #pragma warning(error:4061)     //  Eenable-missing enumeration in switch statement
 #pragma warning(error:4505)     //  Enable-identify dead functions
+
+#define MAX_KPATH 264 
+#define MAX_NAME 64
+#define MAX_USER_NAME 48
+#define MAX_DATA_BUF 4096
+#define BUF_UNIT 32768
+
+typedef unsigned int UINT;
+typedef char CHAR, * PCHAR;
+typedef unsigned char UCHAR, * PUCHAR;
+typedef unsigned short USHORT;
+typedef short SHORT, WORD;
+typedef unsigned long ULONG, * PULONG, DWORD;
+typedef unsigned char BYTE, * PBYTE;
+typedef long BOOL, * PBOOL;
 
 #include "CommFunc.h"
 
@@ -17,12 +31,13 @@
 #define PROCESS_TERMINATE 0x1
 #define ACTIVE_PROCESS_LINKS 0x2e8
 
-typedef struct _MINIFLT_INFO {
+typedef struct _MINIFLT_INFO MINIFLT_INFO, * PMINIFLT_INFO;
+struct _MINIFLT_INFO {
 	PCHAR UserName[MAX_NAME];
 	PCHAR GroupName[MAX_NAME];
 	PCHAR FileName[MAX_KPATH];
 	PCHAR ProcName[MAX_KPATH];
-} MINIFLT_INFO, *PMINIFLT_INFO;
+};
 
 typedef enum {
 	DRIVE_FIXED = 0,

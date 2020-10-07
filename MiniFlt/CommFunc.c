@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "Stdafx.h"
 
 LONG g_NonPagedPoolCnt = 0;
 PVOID MyAllocNonPagedPool(
@@ -598,6 +598,8 @@ BOOL CheckLocalUserOnlyCreate(
 
 		if (pSource != NULL) ExFreePool(pSource);
 	}
+
+	return bLocalUser;
 }
 
 ULONG GetAction(
@@ -636,6 +638,7 @@ NTSTATUS MiniFltConnect(
 {
 	PAGED_CODE();
 
+	UNREFERENCED_PARAMETER(ClientPort);
 	UNREFERENCED_PARAMETER(ServerPortCookie);
 	UNREFERENCED_PARAMETER(ConnectionContext);
 	UNREFERENCED_PARAMETER(SizeOfContext);
@@ -672,6 +675,8 @@ NTSTATUS MiniFltMessage(
 
 	UNREFERENCED_PARAMETER(ConnectionCookie);
 	UNREFERENCED_PARAMETER(OutBufSize);
+	UNREFERENCED_PARAMETER(OutBuf);
+
 
 	*RetLen = 0;
 

@@ -9,10 +9,10 @@
 #include <wdm.h>
 #include <ntstrsafe.h>
 
-#include "MiniFlt.h"
 #include "CommFunc.h"
-#include "Context.h"
 #include "AccessControl.h"
+#include "MiniFlt.h"
+#include "Context.h"
 #include "ErrorCode.h"
 
 #endif

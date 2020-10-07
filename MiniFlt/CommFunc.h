@@ -11,21 +11,6 @@
 
 #define TAG_MINIFLT 'SFNM'
 
-#define MAX_KPATH 264 
-#define MAX_NAME 64
-#define MAX_USER_NAME 48
-#define MAX_DATA_BUF 4096
-#define BUF_UNIT 32768
-
-typedef unsigned int UINT;
-typedef char CHAR, * PCHAR;
-typedef unsigned char UCHAR, * PUCHAR;
-typedef unsigned short USHORT;
-typedef short SHORT, WORD;
-typedef unsigned long ULONG, * PULONG, DWORD;
-typedef unsigned char BYTE, * PBYTE;
-typedef long BOOL, * PBOOL;
-
 typedef enum {
 	WV_UNKNOWN = 0,
 	WV_2008 = 6002,   // 6.0 Windows Vista, Server 2008

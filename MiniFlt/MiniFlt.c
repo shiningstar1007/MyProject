@@ -456,13 +456,13 @@ PMINIFLT_INFO GetMiniFltInfo(
 	PCHAR FileName = NULL;
 	PMINIFLT_INFO MiniFltInfo = NULL;
 
-	if (KeGetCurrentIrql() > APC_LEVEL) return Status;
+	if (KeGetCurrentIrql() > APC_LEVEL) return NULL;
 
 	Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &pVolContext);
 	if (!NT_SUCCESS(Status)) {
 		DbgPrint("%s FltGetVolumeContext Fail (Status=0x%X)", CallFuncName, Status);
 
-		return Status;
+		return NULL;
 	}
 
 	if (pVolContext->VolumeName.Length / 2 >= (USHORT)strlen("X:") && pVolContext->VolumeName.Buffer[1] == L':') {
