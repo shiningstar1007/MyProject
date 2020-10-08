@@ -51,7 +51,15 @@ MiniFltPreCleanup(
   _Flt_CompletionContext_Outptr_ PVOID* CompletionContext
 );
 
-FLT_PREOP_CALLBACK_STATUS MiniFltPreFileMapping(
+FLT_PREOP_CALLBACK_STATUS 
+MiniFltPreFileMapping(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+);
+
+FLT_PREOP_CALLBACK_STATUS 
+MiniFltPreFsControl(
 	_Inout_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
 	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
@@ -169,6 +177,11 @@ FLT_OPERATION_REGISTRATION Callbacks[] = {
 		{ IRP_MJ_ACQUIRE_FOR_SECTION_SYNCHRONIZATION, 
 			0, 
 			MiniFltPreFileMapping, 
+			NULL },
+
+		{ IRP_MJ_FILE_SYSTEM_CONTROL,
+			0, 
+			MiniFltPreFsControl,
 			NULL },
 
     { IRP_MJ_OPERATION_END }
@@ -784,12 +797,16 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreSetInformation(
 		if (NT_SUCCESS(Status) && VolumeContext->DriveType == DRIVE_FIXED) {
 			MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "PsKePreSetInformation");
 			NewMiniFltInfo = GetNewMiniFltInfo(Data, FltObjects);
+			Status = GetUserName(Data, MiniFltInfo);
+			Status = GetProcessImageName(Data, MiniFltInfo);
 		}
 
 		break;
 
 	case FileDispositionInformation: // delete
 		MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "PsKePreSetInformation");
+		Status = GetUserName(Data, MiniFltInfo);
+		Status = GetProcessImageName(Data, MiniFltInfo);
 
 		break;
 	}
@@ -834,4 +851,43 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreFileMapping(
 	}
 
 	return FLT_PREOP_SUCCESS_NO_CALLBACK;
+}
+
+FLT_PREOP_CALLBACK_STATUS MiniFltPreFsControl(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+)
+{
+	FLT_PREOP_CALLBACK_STATUS RetStatus = FLT_PREOP_SUCCESS_NO_CALLBACK;
+	PVOLUME_CONTEXT VolumeContext = NULL;
+	NTSTATUS Status;
+
+	UNREFERENCED_PARAMETER(CompletionContext);
+	PAGED_CODE();
+
+	__try {
+		Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolumeContext);
+		if (!NT_SUCCESS(Status)) {
+
+			__leave;
+		}
+
+		if ((VolumeContext->DriveType == DRIVE_NETWORK) &&
+			(Data->Iopb->Parameters.FileSystemControl.Common.FsControlCode == IOCTL_LMR_DISABLE_LOCAL_BUFFERING)) {
+
+			Data->IoStatus.Status = STATUS_NOT_SUPPORTED;
+			RetStatus = FLT_PREOP_COMPLETE;
+			DbgPrint("%s: IOCTL_LMR_DISABLE_LOCAL_BUFFERING", __FUNCTION__);
+		}
+	}
+	__finally {
+
+		if (VolumeContext != NULL) {
+
+			FltReleaseContext(VolumeContext);
+		}
+	}
+
+	return RetStatus;
 }

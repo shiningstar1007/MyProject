@@ -14,6 +14,8 @@
 #define MAX_DATA_BUF 4096
 #define BUF_UNIT 32768
 
+#define IOCTL_LMR_DISABLE_LOCAL_BUFFERING 0x140390
+
 typedef unsigned int UINT;
 typedef char CHAR, * PCHAR;
 typedef unsigned char UCHAR, * PUCHAR;
