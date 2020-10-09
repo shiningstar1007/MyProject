@@ -115,6 +115,19 @@ MINICODE ACLObjectList()
 	return ErrCode;
 }
 
+VOID ACLObjectClear()
+{
+	PACL_OBJECT ACLObject, NextObject;
+
+	for (ACLObject = g_FirstObject; ACLObject; ACLObject = NextObject) {
+		NextObject = ACLObject->NextObjectLink;
+
+		MyFreeNonPagedPool(ACLObject, &g_ACLNonPagedPoolCnt);
+	}
+
+	g_FirstObject = g_LastObject = NULL;
+}
+
 PACL_SUBJECT g_FirstSubject = NULL, g_LastSubject = NULL;
 PACL_SUBJECT SearchSubject(PACL_SUBJECT Subject)
 {
@@ -198,4 +211,17 @@ MINICODE ACLSubjectList()
 
 
 	return ErrCode;
+}
+
+VOID ACLSubjectClear()
+{
+	PACL_SUBJECT ACLSubject, NextSubject;
+
+	for (ACLSubject = g_FirstSubject; ACLSubject; ACLSubject = NextSubject) {
+		NextSubject = ACLSubject->NextSubjectLink;
+
+		MyFreeNonPagedPool(ACLSubject, &g_ACLNonPagedPoolCnt);
+	}
+
+	g_FirstSubject = g_LastSubject = NULL;
 }
