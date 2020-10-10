@@ -55,4 +55,57 @@ namespace MyCSharp.Service
             return "testFunc";
         }
     }
+
+    public class ACL_Subject
+    {
+        public string subjectName;
+        public UInt64 permissions;
+    }
+
+    public class ACL_Object
+    {
+        public string objectName;
+        public UInt64 permissions;
+    }
+
+    public class ACLSubject
+    {
+        private IList<ACL_Subject> _aclSubject = new List<ACL_Subject>();
+        public IList<ACL_Subject> aclSubject = new List<ACL_Subject>();
+
+        public void ACLSubjectAdd(string subjectName, UInt64 permissions)
+        {
+            ACL_Subject aclSub = new ACL_Subject();
+
+            aclSub.subjectName = subjectName;
+            aclSub.permissions = permissions;
+
+            aclSubject.Add(aclSub);
+        }
+
+        public void ACLSubjectRemove(string subjectName)
+        {
+            Int32 index = -1;
+
+            foreach (var aclSub in aclSubject)
+            {
+                if (aclSub.subjectName == subjectName)
+                {
+                    index = aclSubject.IndexOf(aclSub);
+                    break;
+                }
+            }
+
+            if (index != -1) aclSubject.RemoveAt(index);
+        }
+
+        public void ACLSubjectList()
+        {
+            foreach (var aclSub in aclSubject)
+            {
+                Console.WriteLine("SubjectName={0}, permissions={1}", aclSub.subjectName, aclSub.permissions);
+            }
+        }
+    }
+
 }
