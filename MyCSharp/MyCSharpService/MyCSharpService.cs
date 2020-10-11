@@ -108,4 +108,44 @@ namespace MyCSharp.Service
         }
     }
 
+    public class ACLObject
+    {
+        private IList<ACL_Object> _aclObject = new List<ACL_Object>();
+        public IList<ACL_Object> aclObject = new List<ACL_Object>();
+
+        public void ACLObjectAdd(string objectName, UInt64 permissions)
+        {
+            ACL_Object aclObj = new ACL_Object();
+
+            aclObj.objectName = objectName;
+            aclObj.permissions = permissions;
+
+            aclObject.Add(aclObj);
+        }
+
+        public void ACLObjectRemove(string objectName)
+        {
+            Int32 index = -1;
+
+            foreach (var aclObj in aclObject)
+            {
+                if (aclObj.objectName == objectName)
+                {
+                    index = aclObject.IndexOf(aclObj);
+                    break;
+                }
+            }
+
+            if (index != -1) aclObject.RemoveAt(index);
+        }
+
+        public void ACLObjectList()
+        {
+            foreach (var aclObj in aclObject)
+            {
+                Console.WriteLine("ObjectName={0}, permissions={1}", aclObj.objectName, aclObj.permissions);
+            }
+        }
+    }
+
 }
