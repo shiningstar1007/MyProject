@@ -41,21 +41,6 @@ namespace MyCSharp.Service
         );
     }
 
-    [ServiceContract()]
-    public interface IMyCSharpService
-    {
-        [OperationContract()]
-        string testFunc();
-    }
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    public class MyCSharpService : IMyCSharpService
-    {
-        public string testFunc()
-        {
-            return "testFunc";
-        }
-    }
-
     public class ACL_Subject
     {
         public string subjectName;
@@ -70,12 +55,30 @@ namespace MyCSharp.Service
 
     public class ACLSubject
     {
-        private IList<ACL_Subject> _aclSubject = new List<ACL_Subject>();
         public IList<ACL_Subject> aclSubject = new List<ACL_Subject>();
 
+        private ACL_Subject SearchSubject(string subjectName)
+        {
+            ACL_Subject aclSub = null;
+
+            foreach(var sub in aclSubject)
+            {
+                if (sub.subjectName == subjectName)
+                {
+                    aclSub = sub;
+                    break;
+                }
+            }
+
+            return aclSub;
+        }
         public void ACLSubjectAdd(string subjectName, UInt64 permissions)
         {
-            ACL_Subject aclSub = new ACL_Subject();
+            ACL_Subject aclSub;
+
+            aclSub = SearchSubject(subjectName);
+            if (aclSub != null) return;
+            else aclSub = new ACL_Subject();
 
             aclSub.subjectName = subjectName;
             aclSub.permissions = permissions;
@@ -110,12 +113,31 @@ namespace MyCSharp.Service
 
     public class ACLObject
     {
-        private IList<ACL_Object> _aclObject = new List<ACL_Object>();
         public IList<ACL_Object> aclObject = new List<ACL_Object>();
+
+        private ACL_Object SearchObject(string objectName)
+        {
+            ACL_Object aclObj = null;
+
+            foreach(var obj in aclObject)
+            {
+                if (obj.objectName == objectName)
+                {
+                    aclObj = obj;
+                    break;
+                }
+            }
+
+            return aclObj;
+        }
 
         public void ACLObjectAdd(string objectName, UInt64 permissions)
         {
-            ACL_Object aclObj = new ACL_Object();
+            ACL_Object aclObj;
+
+            aclObj = SearchObject(objectName);
+            if (aclObj != null) return;
+            else aclObj = new ACL_Object();
 
             aclObj.objectName = objectName;
             aclObj.permissions = permissions;
@@ -148,4 +170,18 @@ namespace MyCSharp.Service
         }
     }
 
+    [ServiceContract()]
+    public interface IMyCSharpService
+    {
+        [OperationContract()]
+        string testFunc();
+    }
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+    public class MyCSharpService : IMyCSharpService
+    {
+        public string testFunc()
+        {
+            return "testFunc";
+        }
+    }
 }
