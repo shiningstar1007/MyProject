@@ -51,13 +51,15 @@ namespace MyCSharp.Service
     {
         public string objectName;
         public UInt64 permissions;
+
+        public IList<ACL_Subject> aclSubject = new List<ACL_Subject>();
     }
 
     public class ACLSubject
     {
         public IList<ACL_Subject> aclSubject = new List<ACL_Subject>();
 
-        private ACL_Subject SearchSubject(string subjectName)
+        public ACL_Subject SearchSubject(string subjectName)
         {
             ACL_Subject aclSub = null;
 
@@ -111,11 +113,11 @@ namespace MyCSharp.Service
         }
     }
 
-    public class ACLObject
+    public class ACLObject : ACLSubject
     {
         public IList<ACL_Object> aclObject = new List<ACL_Object>();
 
-        private ACL_Object SearchObject(string objectName)
+        public ACL_Object SearchObject(string objectName)
         {
             ACL_Object aclObj = null;
 
@@ -167,6 +169,37 @@ namespace MyCSharp.Service
             {
                 Console.WriteLine("ObjectName={0}, permissions={1}", aclObj.objectName, aclObj.permissions);
             }
+        }
+    }
+
+    public class ACLEntries : ACLObject
+    {
+        public void ACLEntriesAdd(string objectName, string subjectName)
+        {
+            ACL_Object aclObject = null;
+            ACL_Subject aclSubject = null;
+
+            aclObject = SearchObject(objectName);
+            if (aclObject == null) return;
+
+            aclSubject = SearchSubject(subjectName);
+            if (aclSubject == null) return;
+
+            aclObject.aclSubject.Add(aclSubject);
+        }
+
+        public void ACLEntriesRemove(string objectName, string subjectName)
+        {
+            ACL_Object aclObject = null;
+            ACL_Subject aclSubject = null;
+
+            aclObject = SearchObject(objectName);
+            if (aclObject == null) return;
+
+            aclSubject = SearchSubject(subjectName);
+            if (aclSubject == null) return;
+
+            aclObject.aclSubject.Remove(aclSubject);
         }
     }
 
