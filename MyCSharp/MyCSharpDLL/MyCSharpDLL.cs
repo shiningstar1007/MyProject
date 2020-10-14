@@ -11,7 +11,7 @@ using System.ServiceModel.Description;
 using System.ServiceModel;
 using MyCSharp.Service;
 
-namespace MyCSharpDLL
+namespace MyCSharp.MyCSharpDLL
 {
     public class MyCSharpDLL
     {

@@ -1,0 +1,12 @@
+E:\sourcecode\github\MyCSharp\MyCSharpClient\bin\Release\MyCSharpClient.exe.config
+E:\sourcecode\github\MyCSharp\MyCSharpClient\bin\Release\MyCSharpClient.exe
+E:\sourcecode\github\MyCSharp\MyCSharpClient\bin\Release\MyCSharpClient.pdb
+E:\sourcecode\github\MyCSharp\MyCSharpClient\bin\Release\MyCSharpDLL.dll
+E:\sourcecode\github\MyCSharp\MyCSharpClient\bin\Release\MyCSharpService.dll
+E:\sourcecode\github\MyCSharp\MyCSharpClient\bin\Release\MyCSharpDLL.pdb
+E:\sourcecode\github\MyCSharp\MyCSharpClient\bin\Release\MyCSharpService.pdb
+E:\sourcecode\github\MyCSharp\MyCSharpClient\obj\Release\MyCSharpClient.csprojAssemblyReference.cache
+E:\sourcecode\github\MyCSharp\MyCSharpClient\obj\Release\MyCSharpClient.csproj.CoreCompileInputs.cache
+E:\sourcecode\github\MyCSharp\MyCSharpClient\obj\Release\MyCSharpClient.csproj.CopyComplete
+E:\sourcecode\github\MyCSharp\MyCSharpClient\obj\Release\MyCSharpClient.exe
+E:\sourcecode\github\MyCSharp\MyCSharpClient\obj\Release\MyCSharpClient.pdb

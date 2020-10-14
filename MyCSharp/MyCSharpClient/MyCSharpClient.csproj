@@ -41,10 +41,17 @@
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MyCSharpDLL\MyCSharpDLL.csproj">
+      <Project>{12d4a3c9-d08c-4012-b03e-c30fb3b1c34f}</Project>
+      <Name>MyCSharpDLL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MyCSharpService\MyCSharpService.csproj">
       <Project>{2315e0b1-d043-4581-990b-c411f452a6be}</Project>
       <Name>MyCSharpService</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MyCSharpClient.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
