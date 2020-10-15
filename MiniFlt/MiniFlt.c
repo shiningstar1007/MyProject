@@ -421,6 +421,46 @@ MiniFltInstanceQueryTeardown (
   return STATUS_SUCCESS;
 }
 
+VOID GetAlternateDataStream(PCFLT_RELATED_OBJECTS FltObjects)
+{
+	NTSTATUS Status;
+	PFILE_STREAM_INFORMATION pStreamInfo;
+	PBYTE InfoBlock;
+	WCHAR StreamName[MAX_KPATH] = { 0 };
+	BOOLEAN bDirectory = FALSE;
+
+	Status = FltIsDirectory(FltObjects->FileObject, FltObjects->Instance, &bDirectory);
+	if (NT_SUCCESS(Status) && bDirectory) return FALSE;
+
+	InfoBlock = (PBYTE)MyAllocNonPagedPool((1024 * 64), &g_NonPagedPoolCnt);
+	
+	if (!InfoBlock) return FALSE;
+	else memset(InfoBlock, 0, (1024 * 64));
+
+	pStreamInfo = (PFILE_STREAM_INFORMATION)InfoBlock;
+	pStreamInfo->StreamNameLength = 0;
+
+	Status = FltQueryInformationFile(FltObjects->Instance, FltObjects->FileObject, InfoBlock,
+		(1024 * 64), FileStreamInformation, NULL);
+
+	if (NT_SUCCESS(Status)) {
+		for (;;) {
+			if (pStreamInfo->StreamNameLength == 0) break;
+
+			memcpy(StreamName, pStreamInfo->StreamName, pStreamInfo->StreamNameLength);
+			DbgPrint("StreamName=[%S]", StreamName);
+
+			if (pStreamInfo->NextEntryOffset == 0) break;
+			else {
+				pStreamInfo = (PFILE_STREAM_INFORMATION)((PBYTE)pStreamInfo + pStreamInfo->NextEntryOffset);
+			}
+		}
+	}
+	else DbgPrint("FileStreamInformation failed[0x%X]", Status);
+
+	MyFreeNonPagedPool(InfoBlock, &g_NonPagedPoolCnt);
+}
+
 ULONGLONG GetFileId(
 	_In_ PCFLT_RELATED_OBJECTS FltObjects
 )
