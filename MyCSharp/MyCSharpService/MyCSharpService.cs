@@ -6,11 +6,15 @@ using System.Runtime.InteropServices;
 using System.Timers;
 using System.IO;
 using System.Security.AccessControl;
+using System.Runtime.ConstrainedExecution;
+using System.Security;
 
 namespace MyCSharp.Service
 {
+    [SuppressUnmanagedCodeSecurity()]
     public class Win32API
     {
+        #region Native Method Signatures
         [DllImport("fltlib", SetLastError = true)]
         public static extern int FilterConnectCommunicationPort (
             [MarshalAs (UnmanagedType.LPWStr)]
@@ -39,6 +43,74 @@ namespace MyCSharp.Service
             uint outBufferSize,
             uint bytesReturned
         );
+
+        internal const int GENERIC_READ = unchecked((int)0x80000000);
+        internal const int GENERIC_WRITE = unchecked((int)0x40000000);
+        internal const int INVALID_HANDLE_VALUE = -1;
+        internal const int ERROR_FILE_EXISTS = unchecked((int)0x00000050);
+        internal const string CheckStreamName = ":pske:$DATA";
+
+        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal extern static IntPtr CreateFile(String fileName,
+           int dwDesiredAccess, System.IO.FileShare dwShareMode,
+           IntPtr securityAttrs_MustBeZero, System.IO.FileMode dwCreationDisposition,
+           int dwFlagsAndAttributes, IntPtr hTemplateFile_MustBeZero);
+
+        [DllImport("kernel32", SetLastError = true)]
+        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+        internal extern static bool CloseHandle(IntPtr FileHandle);
+
+        [DllImport("ntdll.dll", SetLastError = true)]
+        internal static extern NTSTATUS NtQueryInformationFile(IntPtr FileHandle,
+            ref IO_STATUS_BLOCK IoStatusBlock, IntPtr FileInformation, uint FileInformationLength,
+            FILE_INFORMATION_CLASS FileStreamInformation);
+
+        [DllImport("kernel32")]
+        public static extern Int32 GetLastError();
+
+        #endregion
+
+        #region Structures
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct IO_STATUS_BLOCK
+        {
+            public UInt32 Status;
+            public UInt64 Information;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 1)]
+        public struct FILE_STREAM_INFORMATION
+        {
+            public UInt32 NextEntryOffset;
+            public UInt32 StreamNameLen;
+            public UInt64 StreamSize;           //LARGE_INTEGER
+            public UInt64 StreamAllocationSize; //LARGE_INTEGER
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+            internal Byte[] StreamName;
+        }
+
+        #endregion
+
+        #region Enumerations
+
+        [Flags]
+        public enum NTSTATUS : uint
+        {
+            STATUS_SUCCESS = 0x00000000,
+            STATUS_INFO_LENGTH_MISMATCH = 0xC0000004
+        }
+
+
+        [Flags]
+        public enum FILE_INFORMATION_CLASS
+        {
+            FileStreamInformation = 22
+        }
+
+        #endregion
+
+        #region Functions
     }
 
     public class ACL_Subject
