@@ -111,6 +111,28 @@ namespace MyCSharp.Service
         #endregion
 
         #region Functions
+
+        public static bool CreateStreamFile(string FileName)
+        {
+            bool bStreamFile = false;
+            IntPtr FileHandle;
+            string StreamName = FileName + ":MiniFlt";
+
+            FileHandle = Win32API.CreateFile(StreamName, Win32API.GENERIC_READ | Win32API.GENERIC_WRITE,
+                0, IntPtr.Zero, FileMode.CreateNew, 0, IntPtr.Zero);
+
+            if (FileHandle.ToInt32() != Win32API.INVALID_HANDLE_VALUE)
+            {
+                Win32API.CloseHandle(FileHandle);
+                bStreamFile = true;
+            }
+            else if (Win32API.ERROR_FILE_EXISTS == Win32API.GetLastError())
+            {
+                bStreamFile = true;
+            }
+
+            return bStreamFile;
+        }
     }
 
     public class ACL_Subject
