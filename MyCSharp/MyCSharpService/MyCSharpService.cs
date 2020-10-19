@@ -181,6 +181,26 @@ namespace MyCSharp.Service
 
             return bStreamFile;
         }
+
+        public bool CheckUseFile(string fileName)
+        {
+            bool bUse = false;
+
+            try
+            {
+                using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    fs.Close();
+                    bUse = true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ErrMsg[{0}]", e.Message.ToString());
+            }
+
+            return bUse;
+        }
     }
 
     public class ACL_Subject
