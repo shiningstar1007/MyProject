@@ -22,6 +22,8 @@ typedef enum {
 
 extern WINDOWS_VERSION g_WinVersion;
 
+#define PROCESS_QUERY_INFORMATION 0x00000400
+
 typedef NTSTATUS(*QUERY_INFO_PROCESS) (
 	__in HANDLE ProcessHandle,
 	__in PROCESSINFOCLASS ProcessInformationClass,
