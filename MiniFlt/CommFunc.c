@@ -288,6 +288,31 @@ ULONG GetSessionId()
 	else return 0;
 }
 
+ULONG ProcGetParentPId(ULONG ProcessId)
+{
+	HANDLE hProcess = NULL;
+	OBJECT_ATTRIBUTES	ObjAttr = { 0 };
+	CLIENT_ID ClientId = { 0 };
+	PROCESS_BASIC_INFORMATION BasicInfo;
+	ULONG ParentPId = 0, BufSize = sizeof(PROCESS_BASIC_INFORMATION);
+
+	if (ProcessId == 0) return 0;
+
+	ObjAttr.Attributes = OBJ_KERNEL_HANDLE;
+
+	ClientId.UniqueProcess = UlongToHandle(ProcessId);
+	if (ZwOpenProcess(&hProcess, PROCESS_QUERY_INFORMATION, &ObjAttr, &ClientId)
+		!= STATUS_SUCCESS || !hProcess) return 0;
+
+	if (ZwQueryInformationProcess(hProcess, ProcessBasicInformation, &BasicInfo,
+		BufSize, &BufSize) == STATUS_SUCCESS)
+		ParentPId = (ULONG)BasicInfo.InheritedFromUniqueProcessId;
+
+	ZwClose(hProcess);
+
+	return ParentPId;
+}
+
 NTSTATUS ZwGetProcessImageName(
 	_In_ PFLT_CALLBACK_DATA Data
 )
