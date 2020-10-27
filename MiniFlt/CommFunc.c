@@ -263,7 +263,6 @@ ULONG GetProcessFullPath(
 
 
 QUERY_INFO_PROCESS ZwQueryInformationProcess = NULL;
-
 ULONG GetSessionId()
 {
 	NTSTATUS Status;
@@ -309,6 +308,27 @@ ULONG ProcGetParentPId(ULONG ProcessId)
 		ParentPId = (ULONG)BasicInfo.InheritedFromUniqueProcessId;
 
 	ZwClose(hProcess);
+
+	return ParentPId;
+}
+
+ULONG ProcGetParentPath(ULONG ProcessId, PCHAR ParentPath)
+{
+	PEPROCESS pProcess = NULL;
+	ULONG ParentPId = ProcGetParentPId(ProcessId);
+
+	*ParentPath = 0;
+	if (ParentPId == 0) return 0;
+
+	if (PsLookupProcessByProcessId(UlongToPtr(ParentPId), &pProcess) == STATUS_SUCCESS
+		&& pProcess) {
+		KAPC_STATE APCState;
+
+		KeStackAttachProcess((PRKPROCESS)pProcess, &APCState);
+		GetProcessFullPath(pProcess, ParentPath);
+		KeUnstackDetachProcess(&APCState);
+		ObDereferenceObject(pProcess);
+	}
 
 	return ParentPId;
 }
