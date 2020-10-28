@@ -833,6 +833,7 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreSetInformation(
 
 	switch (Data->Iopb->Parameters.SetFileInformation.FileInformationClass) {
 	case FileRenameInformation: // rename
+	case FileRenameInformationEx:
 		Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolumeContext);
 		if (NT_SUCCESS(Status) && VolumeContext->DriveType == DRIVE_FIXED) {
 			MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "PsKePreSetInformation");
@@ -844,6 +845,7 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreSetInformation(
 		break;
 
 	case FileDispositionInformation: // delete
+	case FileDispositionInformationEx:
 		MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "PsKePreSetInformation");
 		Status = GetUserName(Data, MiniFltInfo);
 		Status = GetProcessImageName(Data, MiniFltInfo);
