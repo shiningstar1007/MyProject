@@ -287,6 +287,20 @@ ULONG GetSessionId()
 	else return 0;
 }
 
+ULONG ProcGetIdByHandle(HANDLE hProcess)
+{
+	NTSTATUS Status;
+	PROCESS_BASIC_INFORMATION ProcBasicInfo;
+	ULONG Len;
+
+	Status = ZwQueryInformationProcess(hProcess, ProcessBasicInformation,
+		&ProcBasicInfo, sizeof(PROCESS_BASIC_INFORMATION), &Len);
+
+	if (NT_SUCCESS(Status)) return (ULONG)ProcBasicInfo.UniqueProcessId;
+
+	return 0;
+}
+
 ULONG ProcGetParentPId(ULONG ProcessId)
 {
 	HANDLE hProcess = NULL;
