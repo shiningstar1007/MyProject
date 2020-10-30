@@ -287,7 +287,7 @@ ULONG GetSessionId()
 	else return 0;
 }
 
-ULONG ProcGetIdByHandle(HANDLE hProcess)
+ULONG ProcessGetIdByHandle(HANDLE hProcess)
 {
 	NTSTATUS Status;
 	PROCESS_BASIC_INFORMATION ProcBasicInfo;
@@ -301,7 +301,28 @@ ULONG ProcGetIdByHandle(HANDLE hProcess)
 	return 0;
 }
 
-ULONG ProcGetParentPId(ULONG ProcessId)
+ULONG ProcessGetPathBy(PMINIFLT_INFO MiniFltInfo, HANDLE hProcess, ULONG ProcessId)
+{
+	PEPROCESS pProcess = NULL;
+	BOOL bRet = FALSE;
+	ULONG Len = 0;
+
+	if (hProcess) ProcessId = ProcGetIdByHandle(hProcess);
+
+	if (PsLookupProcessByProcessId(UlongToPtr(ProcessId), &pProcess) == STATUS_SUCCESS
+		&& pProcess) {
+		KAPC_STATE APCState;
+
+		KeStackAttachProcess((PRKPROCESS)pProcess, &APCState);
+		Len = GetProcessFullPath(pProcess, MiniFltInfo->ProcName);
+		KeUnstackDetachProcess(&APCState);
+		ObDereferenceObject(pProcess);
+	}
+
+	return Len;
+}
+
+ULONG ProcessGetParentPId(ULONG ProcessId)
 {
 	HANDLE hProcess = NULL;
 	OBJECT_ATTRIBUTES	ObjAttr = { 0 };
@@ -326,7 +347,7 @@ ULONG ProcGetParentPId(ULONG ProcessId)
 	return ParentPId;
 }
 
-ULONG ProcGetParentPath(ULONG ProcessId, PCHAR ParentPath)
+ULONG ProcessGetParentPath(ULONG ProcessId, PCHAR ParentPath)
 {
 	PEPROCESS pProcess = NULL;
 	ULONG ParentPId = ProcGetParentPId(ProcessId);
