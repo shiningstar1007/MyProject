@@ -13,11 +13,21 @@
 
 typedef enum {
 	WV_UNKNOWN = 0,
-	WV_2008 = 6002,   // 6.0 Windows Vista, Server 2008
-	WV_2008R2 = 7601, // 6.1 Windows 7, Server 2008 R2
-	WV_2012 = 9200, 	// 6.2 windows 8, Server 2012
-	WV_2012R2 = 9600, // 6.3 windows 8, Server 2012 R2
-	WV_2016 = 14393   // 10.0 windows 10, Server 2016
+	WV_2008 = 6002,        // 6.0 Windows Vista, Server 2008
+	WV_2008R2 = 7601,      // 6.1 Windows 7, Server 2008 R2
+	WV_2012 = 9200, 	     // 6.2 windows 8, Server 2012
+	WV_2012R2 = 9600,      // 6.3 windows 8, Server 2012 R2
+	WV_WIN10 = 10240,      // Threshold 1: Version 1507, Build 10240.
+	WV_WIN10_TH2 = 10586,  // Threshold 2: Version 1511, Build 10586.
+	WV_WIN10_RS1 = 14393,  // Redstone 1: Version 1607, Build 14393.
+	WV_WIN10_RS2 = 15063,  // Redstone 2: Version 1703, Build 15063.
+	WV_WIN10_RS3 = 16299,  // Redstone 3: Version 1709, Build 16299.
+	WV_WIN10_RS4 = 17134,  // Redstone 4: Version 1803, Build 17134.
+	WV_WIN10_RS5 = 17763,  // Redstone 5: Version 1809, Build 17763.
+	WV_WIN10_19H1 = 18362, // 19H1: Version 1903, Build 18362.
+	WV_WIN10_19H2 = 18363, // 19H2: Version 1909, Build 18363.
+	WV_WIN10_20H1 = 19041, // 20H1: Version 2004, Build 19041.
+	WV_WIN10_20H2 = 19042, // 20H2: Version 2009, Build 19042.
 } WINDOWS_VERSION;
 
 extern WINDOWS_VERSION g_WinVersion;

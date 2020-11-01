@@ -102,7 +102,7 @@ ULONG MySNPrintfW(
 WINDOWS_VERSION g_WinVersion;
 VOID GetVersion()
 {
-	RTL_OSVERSIONINFOW VersionInfo;
+	RTL_OSVERSIONINFOEXW VersionInfo;
 
 	RtlGetVersion(&VersionInfo);
 
@@ -113,7 +113,19 @@ VOID GetVersion()
 		else if (VersionInfo.dwMinorVersion == 3) g_WinVersion = WV_2012R2;
 	}
 	else if (VersionInfo.dwMajorVersion == 10) {
-		if (VersionInfo.dwMinorVersion == 0) g_WinVersion = WV_2016;
+		if (VersionInfo.dwMinorVersion == 0) {
+			if (VersionInfo.dwBuildNumber >= WV_WIN10_20H2) g_WinVersion = WV_WIN10_20H2;
+			else if (VersionInfo.dwBuildNumber >= WV_WIN10_20H1) g_WinVersion = WV_WIN10_20H1;
+			else if (VersionInfo.dwBuildNumber >= WV_WIN10_19H2) g_WinVersion = WV_WIN10_19H2;
+			else if (VersionInfo.dwBuildNumber >= WV_WIN10_19H1) g_WinVersion = WV_WIN10_19H1;
+			else if (VersionInfo.dwBuildNumber >= WV_WIN10_RS5) g_WinVersion = WV_WIN10_RS5;
+			else if (VersionInfo.dwBuildNumber >= WV_WIN10_RS4) g_WinVersion = WV_WIN10_RS4;
+			else if (VersionInfo.dwBuildNumber >= WV_WIN10_RS3) g_WinVersion = WV_WIN10_RS3;
+			else if (VersionInfo.dwBuildNumber >= WV_WIN10_RS2) g_WinVersion = WV_WIN10_RS2;
+			else if (VersionInfo.dwBuildNumber >= WV_WIN10_RS1) g_WinVersion = WV_WIN10_RS1;
+			else if (VersionInfo.dwBuildNumber >= WV_WIN10_TH2) g_WinVersion = WV_WIN10_TH2;
+			else g_WinVersion = WV_WIN10;
+		}
 	}
 	else g_WinVersion = WV_UNKNOWN;
 }
