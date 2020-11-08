@@ -180,30 +180,6 @@ VOID InitializeProcess()
 	}
 }
 
-ULONG ProcGetSessionId()
-{
-	NTSTATUS Status;
-	HANDLE hProcess = NULL;
-	CLIENT_ID ClientId = { 0 };
-	OBJECT_ATTRIBUTES	ObjAttr = { 0 };
-	PROCESS_SESSION_INFORMATION ProcSession;
-	ULONG RetByte;
-
-	ObjAttr.Attributes = OBJ_KERNEL_HANDLE;
-
-	ClientId.UniqueProcess = PsGetCurrentProcessId();
-	Status = ZwOpenProcess(&hProcess, PROCESS_QUERY_INFORMATION, &ObjAttr, &ClientId);
-	if (Status != STATUS_SUCCESS || !hProcess) return 0;
-
-	Status = ZwQueryInformationProcess(hProcess, ProcessSessionInformation,
-		&ProcSession, sizeof(PROCESS_SESSION_INFORMATION), &RetByte);
-
-	ZwClose(hProcess);
-
-	if (Status == STATUS_SUCCESS) return ProcSession.SessionId;
-	else return 0;
-}
-
 VOID GetProcName(
 	_In_opt_ PEPROCESS pProcess,
 	_Out_opt_ PCHAR ProcName

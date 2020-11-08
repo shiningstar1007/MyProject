@@ -92,13 +92,17 @@ typedef unsigned long ULONG, * PULONG, DWORD;
 typedef unsigned char BYTE, * PBYTE;
 typedef long BOOL, * PBOOL;
 
-#define ACTION_READ     0x00000001
-#define ACTION_WRITE    0x00000002
-#define ACTION_TRAVERSE 0x00000004
-#define ACTION_DELETE   0x00000008
-#define ACTION_CREATE   0x00000010
-#define ACTION_EXECUTE  0x00000020
-#define ACTION_ALL      0xFFFFFFFF
+#define ACTION_READ         0x00000001
+#define ACTION_WRITE        0x00000002
+#define ACTION_TRAVERSE     0x00000004
+#define ACTION_DELETE       0x00000008
+#define ACTION_CREATE       0x00000010
+#define ACTION_EXECUTE      0x00000020
+#define ACTION_KEY_CREATE   0x00000100
+#define ACTION_KEY_DELETE   0x00000200
+#define ACTION_VALUE_WRITE  0x00000400
+#define ACTION_VALUE_DELETE 0x00000800
+#define ACTION_ALL          0xFFFFFFFF
 
 typedef struct _USERSID {
 	BYTE                    Revision;
