@@ -84,6 +84,7 @@
     <ClInclude Include="ErrorCode.h" />
     <ClInclude Include="MiniFlt.h" />
     <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="SystemCallHook.h" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>MiniFlt</TargetName>
@@ -176,6 +177,7 @@
     <ClCompile Include="CommFunc.c" />
     <ClCompile Include="Context.c" />
     <ClCompile Include="MiniFlt.c" />
+    <ClCompile Include="SystemCallHook.c" />
     <ResourceCompile Include="MiniFlt.rc" />
   </ItemGroup>
   <ItemGroup>

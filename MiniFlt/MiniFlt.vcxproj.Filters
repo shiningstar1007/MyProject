@@ -31,6 +31,9 @@
     <ClCompile Include="AccessControl.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SystemCallHook.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MiniFlt.h">
@@ -49,6 +52,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ErrorCode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemCallHook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
