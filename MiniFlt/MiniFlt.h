@@ -39,6 +39,9 @@ struct _MINIFLT_INFO {
 	PCHAR GroupName[MAX_NAME];
 	PCHAR FileName[MAX_KPATH];
 	PCHAR ProcName[MAX_KPATH];
+
+	PWCHAR RegPath[MAX_KPATH];
+	PWCHAR RegPathW[MAX_KPATH];
 };
 
 typedef enum {

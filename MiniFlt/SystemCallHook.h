@@ -17,6 +17,8 @@ VOID ObPostCallBack(
 NTSTATUS StartProtectProcess();
 VOID StopProtectProcess();
 
+#define MAX_REGPATH 1024
+
 typedef struct _REG_ROOTKEYW {
 	WCHAR KRootName[MAX_KPATH];
 	WCHAR URootName[32];

@@ -103,11 +103,118 @@ REG_LINKKEYW g_ControlSet = { L"\\SYSTEM\\ControlSet001", L"\\SYSTEM\\CurrentCon
 REG_LINKKEYW g_CHPCurrent = { L"\\SYSTEM\\CurrentControlSet\\Hardware Profiles\\0001",
 	L"\\SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current" };
 
-NTSTATUS DecisionRegCallback(ULONG Action, PVOID pRootObject, PUNICODE_STRING pSubKey)
+BOOL GetRegPath(PMINIFLT_INFO MiniFltInfo, PVOID pRootObject, PUNICODE_STRING pValueName)
+{
+	NTSTATUS Status;
+	PVOID pKeyObj = NULL;
+	PWCHAR pRoot = NULL, pRest = NULL;
+	PUNICODE_STRING UniStringKey;
+	ULONG i, PathWLen, TempLen = 0, ByteSize = MAX_REGPATH * sizeof(WCHAR);
+	LONG SubLen;
+
+	UniStringKey = MyAllocNonPagedPool(ByteSize + sizeof(UNICODE_STRING), &g_NonPagedPoolCnt);
+	if (!UniStringKey) return FALSE;
+
+	UniStringKey->Buffer = NULL;
+
+	if (pRootObject) pKeyObj = pRootObject;
+
+	if (pKeyObj) {
+		UniStringKey->MaximumLength = (USHORT)ByteSize;
+		Status = ObQueryNameString(pKeyObj, (POBJECT_NAME_INFORMATION)UniStringKey, ByteSize, &TempLen);
+		if (Status == STATUS_SUCCESS || UniStringKey->Buffer)
+		{
+			TempLen = UniStringKey->Length / 2;
+		}
+
+		if (!UniStringKey->Buffer) {
+			MyFreeNonPagedPool(UniStringKey, &g_NonPagedPoolCnt);
+			return FALSE;
+		}
+	}
+
+	__try {
+		SubLen = MAX_REGPATH - TempLen - 2;
+		if (pValueName && (SubLen > 0)) {
+			if (SubLen > (pValueName->Length / 2)) SubLen = pValueName->Length / 2;
+
+			TempLen += MySNPrintfW(UniStringKey->Buffer + TempLen, MAX_REGPATH - TempLen, 
+				L"\\%*.*s", SubLen, SubLen, pValueName->Buffer);
+		}
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		MyFreeNonPagedPool(UniStringKey, &g_NonPagedPoolCnt);
+		return FALSE;
+	}
+
+	for (i = 0; i < g_RootKeyCnt; i++) {
+		if (_wcsnicmp(UniStringKey->Buffer, g_RootKeys[i].KRootName, g_RootKeys[i].KRootLen)) continue;
+
+		pRoot = g_RootKeys[i].URootName;
+		pRest = UniStringKey->Buffer + g_RootKeys[i].KRootLen;
+
+		break;
+	}
+
+	__try {
+		PWCHAR TmpPath = NULL;
+
+		if (!pRest) {
+			pRest = UniStringKey->Buffer;
+		}
+
+		PathWLen = MyStrNCopyW(MiniFltInfo->RegPathW, pRoot, -1, MAX_KPATH);
+
+		if (!_wcsnicmp(g_ControlSet.OriName, pRest, g_ControlSet.OriLen)) {
+			TmpPath = MyAllocNonPagedPool(MAX_KPATH * sizeof(WCHAR), &g_NonPagedPoolCnt);
+			if (TmpPath != NULL) {
+				TempLen = MySNPrintfW(TmpPath, MAX_KPATH, L"%s", g_ControlSet.LinkName);
+				MyStrNCpyW(TmpPath + TempLen, pRest + g_ControlSet.OriLen, -1, MAX_KPATH - TempLen);
+
+				if (!_wcsnicmp(g_CHPCurrent.OriName, TmpPath, g_CHPCurrent.OriLen)) {
+					PathWLen += MySNPrintfW(MiniFltInfo->RegPathW + PathWLen, MAX_KPATH - PathWLen, L"%s",
+						g_CHPCurrent.LinkName);
+					PathWLen += MyStrNCopyW(MiniFltInfo->RegPathW + PathWLen, TmpPath + g_CHPCurrent.OriLen,
+						-1, MAX_KPATH - PathWLen);
+				}
+				else {
+					PathWLen += MyStrNCopyW(MiniFltInfo->RegPathW + PathWLen, TmpPath, -1, MAX_KPATH - PathWLen);
+				}
+			}
+		}
+		if (TmpPath != NULL) {
+			MyFreeNonPagedPool(TmpPath, &g_NonPagedPoolCnt);
+		}
+		else {
+			PathWLen += MyStrNCopyW(MiniFltInfo->RegPathW + PathWLen, pRest, -1, MAX_KPATH - PathWLen);
+		}
+
+		if (PathWLen > 0 && MiniFltInfo->RegPathW[PathWLen - 1] == L'\\') {
+			MiniFltInfo->RegPathW[--PathWLen] = 0;
+		}
+
+		MyWideCharToChar(MiniFltInfo->RegPathW, MiniFltInfo->RegPath, MAX_KPATH);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		MyFreeNonPagedPool(UniStringKey, &g_NonPagedPoolCnt);
+
+		return FALSE;
+	}
+
+	MyFreeNonPagedPool(UniStringKey, &g_NonPagedPoolCnt);
+
+	return TRUE;
+}
+
+NTSTATUS DecisionRegCallback(ULONG Action, PVOID pRootObject, PUNICODE_STRING pValueName)
 {
 	NTSTATUS Status = STATUS_SUCCESS;
+	PMINIFLT_INFO MiniFltInfo;
+	BOOL bGetRegPath;
 
 	if (!pRootObject) return Status;
+
+	bGetRegPath = GetRegPath(MiniFltInfo, pRootObject, pValueName);
 
 
 	return Status;
