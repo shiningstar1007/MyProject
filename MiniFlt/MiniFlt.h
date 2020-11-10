@@ -33,6 +33,8 @@ typedef long BOOL, * PBOOL;
 #define PROCESS_TERMINATE 0x1
 #define ACTIVE_PROCESS_LINKS 0x2e8
 
+extern NPAGED_LOOKASIDE_LIST g_MiniFltLookaside;
+
 typedef struct _MINIFLT_INFO MINIFLT_INFO, * PMINIFLT_INFO;
 struct _MINIFLT_INFO {
 	PCHAR UserName[MAX_NAME];

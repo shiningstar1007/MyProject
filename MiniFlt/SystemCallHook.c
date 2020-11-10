@@ -214,8 +214,13 @@ NTSTATUS DecisionRegCallback(ULONG Action, PVOID pRootObject, PUNICODE_STRING pV
 
 	if (!pRootObject) return Status;
 
+	MiniFltInfo = (PMINIFLT_INFO)ExAllocateFromNPagedLookasideList(&g_MiniFltLookaside);
+	if (MiniFltInfo == NULL) return Status;
+
 	bGetRegPath = GetRegPath(MiniFltInfo, pRootObject, pValueName);
 
+
+	ExFreeToNPagedLookasideList(&g_MiniFltLookaside, MiniFltInfo);
 
 	return Status;
 }

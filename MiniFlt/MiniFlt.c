@@ -371,6 +371,25 @@ VOID GetAlternateDataStream(PCFLT_RELATED_OBJECTS FltObjects)
 	MyFreeNonPagedPool(InfoBlock, &g_NonPagedPoolCnt);
 }
 
+ULONG GetVolumeId(
+	_In_ PCFLT_RELATED_OBJECTS FltObjects
+)
+{
+	IO_STATUS_BLOCK IoStatus;
+	PFILE_FS_VOLUME_INFORMATION pFsVolumeInfo;
+	ULONG BufSize = sizeof(PFILE_FS_VOLUME_INFORMATION) + 200, VolumeId;
+
+	pFsVolumeInfo = (PFILE_FS_VOLUME_INFORMATION)MyAllocNonPagedPool(BufSize, &g_NonPagedPoolCnt);
+	if (pFsVolumeInfo == NULL) return 0;
+
+	memset(pFsVolumeInfo, 0, BufSize);
+	FltQueryVolumeInformationFile(FltObjects->Instance, FltObjects->FileObject, pFsVolumeInfo, BufSize, FileFsVolumeInformation, NULL);
+	VolumeId = pFsVolumeInfo->VolumeSerialNumber;
+	MyFreeNonPagedPool(pFsVolumeInfo, &g_NonPagedPoolCnt);
+
+	return VolumeId;
+}
+
 ULONGLONG GetFileId(
 	_In_ PCFLT_RELATED_OBJECTS FltObjects
 )
