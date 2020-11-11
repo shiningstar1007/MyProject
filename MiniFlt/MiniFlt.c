@@ -426,6 +426,27 @@ ULONGLONG GetFileId(
 	return FileRef.FileId64.Value;
 }
 
+VOID GetFileNameFromFileObject(
+	_In_ PCFLT_RELATED_OBJECTS FltObjects
+)
+{
+	NTSTATUS Status;
+	CHAR FileName[MAX_KPATH] = { 0 };
+	ULONG BufSize = sizeof(FILE_NAME_INFORMATION) + (MAX_KPATH * sizeof(WCHAR));
+	PFILE_NAME_INFORMATION FileNameInfo = (PFILE_NAME_INFORMATION)MyAllocNonPagedPool(BufSize, &g_NonPagedPoolCnt);
+
+	if (FileNameInfo == NULL) return;
+
+	memset(FileNameInfo, 0, BufSize);
+	Status = FltQueryInformationFile(FltObjects->Instance, FltObjects->FileObject, &FileNameInfo,
+		sizeof(FILE_NAME_INFORMATION), FileNameInformation, NULL);
+
+	if (NT_SUCCESS(Status)) {
+		MyWideCharToChar(FileNameInfo->FileName, FileName, MAX_KPATH);
+	}
+
+}
+
 PMINIFLT_INFO GetMiniFltInfo(
 	_In_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
