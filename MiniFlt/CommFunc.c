@@ -295,16 +295,17 @@ ULONG ProcessGetPathBy(PMINIFLT_INFO MiniFltInfo, HANDLE hProcess, ULONG Process
 	BOOL bRet = FALSE;
 	ULONG Len = 0;
 
-	if (hProcess) ProcessId = ProcGetIdByHandle(hProcess);
+	if (hProcess) ProcessId = ProcessGetIdByHandle(hProcess);
 
-	if (PsLookupProcessByProcessId(UlongToPtr(ProcessId), &pProcess) == STATUS_SUCCESS
-		&& pProcess) {
-		KAPC_STATE APCState;
+	if (PsLookupProcessByProcessId(UlongToPtr(ProcessId), &pProcess) == STATUS_SUCCESS) {
+		if (pProcess != NULL) {
+			KAPC_STATE APCState;
 
-		KeStackAttachProcess((PRKPROCESS)pProcess, &APCState);
-		Len = GetProcessFullPath(pProcess, MiniFltInfo->ProcName);
-		KeUnstackDetachProcess(&APCState);
-		ObDereferenceObject(pProcess);
+			KeStackAttachProcess((PRKPROCESS)pProcess, &APCState);
+			Len = GetProcessFullPath(pProcess, MiniFltInfo->ProcNameW);
+			KeUnstackDetachProcess(&APCState);
+			ObDereferenceObject(pProcess);
+		}
 	}
 
 	return Len;
@@ -312,6 +313,7 @@ ULONG ProcessGetPathBy(PMINIFLT_INFO MiniFltInfo, HANDLE hProcess, ULONG Process
 
 ULONG ProcessGetParentPId(ULONG ProcessId)
 {
+	NTSTATUS Status;
 	HANDLE hProcess = NULL;
 	OBJECT_ATTRIBUTES	ObjAttr = { 0 };
 	CLIENT_ID ClientId = { 0 };
@@ -320,35 +322,36 @@ ULONG ProcessGetParentPId(ULONG ProcessId)
 
 	if (ProcessId == 0) return 0;
 
-	ObjAttr.Attributes = OBJ_KERNEL_HANDLE;
-
+	InitializeObjectAttributes(&ObjAttr, NULL, OBJ_KERNEL_HANDLE, NULL, NULL);
 	ClientId.UniqueProcess = UlongToHandle(ProcessId);
-	if (ZwOpenProcess(&hProcess, PROCESS_QUERY_INFORMATION, &ObjAttr, &ClientId)
-		!= STATUS_SUCCESS || !hProcess) return 0;
+
+	Status = ZwOpenProcess(&hProcess, PROCESS_QUERY_INFORMATION, &ObjAttr, &ClientId);
+	if (Status != STATUS_SUCCESS || hProcess == NULL) return 0;
 
 	if (ZwQueryInformationProcess(hProcess, ProcessBasicInformation, &BasicInfo,
-		BufSize, &BufSize) == STATUS_SUCCESS)
+		BufSize, &BufSize) == STATUS_SUCCESS) {
 		ParentPId = (ULONG)BasicInfo.InheritedFromUniqueProcessId;
+	}
 
 	ZwClose(hProcess);
 
 	return ParentPId;
 }
 
-ULONG ProcessGetParentPath(ULONG ProcessId, PCHAR ParentPath)
+ULONG ProcessGetParentPath(ULONG ProcessId, PWCHAR ParentPathW)
 {
+	NTSTATUS Status;
 	PEPROCESS pProcess = NULL;
-	ULONG ParentPId = ProcGetParentPId(ProcessId);
+	ULONG ParentPId = ProcessGetParentPId(ProcessId);
 
-	*ParentPath = 0;
 	if (ParentPId == 0) return 0;
 
-	if (PsLookupProcessByProcessId(UlongToPtr(ParentPId), &pProcess) == STATUS_SUCCESS
-		&& pProcess) {
+	Status = PsLookupProcessByProcessId(UlongToPtr(ParentPId), &pProcess);
+	if (Status == STATUS_SUCCESS && pProcess) {
 		KAPC_STATE APCState;
 
 		KeStackAttachProcess((PRKPROCESS)pProcess, &APCState);
-		GetProcessFullPath(pProcess, ParentPath);
+		GetProcessFullPath(pProcess, ParentPathW);
 		KeUnstackDetachProcess(&APCState);
 		ObDereferenceObject(pProcess);
 	}
@@ -944,7 +947,7 @@ NTSTATUS ReadRegStringA(
 	OBJECT_ATTRIBUTES ObjAttr;
 	HANDLE RegKey = NULL;
 	UNICODE_STRING UniValName, UniVal;
-	ANSI_STRING AnsiVal;
+	ANSI_STRING AnsiVal = { 0 };
 	PKEY_VALUE_PARTIAL_INFORMATION PartialInfo = NULL;
 	ULONG RetLen;
 	ULONG Len = sizeof(KEY_VALUE_PARTIAL_INFORMATION) + ValLen * sizeof(WCHAR);
@@ -972,16 +975,16 @@ NTSTATUS ReadRegStringA(
 			RtlCopyMemory(RetVal, AnsiVal.Buffer, AnsiVal.Length);
 			RetVal[AnsiVal.Length] = ANSI_NULL;
 
-			if (ActualLen) *ActualLen = AnsiVal.Length;
+			if (ActualLen != NULL) *ActualLen = AnsiVal.Length;
 		}
 	}
 	else DbgPrint("ZwQueryValueKey failed : 0x%X", Status);
 
-	if (RegKey) ZwClose(RegKey);
+	if (RegKey != NULL) ZwClose(RegKey);
 
-	if (AnsiVal.Buffer) RtlFreeAnsiString(&AnsiVal);
+	if (AnsiVal.Buffer != NULL) RtlFreeAnsiString(&AnsiVal);
 
-	if (PartialInfo) MyFreeNonPagedPool(PartialInfo, &g_NonPagedPoolCnt);
+	if (PartialInfo != NULL) MyFreeNonPagedPool(PartialInfo, &g_NonPagedPoolCnt);
 
 	return Status;
 }

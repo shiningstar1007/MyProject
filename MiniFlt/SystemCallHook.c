@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#pragma warning(default : 4061)
 
 PVOID g_RegHandle = NULL;
 OB_PREOP_CALLBACK_STATUS ObPreCallBack(
@@ -169,7 +170,7 @@ BOOL GetRegPath(PMINIFLT_INFO MiniFltInfo, PVOID pRootObject, PUNICODE_STRING pV
 			TmpPath = MyAllocNonPagedPool(MAX_KPATH * sizeof(WCHAR), &g_NonPagedPoolCnt);
 			if (TmpPath != NULL) {
 				TempLen = MySNPrintfW(TmpPath, MAX_KPATH, L"%s", g_ControlSet.LinkName);
-				MyStrNCpyW(TmpPath + TempLen, pRest + g_ControlSet.OriLen, -1, MAX_KPATH - TempLen);
+				MyStrNCopyW(TmpPath + TempLen, pRest + g_ControlSet.OriLen, -1, MAX_KPATH - TempLen);
 
 				if (!_wcsnicmp(g_CHPCurrent.OriName, TmpPath, g_CHPCurrent.OriLen)) {
 					PathWLen += MySNPrintfW(MiniFltInfo->RegPathW + PathWLen, MAX_KPATH - PathWLen, L"%s",
@@ -206,7 +207,11 @@ BOOL GetRegPath(PMINIFLT_INFO MiniFltInfo, PVOID pRootObject, PUNICODE_STRING pV
 	return TRUE;
 }
 
-NTSTATUS DecisionRegCallback(ULONG Action, PVOID pRootObject, PUNICODE_STRING pValueName)
+NTSTATUS DecisionRegCallback(
+	_In_ ULONG Action, 
+	_In_ PVOID pRootObject, 
+	_Inout_ PUNICODE_STRING pValueName
+)
 {
 	NTSTATUS Status = STATUS_SUCCESS;
 	PMINIFLT_INFO MiniFltInfo;
@@ -225,51 +230,55 @@ NTSTATUS DecisionRegCallback(ULONG Action, PVOID pRootObject, PUNICODE_STRING pV
 	return Status;
 }
 
-NTSTATUS RegisterCallback(IN PVOID CallbackContext, IN PVOID Argument1, IN PVOID Argument2)
+NTSTATUS RegisterCallback(
+	_In_ PVOID CallbackContext, 
+	_In_ PVOID Argument1, 
+	_In_ PVOID Argument2
+)
 {
 	REG_NOTIFY_CLASS RegNotifyType = (REG_NOTIFY_CLASS)Argument1;
 	NTSTATUS Status = STATUS_SUCCESS;
 
 	switch (RegNotifyType) {
-	case RegNtPreCreateKeyEx: {
-		PREG_CREATE_KEY_INFORMATION pRegCreateKey = (PREG_CREATE_KEY_INFORMATION)Argument2;
+		case RegNtPreCreateKeyEx: {
+			PREG_CREATE_KEY_INFORMATION pRegCreateKey = (PREG_CREATE_KEY_INFORMATION)Argument2;
 
-		if (pRegCreateKey != NULL) {
-			Status = DecisionRegCallback(ACTION_KEY_CREATE, pRegCreateKey->RootObject, pRegCreateKey->CompleteName);
+			if (pRegCreateKey != NULL) {
+				Status = DecisionRegCallback(ACTION_KEY_CREATE, pRegCreateKey->RootObject, pRegCreateKey->CompleteName);
+			}
+
+			break;
+		}
+		case RegNtPreRenameKey:
+		case RegNtPreDeleteKey: {
+			PREG_DELETE_KEY_INFORMATION pRegDeleteKey = (PREG_DELETE_KEY_INFORMATION)Argument2;
+
+			if (pRegDeleteKey != NULL) {
+				Status = DecisionRegCallback(ACTION_KEY_DELETE, pRegDeleteKey->Object, NULL);
+			}
+
+			break;
+		}
+		case RegNtPreSetValueKey: {
+			PREG_SET_VALUE_KEY_INFORMATION pRegSetValueKey = (PREG_SET_VALUE_KEY_INFORMATION)Argument2;
+
+			if (pRegSetValueKey != NULL) {
+				Status = DecisionRegCallback(ACTION_VALUE_WRITE, pRegSetValueKey->Object, pRegSetValueKey->ValueName);
+			}
+
+			break;
+		}
+		case RegNtPreDeleteValueKey: {
+			PREG_DELETE_VALUE_KEY_INFORMATION pRegDeleteValueKey = (PREG_DELETE_VALUE_KEY_INFORMATION)Argument2;
+
+			if (pRegDeleteValueKey != NULL) {
+				Status = DecisionRegCallback(ACTION_VALUE_DELETE, pRegDeleteValueKey->Object, pRegDeleteValueKey->ValueName);
+			}
+
+			break;
 		}
 
-		break;
-	}
-	case RegNtPreRenameKey:
-	case RegNtPreDeleteKey: {
-		PREG_DELETE_KEY_INFORMATION pRegDeleteKey = (PREG_DELETE_KEY_INFORMATION)Argument2;
-
-		if (pRegDeleteKey != NULL) {
-			Status = DecisionRegCallback(ACTION_KEY_DELETE, pRegDeleteKey->Object, NULL);
-		}
-
-		break;
-	}
-	case RegNtPreSetValueKey: {
-		PREG_SET_VALUE_KEY_INFORMATION pRegSetValueKey = (PREG_SET_VALUE_KEY_INFORMATION)Argument2;
-
-		if (pRegSetValueKey != NULL) {
-			Status = DecisionRegCallback(ACTION_VALUE_WRITE, pRegSetValueKey->Object, pRegSetValueKey->ValueName);
-		}
-
-		break;
-	}
-	case RegNtPreDeleteValueKey: {
-		PREG_DELETE_VALUE_KEY_INFORMATION pRegDeleteValueKey = (PREG_DELETE_VALUE_KEY_INFORMATION)Argument2;
-
-		if (pRegDeleteValueKey != NULL) {
-			Status = DecisionRegCallback(ACTION_VALUE_DELETE, pRegDeleteValueKey->Object, pRegDeleteValueKey->ValueName);
-		}
-
-		break;
-	}
-
-	default: break;
+		default: break;
 	}
 
 	return Status;
