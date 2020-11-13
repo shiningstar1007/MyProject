@@ -34,12 +34,12 @@ extern WINDOWS_VERSION g_WinVersion;
 
 #define PROCESS_QUERY_INFORMATION 0x00000400
 
-typedef NTSTATUS(*QUERY_INFO_PROCESS) (
-	__in HANDLE ProcessHandle,
-	__in PROCESSINFOCLASS ProcessInformationClass,
-	__out_bcount(ProcessInformationLength) PVOID ProcessInformation,
-	__in ULONG ProcessInformationLength,
-	__out_opt PULONG ReturnLength
+typedef NTSTATUS(*QUERY_INFORMATION_PROCESS) (
+	_In_      HANDLE           ProcessHandle,
+	_In_      PROCESSINFOCLASS ProcessInformationClass,
+	_Out_     PVOID            ProcessInformation,
+	_In_      ULONG            ProcessInformationLength,
+	_Out_opt_ PULONG           ReturnLength
 );
 
 #define NT_PROCNAMELEN 16

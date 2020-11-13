@@ -213,7 +213,7 @@ NTSTATUS DecisionRegCallback(
 	_Inout_ PUNICODE_STRING pValueName
 )
 {
-	NTSTATUS Status = STATUS_SUCCESS;
+	NTSTATUS Status = STATUS_SUCCESS; // STATUS_ACCESS_DENIED
 	PMINIFLT_INFO MiniFltInfo;
 	BOOL bGetRegPath;
 

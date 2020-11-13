@@ -250,7 +250,23 @@ ULONG GetProcessFullPath(
 }
 
 
-QUERY_INFO_PROCESS ZwQueryInformationProcess = NULL;
+QUERY_INFORMATION_PROCESS ZwQueryInformationProcess = NULL;
+NTSTATUS InitZwQueryInformationProcess()
+{
+	if (!ZwQueryInformationProcess) {
+		UNICODE_STRING RoutineName;
+		RtlInitUnicodeString(&RoutineName, L"ZwQueryInformationProcess");
+
+		ZwQueryInformationProcess = (QUERY_INFORMATION_PROCESS)MmGetSystemRoutineAddress(&RoutineName);
+
+		if (!ZwQueryInformationProcess) {
+			return STATUS_UNSUCCESSFUL;
+		}
+	}
+
+	return STATUS_SUCCESS;
+}
+
 ULONG GetSessionId()
 {
 	NTSTATUS Status;
@@ -260,9 +276,11 @@ ULONG GetSessionId()
 	PROCESS_SESSION_INFORMATION ProcSession;
 	ULONG RetByte;
 
-	ObjAttr.Attributes = OBJ_KERNEL_HANDLE;
+	if (ZwQueryInformationProcess == NULL && InitZwQueryInformationProcess() == STATUS_UNSUCCESSFUL) return 0;
 
+	InitializeObjectAttributes(&ObjAttr, NULL, OBJ_KERNEL_HANDLE, NULL, NULL);
 	ClientId.UniqueProcess = PsGetCurrentProcessId();
+
 	Status = ZwOpenProcess(&hProcess, PROCESS_QUERY_INFORMATION, &ObjAttr, &ClientId);
 	if (Status != STATUS_SUCCESS || !hProcess) return 0;
 
@@ -280,6 +298,8 @@ ULONG ProcessGetIdByHandle(HANDLE hProcess)
 	NTSTATUS Status;
 	PROCESS_BASIC_INFORMATION ProcBasicInfo;
 	ULONG Len;
+
+	if (ZwQueryInformationProcess == NULL && InitZwQueryInformationProcess() == STATUS_UNSUCCESSFUL) return 0;
 
 	Status = ZwQueryInformationProcess(hProcess, ProcessBasicInformation,
 		&ProcBasicInfo, sizeof(PROCESS_BASIC_INFORMATION), &Len);
@@ -321,6 +341,8 @@ ULONG ProcessGetParentPId(ULONG ProcessId)
 	ULONG ParentPId = 0, BufSize = sizeof(PROCESS_BASIC_INFORMATION);
 
 	if (ProcessId == 0) return 0;
+
+	if (ZwQueryInformationProcess == NULL && InitZwQueryInformationProcess() == STATUS_UNSUCCESSFUL) return 0;
 
 	InitializeObjectAttributes(&ObjAttr, NULL, OBJ_KERNEL_HANDLE, NULL, NULL);
 	ClientId.UniqueProcess = UlongToHandle(ProcessId);
@@ -372,24 +394,14 @@ NTSTATUS ZwGetProcessImageName(
 
 	PAGED_CODE();
 
+	if (ZwQueryInformationProcess == NULL && InitZwQueryInformationProcess() == STATUS_UNSUCCESSFUL) return 0;
+
 	pProcess = FltGetRequestorProcess(Data);
 	if (pProcess) {
 		Status = ObOpenObjectByPointer(pProcess, OBJ_KERNEL_HANDLE, NULL, GENERIC_READ, 0, KernelMode, &hProcess);
 		if (!NT_SUCCESS(Status)) {
 			DbgPrint("[TEST] ObOpenObjectByPointer failed [0x%X]", Status);
 			return Status;
-		}
-
-		if (!ZwQueryInformationProcess) {
-			UNICODE_STRING RoutineName;
-			RtlInitUnicodeString(&RoutineName, L"ZwQueryInformationProcess");
-
-			ZwQueryInformationProcess = (QUERY_INFO_PROCESS)MmGetSystemRoutineAddress(&RoutineName);
-
-			if (!ZwQueryInformationProcess) {
-				ZwClose(hProcess);
-				return STATUS_UNSUCCESSFUL;
-			}
 		}
 
 		Status = ZwQueryInformationProcess(hProcess, ProcessImageFileName, NULL, 0, &BufLen);

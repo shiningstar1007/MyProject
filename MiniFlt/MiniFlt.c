@@ -340,7 +340,7 @@ VOID GetAlternateDataStream(PCFLT_RELATED_OBJECTS FltObjects)
 	BOOLEAN bDirectory = FALSE;
 
 	Status = FltIsDirectory(FltObjects->FileObject, FltObjects->Instance, &bDirectory);
-	if (NT_SUCCESS(Status) && bDirectory) return FALSE;
+	if (NT_SUCCESS(Status) && bDirectory) return;
 
 	InfoBlock = (PBYTE)MyAllocNonPagedPool((1024 * 64), &g_NonPagedPoolCnt);
 	
@@ -375,7 +375,6 @@ ULONG GetVolumeId(
 	_In_ PCFLT_RELATED_OBJECTS FltObjects
 )
 {
-	IO_STATUS_BLOCK IoStatus;
 	PFILE_FS_VOLUME_INFORMATION pFsVolumeInfo;
 	ULONG BufSize = sizeof(PFILE_FS_VOLUME_INFORMATION) + 200, VolumeId;
 
@@ -517,8 +516,9 @@ PMINIFLT_INFO GetMiniFltInfo(
 	if (FileName == NULL) {
 		FileName = MakeFileNameByFileObj(pVolContext, FltObjects->FileObject);
 		if (FileName == NULL) {
-			DbgPrint("%s MakeFilePathByFileObj failed (DriveType=%d)",CallFuncName, pVolContext->DriveType);
+			DbgPrint("%s MakeFilePathByFileObj failed (DriveType=%d)", CallFuncName, pVolContext->DriveType);
 		}
+		else FileName = GetFileNameFromFileObject(FltObjects);
 	}
 
 	if (pFullNameInfo != NULL) FltReleaseFileNameInformation(pFullNameInfo);
