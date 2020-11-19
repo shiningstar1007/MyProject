@@ -15,5 +15,6 @@
 #include "Context.h"
 #include "ErrorCode.h"
 #include "SystemCallHook.h"
+#include "MiniFltLog.h"
 
 #endif

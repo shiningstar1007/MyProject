@@ -33,7 +33,37 @@ typedef long BOOL, * PBOOL;
 #define PROCESS_TERMINATE 0x1
 #define ACTIVE_PROCESS_LINKS 0x2e8
 
+#define MINI_PORT_NAME     L"\\MiniFltPort"
+#define MINI_LOG_PORT_NAME L"\\MiniFltLogPort"
+
+#define RECORD_SIZE 4096
+
 extern NPAGED_LOOKASIDE_LIST g_MiniFltLookaside;
+
+typedef struct _MINI_GLOBAL_DATA {
+	PFLT_FILTER hFilter;
+	PDRIVER_OBJECT DriverObject;
+	UNICODE_STRING RegistryPath;
+
+	PFLT_PORT ServerPort;
+	PFLT_PORT ClientPort;
+
+	PFLT_PORT ServerLogPort;
+	PFLT_PORT ClientLogPort;
+
+	LONG MaxLogBufCnt;
+	__volatile LONG LogBufCnt;
+
+	__volatile LONG StaticBufInUse;
+	PVOID OutOfMemoryBuf[RECORD_SIZE / sizeof(PVOID)];
+
+	__volatile LONG LogSequenceNumber;
+
+	LIST_ENTRY LogBufList;
+
+	BOOL bFirstInitLoad;
+	BOOL bFirstLoadReg;
+} MINI_GLOBAL_DATA, * PMINI_GLOBAL_DATA;
 
 typedef struct _MINIFLT_INFO MINIFLT_INFO, * PMINIFLT_INFO;
 struct _MINIFLT_INFO {

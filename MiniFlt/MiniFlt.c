@@ -1,7 +1,8 @@
 #include "StdAfx.h"
 
-PFLT_FILTER g_hFilter;
 NPAGED_LOOKASIDE_LIST g_MiniFltLookaside;
+
+MINI_GLOBAL_DATA g_MiniData;
 
 DRIVER_INITIALIZE DriverEntry;
 NTSTATUS
@@ -64,6 +65,35 @@ MiniFltPreFsControl(
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
 	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
 );
+
+NTSTATUS InitializeCommPort()
+{
+	NTSTATUS Status;
+	PSECURITY_DESCRIPTOR SecDes;
+	OBJECT_ATTRIBUTES ObjAttr;
+	UNICODE_STRING UniPortName;
+
+	Status = FltBuildDefaultSecurityDescriptor(&SecDes, FLT_PORT_ALL_ACCESS);
+	if (!NT_SUCCESS(Status)) return Status;
+
+	RtlInitUnicodeString(&UniPortName, MINI_PORT_NAME);
+	InitializeObjectAttributes(&ObjAttr, &UniPortName, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, SecDes);
+
+	Status = FltCreateCommunicationPort(g_MiniData.hFilter, &g_MiniData.ServerPort, &ObjAttr, NULL,
+		MiniFltConnect, MiniFltDisconnect, MiniFltMessage, 1);
+/*
+	if (NT_SUCCESS(Status)) {
+		RtlInitUnicodeString(&UniPortName, MINI_LOG_PORT_NAME);
+		InitializeObjectAttributes(&ObjAttr, &UniPortName, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, SecDes);
+
+		Status = FltCreateCommunicationPort(g_KeData.hFilter, &g_KeData.ServerLogPort, &ObjAttr, NULL,
+			MiniFltLogConnect, MiniFltLogDisconnect, MiniFltLogMessage, 1);
+	}
+*/
+	FltFreeSecurityDescriptor(SecDes);
+
+	return Status;
+}
 
 
 #ifdef ALLOC_PRAGMA
@@ -138,18 +168,18 @@ DriverEntry (
 
     status = FltRegisterFilter( DriverObject,
                                 &FilterRegistration,
-                                &g_hFilter);
-
+                                &g_MiniData.hFilter);
+		
     if (!NT_SUCCESS( status )) {
 
         return status;
     }
 
-    status = FltStartFiltering(g_hFilter);
+    status = FltStartFiltering(g_MiniData.hFilter);
 
     if (!NT_SUCCESS( status )) {
 
-        FltUnregisterFilter(g_hFilter);
+        FltUnregisterFilter(g_MiniData.hFilter);
     }
 
     return status;
@@ -166,7 +196,7 @@ MiniFltUnload (
 
 	ExDeleteNPagedLookasideList(&g_MiniFltLookaside);
 
-  FltUnregisterFilter(g_hFilter);
+  FltUnregisterFilter(g_MiniData.hFilter);
 
   return STATUS_SUCCESS;
 }
