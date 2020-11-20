@@ -40,6 +40,17 @@ typedef long BOOL, * PBOOL;
 
 extern NPAGED_LOOKASIDE_LIST g_MiniFltLookaside;
 
+typedef enum _MINIFLT_COMMAND {
+
+	GET_LOG,
+} MINIFLT_COMMAND;
+
+typedef struct _COMMAND_MESSAGE {
+	MINIFLT_COMMAND Command;
+	ULONG Reserved;  // Alignment on IA64
+	UCHAR Data[];
+} COMMAND_MESSAGE, * PCOMMAND_MESSAGE;
+
 typedef struct _MINI_GLOBAL_DATA {
 	PFLT_FILTER hFilter;
 	PDRIVER_OBJECT DriverObject;
@@ -64,6 +75,9 @@ typedef struct _MINI_GLOBAL_DATA {
 	BOOL bFirstInitLoad;
 	BOOL bFirstLoadReg;
 } MINI_GLOBAL_DATA, * PMINI_GLOBAL_DATA;
+
+extern MINI_GLOBAL_DATA g_MiniData;
+
 
 typedef struct _MINIFLT_INFO MINIFLT_INFO, * PMINIFLT_INFO;
 struct _MINIFLT_INFO {

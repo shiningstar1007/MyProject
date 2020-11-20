@@ -83,6 +83,7 @@
     <ClInclude Include="Context.h" />
     <ClInclude Include="ErrorCode.h" />
     <ClInclude Include="MiniFlt.h" />
+    <ClInclude Include="MiniFltLog.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="SystemCallHook.h" />
   </ItemGroup>
@@ -177,6 +178,7 @@
     <ClCompile Include="CommFunc.c" />
     <ClCompile Include="Context.c" />
     <ClCompile Include="MiniFlt.c" />
+    <ClCompile Include="MiniFltLog.c" />
     <ClCompile Include="SystemCallHook.c" />
     <ResourceCompile Include="MiniFlt.rc" />
   </ItemGroup>
