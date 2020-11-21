@@ -72,6 +72,8 @@ typedef struct _MINI_GLOBAL_DATA {
 
 	LIST_ENTRY LogBufList;
 
+	NPAGED_LOOKASIDE_LIST LogBufLookaside;
+
 	BOOL bFirstInitLoad;
 	BOOL bFirstLoadReg;
 } MINI_GLOBAL_DATA, * PMINI_GLOBAL_DATA;
@@ -84,6 +86,7 @@ struct _MINIFLT_INFO {
 	PCHAR UserName[MAX_NAME];
 	PCHAR GroupName[MAX_NAME];
 	PCHAR FileName[MAX_KPATH];
+	WPCHAR FileNameW[MAX_KPATH];
 
 	PCHAR ProcName[MAX_KPATH];
 	PWCHAR ProcNameW[MAX_KPATH];

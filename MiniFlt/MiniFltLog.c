@@ -8,6 +8,142 @@
 #pragma alloc_text(PAGE, MiniFltLogMessage)
 #endif
 
+LOG_RECORD g_LastLog = { 0 };
+ULONG g_LogAllocCnt = 0;
+
+PRECORD_LIST AllocateMiniFltLogBuf(
+	_Out_ PULONG RecordType
+)
+{
+	PVOID Buffer;
+	ULONG RecType = RECORD_TYPE_NORMAL;
+
+	if (g_MiniData.LogBufCnt < g_MiniData.MaxLogBufCnt) {
+		InterlockedIncrement(&g_MiniData.LogBufCnt);
+		Buffer = ExAllocateFromNPagedLookasideList(&g_MiniData.LogBufLookaside);
+
+		if (Buffer == NULL) {
+			InterlockedDecrement(&g_MiniData.LogBufCnt);
+			RecType = RECORD_TYPE_FLAG_OUT_OF_MEMORY;
+		}
+	}
+	else {
+		RecType = RECORD_TYPE_FLAG_EXCEED_MEMORY_ALLOWANCE;
+		Buffer = NULL;
+	}
+
+	*RecordType = RecType;
+
+	return Buffer;
+}
+
+VOID FreeMiniFltLogBuf(
+	_In_ PVOID Buffer
+)
+{
+	ExFreeToNPagedLookasideList(&g_MiniData.LogBufLookaside, Buffer);
+	InterlockedDecrement(&g_MiniData.LogBufCnt);
+}
+
+PRECORD_LIST CreateMiniFltLog()
+{
+	PRECORD_LIST LogBuf;
+	ULONG InitRecordType;
+
+	LogBuf = AllocateMiniFltLogBuf(&InitRecordType);
+	if (LogBuf == NULL) {
+		if (!InterlockedExchange(&g_MiniData.StaticBufInUse, TRUE)) {
+
+			LogBuf = (PRECORD_LIST)g_MiniData.OutOfMemoryBuf;
+			InitRecordType |= RECORD_TYPE_FLAG_STATIC;
+		}
+	}
+
+	if (LogBuf) {
+		LogBuf->LogRecord.RecordType = InitRecordType;
+		LogBuf->LogRecord.Length = sizeof(LOG_RECORD);
+		LogBuf->LogRecord.SequenceNumber = InterlockedIncrement(&g_MiniData.LogSequenceNumber);
+		RtlZeroMemory(&LogBuf->LogRecord.Data, sizeof(LOG_DATA));
+	}
+
+	return LogBuf;
+}
+
+VOID FreeMiniFltLog(
+	_In_ PRECORD_LIST Record
+)
+{
+	if (FlagOn(Record->LogRecord.RecordType, RECORD_TYPE_FLAG_STATIC)) {
+		FLT_ASSERT(g_MiniData.StaticBufInUse);
+		g_MiniData.StaticBufInUse = FALSE;
+	}
+	else FreeMiniFltLogBuf(Record);
+}
+
+VOID SetMiniFltRecordName(
+	_Inout_ PLOG_RECORD LogRecord,
+	_In_opt_ PWCHAR ObjPathW
+)
+{
+	FLT_ASSERT(ObjPathW != NULL);
+
+	MyStrNCopyW(LogRecord->FileNameW, ObjPathW, -1, MAX_KPATH);
+	LogRecord->Length = ROUND_TO_SIZE((LogRecord->Length + MAX_KPATH + sizeof(WCHAR)), sizeof(PVOID));
+
+	FLT_ASSERT(LogRecord->Length <= MAX_LOG_RECORD_LENGTH);
+}
+
+VOID MiniFltLog(
+	_In_ PMINIFLT_INFO MiniFltInfo
+)
+{
+	PRECORD_LIST RecordList;
+	PLOG_RECORD LogRecord;
+	//SYSTEMTIME SysTime;
+
+	RecordList = CreateMiniFltLog();
+	if (!RecordList) return;
+
+	LogRecord = &RecordList->LogRecord;
+
+	//LogRecord->Data.Time = MiniFltInfo->Time;
+	//KrnlTimeToSysTime(LogRecord->Data.Time.QuadPart, &SysTime);
+
+	SetMiniFltRecordName(LogRecord, MiniFltInfo->FileNameW);
+	MyStrNCopy(LogRecord->Data.FileName, MiniFltInfo->FileName, MAX_KPATH);
+	MyStrNCopy(LogRecord->Data.ProcName, MiniFltInfo->ProcName, MAX_KPATH);
+	MyStrNCopyW(LogRecord->Data.ProcNameW, MiniFltInfo->ProcNameW, -1, MAX_KPATH);
+
+	if (*MiniFltInfo->UserName) MyStrNCopy(LogRecord->Data.UserName, MiniFltInfo->UserName, MAX_NAME);
+/*
+	MySNPrintf(LogRecord->Data.DateTime, sizeof(LogRecord->Data.DateTime), "%04u-%02u-%02u %02u:%02u:%02u.%03u",
+		SysTime.wYear, SysTime.wMonth, SysTime.wDay, SysTime.wHour, SysTime.wMinute, SysTime.wSecond, SysTime.wMilliseconds);
+*/
+
+	memcpy(&g_LastLog, LogRecord, sizeof(LOG_RECORD));
+	InsertTailList(&g_MiniData.LogBufList, &RecordList->List);
+}
+
+VOID MiniFltLogWorkItemRoutine(
+	_In_ PFLT_GENERIC_WORKITEM WorkItem,
+	_In_ PVOID FltObject,
+	_In_opt_ PVOID Context
+)
+{
+	PLOG_WORKITEM_CONTEXT WorkItemCtx = (PLOG_WORKITEM_CONTEXT)Context;
+
+	UNREFERENCED_PARAMETER(WorkItem);
+	UNREFERENCED_PARAMETER(FltObject);
+
+	if (!WorkItemCtx) return;
+
+	MiniFltLog(&WorkItemCtx->MiniInfo);
+
+	MyFreeNonPagedPool(WorkItemCtx, &g_LogAllocCnt);
+
+	FltFreeGenericWorkItem(WorkItem);
+}
+
 NTSTATUS MiniFltGetLog(
 	_Out_writes_bytes_to_opt_(OutBufLen, *RetOutBufLen) PUCHAR OutBuffer,
 	_In_ ULONG OutBufLen,
