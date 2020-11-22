@@ -124,6 +124,35 @@ VOID MiniFltLog(
 	InsertTailList(&g_MiniData.LogBufList, &RecordList->List);
 }
 
+NTSTATUS MiniFltLogAsync(
+	_In_ PMINIFLT_INFO MiniFltInfo
+)
+{
+	PFLT_GENERIC_WORKITEM WorkItem = NULL;
+	PLOG_WORKITEM_CONTEXT WorkItemCtx = NULL;
+	NTSTATUS Status = STATUS_SUCCESS;
+
+	WorkItem = FltAllocateGenericWorkItem();
+	if (WorkItem) {
+		WorkItemCtx = MyAllocNonPagedPool(sizeof(LOG_WORKITEM_CONTEXT), &g_LogAllocCnt);
+		if (WorkItemCtx) {
+			RtlCopyMemory(&WorkItemCtx->MiniInfo, MiniFltInfo, sizeof(MINIFLT_INFO));
+
+			Status = FltQueueGenericWorkItem(WorkItem, (PVOID)MiniFltInfo->FltObjects->Filter, MiniFltLogWorkItemRoutine,
+				DelayedWorkQueue, (PVOID)WorkItemCtx);
+			if (!NT_SUCCESS(Status)) {
+				DbgPrint("MiniFltLogAsync: Failed to Create LogWorkItem\n");
+				MyFreeNonPagedPool(WorkItemCtx, &g_LogAllocCnt);
+
+				FltFreeGenericWorkItem(WorkItem);
+			}
+		}
+		else FltFreeGenericWorkItem(WorkItem);
+	}
+
+	return Status;
+}
+
 VOID MiniFltLogWorkItemRoutine(
 	_In_ PFLT_GENERIC_WORKITEM WorkItem,
 	_In_ PVOID FltObject,
@@ -151,6 +180,47 @@ NTSTATUS MiniFltGetLog(
 )
 {
 	NTSTATUS Status = STATUS_NO_MORE_ENTRIES;
+	PLIST_ENTRY pList;
+	ULONG BytesWritten = 0;
+	PLOG_RECORD pLogRecord;
+	PRECORD_LIST pRecordList;
+	BOOL RecordsAvailable = FALSE;
+
+	while (!IsListEmpty(&g_MiniData.LogBufList) && (OutBufLen > 0)) {
+		RecordsAvailable = TRUE;
+		pList = RemoveHeadList(&g_MiniData.LogBufList);
+		pRecordList = CONTAINING_RECORD(pList, RECORD_LIST, List);
+		pLogRecord = &pRecordList->LogRecord;
+
+		if (REMAINING_NAME_SPACE(pLogRecord) == MAX_NAME_SPACE) {
+			pLogRecord->Length += ROUND_TO_SIZE(sizeof(WCHAR), sizeof(PVOID));
+			pLogRecord->FileNameW[0] = 0;
+		}
+
+		if (OutBufLen < pLogRecord->Length) {
+			InsertHeadList(&g_MiniData.LogBufList, pList);
+			break;
+		}
+
+		__try {
+			RtlCopyMemory(OutBuffer, pLogRecord, pLogRecord->Length);
+		}
+		__except (PsKeExceptionFilter(GetExceptionInformation(), TRUE)) {
+			InsertHeadList(&g_MiniData.LogBufList, pList);
+
+			return GetExceptionCode();
+		}
+
+		BytesWritten += pLogRecord->Length;
+		OutBufLen -= pLogRecord->Length;
+		OutBuffer += pLogRecord->Length;
+		FreeMiniFltLogBuf(pRecordList);
+	}
+
+	if ((BytesWritten == 0) && RecordsAvailable) Status = STATUS_BUFFER_TOO_SMALL;
+	else if (BytesWritten > 0) Status = STATUS_SUCCESS;
+
+	*RetOutBufLen = BytesWritten;
 
 	return Status;
 }

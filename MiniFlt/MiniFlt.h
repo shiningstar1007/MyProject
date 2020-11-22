@@ -86,13 +86,17 @@ struct _MINIFLT_INFO {
 	PCHAR UserName[MAX_NAME];
 	PCHAR GroupName[MAX_NAME];
 	PCHAR FileName[MAX_KPATH];
-	WPCHAR FileNameW[MAX_KPATH];
+	PWCHAR FileNameW[MAX_KPATH];
 
 	PCHAR ProcName[MAX_KPATH];
 	PWCHAR ProcNameW[MAX_KPATH];
 
 	PWCHAR RegPath[MAX_KPATH];
 	PWCHAR RegPathW[MAX_KPATH];
+
+	DRIVE_TYPE DrvType;
+	FLT_FILESYSTEM_TYPE FSType;
+	PCFLT_RELATED_OBJECTS FltObjects;
 };
 
 typedef enum {

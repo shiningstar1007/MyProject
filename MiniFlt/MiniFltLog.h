@@ -9,6 +9,13 @@
 #define RECORD_TYPE_FLAG_EXCEED_MEMORY_ALLOWANCE 0x20000000
 #define RECORD_TYPE_FLAG_OUT_OF_MEMORY           0x10000000
 
+#define REMAINING_NAME_SPACE(LogRecord) \
+	(FLT_ASSERT((LogRecord)->Length >= sizeof(LOG_RECORD)), \
+	(USHORT)(MAX_NAME_SPACE - ((LogRecord)->Length - sizeof(LOG_RECORD))))
+
+#define MAX_LOG_RECORD_LENGTH  (RECORD_SIZE - FIELD_OFFSET( RECORD_LIST, LogRecord ))
+#define MAX_NAME_SPACE ROUND_TO_SIZE((RECORD_SIZE - sizeof(RECORD_LIST)), sizeof( PVOID ))
+
 extern ULONG g_LogAllocCnt;
 
 typedef struct _LOG_WORKITEM_CONTEXT {
