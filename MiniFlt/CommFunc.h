@@ -92,6 +92,32 @@ typedef unsigned long ULONG, * PULONG, DWORD;
 typedef unsigned char BYTE, * PBYTE;
 typedef long BOOL, * PBOOL;
 
+#define TICKSPERMIN       600000000
+#define TICKSPERSEC       10000000
+#define TICKSPERMSEC      10000
+#define SECSPERDAY        86400
+#define SECSPERHOUR       3600
+#define SECSPERMIN        60
+#define MINSPERHOUR       60
+#define HOURSPERDAY       24
+#define EPOCHWEEKDAY      1
+#define DAYSPERWEEK       7
+#define EPOCHYEAR         1601
+#define DAYSPERNORMALYEAR 365
+#define DAYSPERLEAPYEAR   366
+#define MONSPERYEAR       12
+
+typedef struct _SYSTEMTIME {
+	USHORT wYear;
+	USHORT wMonth;
+	USHORT wDayOfWeek;
+	USHORT wDay;
+	USHORT wHour;
+	USHORT wMinute;
+	USHORT wSecond;
+	USHORT wMilliseconds;
+} SYSTEMTIME, *PSYSTEMTIME;
+
 #define ACTION_READ         0x00000001
 #define ACTION_WRITE        0x00000002
 #define ACTION_TRAVERSE     0x00000004

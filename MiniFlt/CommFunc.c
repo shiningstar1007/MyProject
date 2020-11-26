@@ -29,6 +29,74 @@ PVOID MyFreeNonPagedPool(
 	return NULL;
 }
 
+static const int YearLengths[2] = { DAYSPERNORMALYEAR, DAYSPERLEAPYEAR };
+static const int MonthLengths[2][MONSPERYEAR] = {
+	{ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },
+	{ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+};
+
+VOID KrnlTimeToSysTime(
+	_In_ LONGLONG KrnlTime,
+	_Inout_ PSYSTEMTIME SysTime
+)
+{
+	const int* Months;
+	int LeapSecondCorrections, SecondsInDay, CurYear, LeapYear, CurMonth, Days;
+
+	SysTime->wMilliseconds = (USHORT)((KrnlTime % TICKSPERSEC) / TICKSPERMSEC);
+
+	KrnlTime = KrnlTime / TICKSPERSEC;
+
+	LeapSecondCorrections = 0;
+	Days = (int)(KrnlTime / SECSPERDAY);
+	SecondsInDay = (int)(KrnlTime % SECSPERDAY);
+	SecondsInDay += LeapSecondCorrections;
+	while (SecondsInDay < 0) {
+		SecondsInDay += SECSPERDAY;
+		Days--;
+	}
+	while (SecondsInDay >= SECSPERDAY) {
+		SecondsInDay -= SECSPERDAY;
+		Days++;
+	}
+
+	SysTime->wHour = (USHORT)(SecondsInDay / SECSPERHOUR);
+	SecondsInDay = SecondsInDay % SECSPERHOUR;
+
+	SysTime->wMinute = (USHORT)(SecondsInDay / SECSPERMIN);
+	SysTime->wSecond = (USHORT)(SecondsInDay % SECSPERMIN);
+	SysTime->wDayOfWeek = (USHORT)((EPOCHWEEKDAY + Days) % DAYSPERWEEK);
+
+	for (CurYear = EPOCHYEAR;; CurYear++) {
+		LeapYear = IsLeapYear(CurYear);
+		if (Days < YearLengths[LeapYear]) break;
+
+		Days = Days - YearLengths[LeapYear];
+	}
+	SysTime->wYear = (USHORT)CurYear;
+
+	Months = MonthLengths[LeapYear];
+	for (CurMonth = 0; Days >= Months[CurMonth]; CurMonth++) {
+		Days = Days - Months[CurMonth];
+	}
+	SysTime->wMonth = (USHORT)(CurMonth + 1);
+	SysTime->wDay = (USHORT)(Days + 1);
+}
+
+LARGE_INTEGER GetKernelTime(
+	_Inout_ PSYSTEMTIME SysTime
+)
+{
+	LARGE_INTEGER Time, SystemTime;
+
+	KeQuerySystemTime(&SystemTime);
+	ExSystemTimeToLocalTime(&SystemTime, &Time);
+
+	if (SysTime != NULL) KrnlTimeToSysTime(Time.QuadPart, SysTime);
+
+	return Time;
+}
+
 ULONG MyStrNCopy(
 	_Out_ PCHAR DestBuf,
 	_In_ CONST PCHAR SourceBuf,
