@@ -83,6 +83,7 @@ extern MINI_GLOBAL_DATA g_MiniData;
 
 typedef struct _MINIFLT_INFO MINIFLT_INFO, * PMINIFLT_INFO;
 struct _MINIFLT_INFO {
+	LARGE_INTEGER Time;
 	PCHAR UserName[MAX_NAME];
 	PCHAR GroupName[MAX_NAME];
 	PCHAR FileName[MAX_KPATH];

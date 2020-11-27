@@ -165,6 +165,15 @@ ULONG MyStrNCopy(
 	_In_ ULONG MaxLen
 );
 
+VOID KrnlTimeToSysTime(
+	_In_ LONGLONG KrnlTime,
+	_Inout_ PSYSTEMTIME SysTime
+);
+
+LARGE_INTEGER GetKernelTime(
+	_Inout_ PSYSTEMTIME SysTime
+);
+
 ULONG MyStrNCopyW(
 	_Out_ PWCHAR DestBuf,
 	_In_ CONST PWCHAR SourceBuf,

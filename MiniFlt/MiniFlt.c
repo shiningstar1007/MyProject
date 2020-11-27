@@ -81,18 +81,31 @@ NTSTATUS InitializeCommPort()
 
 	Status = FltCreateCommunicationPort(g_MiniData.hFilter, &g_MiniData.ServerPort, &ObjAttr, NULL,
 		MiniFltConnect, MiniFltDisconnect, MiniFltMessage, 1);
-/*
+
 	if (NT_SUCCESS(Status)) {
 		RtlInitUnicodeString(&UniPortName, MINI_LOG_PORT_NAME);
 		InitializeObjectAttributes(&ObjAttr, &UniPortName, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, SecDes);
 
-		Status = FltCreateCommunicationPort(g_KeData.hFilter, &g_KeData.ServerLogPort, &ObjAttr, NULL,
+		Status = FltCreateCommunicationPort(g_MiniData.hFilter, &g_MiniData.ServerLogPort, &ObjAttr, NULL,
 			MiniFltLogConnect, MiniFltLogDisconnect, MiniFltLogMessage, 1);
 	}
-*/
+
 	FltFreeSecurityDescriptor(SecDes);
 
 	return Status;
+}
+
+NTSTATUS FinalizeCommPort()
+{
+	if (g_MiniData.ServerPort != NULL) {
+
+		FltCloseCommunicationPort(g_MiniData.ServerPort);
+	}
+
+	if (g_MiniData.ServerLogPort != NULL) {
+
+		FltCloseCommunicationPort(g_MiniData.ServerLogPort);
+	}
 }
 
 
@@ -165,6 +178,7 @@ DriverEntry (
 
 
 		ExInitializeNPagedLookasideList(&g_MiniFltLookaside, NULL, NULL, 0, sizeof(MINIFLT_INFO), TAG_MINIFLT, 0);
+		KeInitializeSpinLock(&g_LogSpinLock);
 
     status = FltRegisterFilter( DriverObject,
                                 &FilterRegistration,

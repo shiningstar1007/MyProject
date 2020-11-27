@@ -10,6 +10,7 @@
 
 LOG_RECORD g_LastLog = { 0 };
 ULONG g_LogAllocCnt = 0;
+KSPIN_LOCK g_LogSpinLock;
 
 PRECORD_LIST AllocateMiniFltLogBuf(
 	_Out_ PULONG RecordType
@@ -93,21 +94,21 @@ VOID SetMiniFltRecordName(
 	FLT_ASSERT(LogRecord->Length <= MAX_LOG_RECORD_LENGTH);
 }
 
-VOID MiniFltLog(
+VOID InsertMiniFltLog(
 	_In_ PMINIFLT_INFO MiniFltInfo
 )
 {
 	PRECORD_LIST RecordList;
 	PLOG_RECORD LogRecord;
-	//SYSTEMTIME SysTime;
+	SYSTEMTIME SysTime;
+	KLOCK_QUEUE_HANDLE hLockQueue;
 
 	RecordList = CreateMiniFltLog();
 	if (!RecordList) return;
 
 	LogRecord = &RecordList->LogRecord;
 
-	//LogRecord->Data.Time = MiniFltInfo->Time;
-	//KrnlTimeToSysTime(LogRecord->Data.Time.QuadPart, &SysTime);
+	LogRecord->Data.Time = GetKernelTime(&SysTime);
 
 	SetMiniFltRecordName(LogRecord, MiniFltInfo->FileNameW);
 	MyStrNCopy(LogRecord->Data.FileName, MiniFltInfo->FileName, MAX_KPATH);
@@ -120,8 +121,11 @@ VOID MiniFltLog(
 		SysTime.wYear, SysTime.wMonth, SysTime.wDay, SysTime.wHour, SysTime.wMinute, SysTime.wSecond, SysTime.wMilliseconds);
 */
 
-	memcpy(&g_LastLog, LogRecord, sizeof(LOG_RECORD));
+	KeAcquireInStackQueuedSpinLock(&g_LogSpinLock, &hLockQueue);
+	RtlCopyMemory(&g_LastLog, LogRecord, sizeof(LOG_RECORD));
 	InsertTailList(&g_MiniData.LogBufList, &RecordList->List);
+	KeReleaseInStackQueuedSpinLock(&hLockQueue);
+
 }
 
 NTSTATUS MiniFltLogAsync(
@@ -166,7 +170,7 @@ VOID MiniFltLogWorkItemRoutine(
 
 	if (!WorkItemCtx) return;
 
-	MiniFltLog(&WorkItemCtx->MiniInfo);
+	InsertMiniFltLog(&WorkItemCtx->MiniInfo);
 
 	MyFreeNonPagedPool(WorkItemCtx, &g_LogAllocCnt);
 
@@ -185,7 +189,9 @@ NTSTATUS MiniFltGetLog(
 	PLOG_RECORD pLogRecord;
 	PRECORD_LIST pRecordList;
 	BOOL RecordsAvailable = FALSE;
+	KLOCK_QUEUE_HANDLE hLockQueue;
 
+	KeAcquireInStackQueuedSpinLock(&g_LogSpinLock, &hLockQueue);
 	while (!IsListEmpty(&g_MiniData.LogBufList) && (OutBufLen > 0)) {
 		RecordsAvailable = TRUE;
 		pList = RemoveHeadList(&g_MiniData.LogBufList);
@@ -207,6 +213,7 @@ NTSTATUS MiniFltGetLog(
 		}
 		__except (PsKeExceptionFilter(GetExceptionInformation(), TRUE)) {
 			InsertHeadList(&g_MiniData.LogBufList, pList);
+			KeReleaseInStackQueuedSpinLock(&hLockQueue);
 
 			return GetExceptionCode();
 		}
@@ -216,6 +223,7 @@ NTSTATUS MiniFltGetLog(
 		OutBuffer += pLogRecord->Length;
 		FreeMiniFltLogBuf(pRecordList);
 	}
+	KeReleaseInStackQueuedSpinLock(&hLockQueue);
 
 	if ((BytesWritten == 0) && RecordsAvailable) Status = STATUS_BUFFER_TOO_SMALL;
 	else if (BytesWritten > 0) Status = STATUS_SUCCESS;

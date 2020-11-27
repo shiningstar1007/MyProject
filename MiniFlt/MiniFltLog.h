@@ -17,6 +17,7 @@
 #define MAX_NAME_SPACE ROUND_TO_SIZE((RECORD_SIZE - sizeof(RECORD_LIST)), sizeof( PVOID ))
 
 extern ULONG g_LogAllocCnt;
+extern KSPIN_LOCK g_LogSpinLock;
 
 typedef struct _LOG_WORKITEM_CONTEXT {
 	MINIFLT_INFO MiniInfo;
@@ -55,5 +56,26 @@ typedef struct _LOG_RECORD {
 	WCHAR FileNameW[MAX_KPATH]; //  This is a null terminated string
 
 } LOG_RECORD, * PLOG_RECORD;
+
+NTSTATUS MiniFltLogConnect(
+	_In_ PFLT_PORT ClientPort,
+	_In_ PVOID ServerPortCookie,
+	_In_reads_bytes_(SizeOfContext) PVOID ConnectionContext,
+	_In_ ULONG SizeOfContext,
+	_Flt_ConnectionCookie_Outptr_ PVOID* ConnectionCookie
+);
+
+VOID MiniFltLogDisconnect(
+	_In_opt_ PVOID ConnectionCookie
+);
+
+NTSTATUS MiniFltLogMessage(
+	_In_ PVOID ConnectionCookie,
+	_In_reads_bytes_opt_(InputBufSize) PVOID InputBuf,
+	_In_ ULONG InputBufSize,
+	_Out_writes_bytes_to_opt_(OutputBufSize, *RetOutBufLen) PVOID OutputBuf,
+	_In_ ULONG OutputBufSize,
+	_Out_ PULONG RetOutBufLen
+);
 
 #endif
