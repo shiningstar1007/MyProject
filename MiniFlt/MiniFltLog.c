@@ -94,7 +94,7 @@ VOID SetMiniFltRecordName(
 	FLT_ASSERT(LogRecord->Length <= MAX_LOG_RECORD_LENGTH);
 }
 
-VOID InsertMiniFltLog(
+VOID MiniFltLogInsert(
 	_In_ PMINIFLT_INFO MiniFltInfo
 )
 {
@@ -126,6 +126,23 @@ VOID InsertMiniFltLog(
 	InsertTailList(&g_MiniData.LogBufList, &RecordList->List);
 	KeReleaseInStackQueuedSpinLock(&hLockQueue);
 
+}
+
+
+VOID MiniFltLogClear()
+{
+	PLIST_ENTRY pList;
+	PRECORD_LIST pRecordList;
+	KLOCK_QUEUE_HANDLE hLockQueue;
+
+	KeAcquireInStackQueuedSpinLock(&g_LogSpinLock, &hLockQueue);
+	while (!IsListEmpty(&g_MiniData.LogBufList)) {
+		pList = RemoveHeadList(&g_MiniData.LogBufList);
+
+		pRecordList = CONTAINING_RECORD(pList, RECORD_LIST, List);
+		FreeMiniFltLog(pRecordList);
+	}
+	KeReleaseInStackQueuedSpinLock(&hLockQueue);
 }
 
 NTSTATUS MiniFltLogAsync(
@@ -170,7 +187,7 @@ VOID MiniFltLogWorkItemRoutine(
 
 	if (!WorkItemCtx) return;
 
-	InsertMiniFltLog(&WorkItemCtx->MiniInfo);
+	MiniFltLogInsert(&WorkItemCtx->MiniInfo);
 
 	MyFreeNonPagedPool(WorkItemCtx, &g_LogAllocCnt);
 
