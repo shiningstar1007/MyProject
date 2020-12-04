@@ -107,22 +107,22 @@ NTSTATUS ZwGetProcessImageName(
 }
 ```
 
-먼저 FltGetRequestorProcess API를 이용해서 EPROCESS의 포인터를 획득하고 난 뒤에  
+먼저 FltGetRequestorProcess API를 이용해서 **EPROCESS의 포인터를 획득**하고 난 뒤에  
 ObOpenObjectByPointer API를 호출해서 EPROCESS의 핸들을 획득합니다.  
 여기서 ObOpenObjectByPointer API를 호출 할 때 반드시 2번째 파라미터  
-HandleAttributes 값은 OBJ_KERNEL_HANDLE 를 설정해야 합니다.  
-(간혹 이 부분을 0으로 셋팅하고 커널에서 사용하시는분들이 계시더군요..)  
+**HandleAttributes 값은 OBJ_KERNEL_HANDLE** 를 설정해야 합니다.  
+**(간혹 이 부분을 0으로 셋팅하고 커널에서 사용하시는분들이 계시더군요..)**  
 이 후에 획득한 핸들을 가지고 ZwQueryInformationProcess API를 호출하면 됩니다.  
-여기서 2번째 파라미터 ProcessInformationClass 값은 ProcessImageFileName 로 설정을 해주시면 됩니다.  
+여기서 2번째 파라미터 **ProcessInformationClass 값은 ProcessImageFileName 로 설정**을 해주시면 됩니다.  
 ProcessImageFileName 값은 프로세스 이미지 파일 이름을 획득할 때 설정하는 값입니다.  
 
 추가적으로 ZwQueryInformationProcess API를 호출 할 때 버퍼를 충분히 크게 잡아도 되지만  
 리턴 되는 값을 가지고 메모리를 할당해서 재 호출 하는 방법이 좀 더 좋다고 생각하기에  
-저는 2번을 호출하여 먼저 할당 할 메모리 사이즈를 리턴 받고 이 후 메모리를 할당하고  
-재 호출하여 프로세스 이미지 파일 경로가 저장된 UNICODE_STRING 포인터를 리턴 받았습니다.  
-그리고 그 안에 있는 데이터를 확인하여 프로세스 경로를 획득하였습니다.  
-그리고 난 다음에 마지막에는 반드시 ObOpenObjectByPointer API 를 호출해서 획득한 핸들을  
-닫아주기 위해 ZwClose API를 호출 해줘야 합니다.  
+저는 2번 호출하여 먼저 할당 할 메모리 사이즈를 리턴 받고 이 후 메모리를 할당하고  
+다시 호출하여 프로세스 이미지 파일 경로가 저장된 UNICODE_STRING 포인터를 리턴 받았습니다.  
+그리고 그 안에 있는 버퍼를 확인하여 프로세스 경로를 획득하였습니다.  
+그리고 난 다음에 마지막에는 반드시 ObOpenObjectByPointer API 를 호출해서  
+**획득한 핸들을 닫아주기 위해 **ZwClose API를 호출** 해줘야 합니다.  
 
 이것으로 제가 알고 있는 총 3가지의 방법으로 커널에서 현재 실행중인 프로세스의 경로를   
 획득하는 방법에 대해서 알아봤습니다.  
