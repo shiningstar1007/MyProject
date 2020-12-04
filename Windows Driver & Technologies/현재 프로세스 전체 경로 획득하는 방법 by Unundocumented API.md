@@ -48,6 +48,7 @@ NTSTATUS InitZwQueryInformationProcess()
 1. 현재 프로세스의 EPROCESS 포인터를 획득해야 합니다.  
 2. 그리고 난 다음에 획득한 EPROCESS 포인터의 핸들을 획득하고,  
 3. 그 핸들을 가지고 프로세스에 대한 정보를 조회하면 됩니다.  
+
 그럼 위 순서를 코드로 보면 아래와 같습니다.  
 
 ```c
