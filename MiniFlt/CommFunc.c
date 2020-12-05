@@ -437,7 +437,7 @@ ULONG ProcessGetParentPath(ULONG ProcessId, PWCHAR ParentPathW)
 	if (ParentPId == 0) return 0;
 
 	Status = PsLookupProcessByProcessId(UlongToPtr(ParentPId), &pProcess);
-	if (Status == STATUS_SUCCESS && pProcess) {
+	if (Status == STATUS_SUCCESS && pProcess != NULL) {
 		KAPC_STATE APCState;
 
 		KeStackAttachProcess((PRKPROCESS)pProcess, &APCState);

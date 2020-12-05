@@ -8,13 +8,15 @@ OB_PREOP_CALLBACK_STATUS ObPreCallBack(
 )
 {
 	CHAR ProcName[MAX_KPATH] = { 0 };
-	PEPROCESS pEProc = (PEPROCESS)ObPreOperInfo->Object;
+	WCHAR ProcNameW[MAX_KPATH] = { 0 };
+	PEPROCESS pEProcess = (PEPROCESS)ObPreOperInfo->Object;
 
 	UNREFERENCED_PARAMETER(RegContext);
 
 	if (KeGetCurrentIrql() != PASSIVE_LEVEL) DbgPrint("KeGetCurrentIrql[0x%X]", KeGetCurrentIrql());
 
-	MyStrNCopy(ProcName, (PCHAR)pEProc + g_ProcNameOffset, MAX_KPATH);
+	GetProcessFullPath(pEProcess, ProcNameW);
+	MyWideCharToChar(ProcNameW, ProcName, MAX_KPATH);
 	if (*ProcName) {
 		if (!_stricmp("notepad.exe", ProcName)) {
 			if (ObPreOperInfo->Operation == OB_OPERATION_HANDLE_CREATE) {
@@ -35,14 +37,16 @@ VOID ObPostCallBack(
 	_Inout_ POB_POST_OPERATION_INFORMATION OperInfo
 )
 {
-	PEPROCESS pEProc = (PEPROCESS)OperInfo->Object;
+	PEPROCESS pEProcess = (PEPROCESS)OperInfo->Object;
 	PLIST_ENTRY pListEntry;
 	CHAR ProcName[MAX_KPATH] = { 0 };
-	ULONG_PTR ProcAddress = (ULONG_PTR)pEProc;
+	WCHAR ProcNameW[MAX_KPATH] = { 0 };
+	ULONG_PTR ProcAddress = (ULONG_PTR)pEProcess;
 
 	UNREFERENCED_PARAMETER(RegContext);
 
-	MyStrNCopy(ProcName, (PCHAR)pEProc + g_ProcNameOffset, MAX_KPATH);
+	GetProcessFullPath(pEProcess, ProcNameW);
+	MyWideCharToChar(ProcNameW, ProcName, MAX_KPATH);
 	if (*ProcName) {
 		if (!_stricmp("notepad.exe", ProcName)) {
 			pListEntry = (PLIST_ENTRY)((ULONG_PTR)ProcAddress + ACTIVE_PROCESS_LINKS);
