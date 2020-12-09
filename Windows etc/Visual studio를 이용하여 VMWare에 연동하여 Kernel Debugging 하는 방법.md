@@ -1,6 +1,6 @@
-# Visual studio를 이용하여 VMWare에 연동하여 Kernel Debuggin 하는 방법
+# Visual studio를 이용하여 VMWare에 연동하여 Kernel Debugging 하는 방법
 
-1. VMWare 설정  
+## 1. VMWare 설정  
 먼저 VMWare를 설정해야 하는데 디버깅을 할 VMWare에 Serial Port를 생성해줘야 합니다.  
 순서는 아래 그림과 같습니다.  
 
@@ -39,14 +39,15 @@
 
 ![이미지](./images/debug4.jpg)  
 
-그 다음에는 바로 Cmd를 실행 후 명령어를 실행해 줘야 합니다.  
+그 다음에는 바로 Cmd를 실행 후 명령어를 실행해줘야 합니다.  
 1. Cmd 실행  
 2. bcdedit /debug on 명령어 실행  
-3. reboot  
+3. OS 재시작  
+
 이러면 VMWare에서의 설정은 끝이 납니다.  
 
 
-2. Visual Studio 설정  
+## 2. Visual Studio 설정  
 Visual Studio에서의 설정은 간단합니다.  
 
 ![이미지](./images/debug5.jpg)  
@@ -70,7 +71,7 @@ Visual Studio에서의 설정은 간단합니다.
 
 이렇게 설정을 하면 Visual Studio 설정도 끝이 납니다.  
 
-3. Debugging 시작  
+## 3. Debugging 시작  
 이제 VMWare에 연결하여 커널 디버깅을 하도록 하겠습니다.  
 
 ![이미지](./images/debug7.jpg)  
