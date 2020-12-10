@@ -67,8 +67,8 @@ VOID KrnlTimeToSysTime(
 	SysTime->wSecond = (USHORT)(SecondsInDay % SECSPERMIN);
 	SysTime->wDayOfWeek = (USHORT)((EPOCHWEEKDAY + Days) % DAYSPERWEEK);
 
-	for (CurYear = EPOCHYEAR;; CurYear++) {
-		LeapYear = IsLeapYear(CurYear);
+	for (CurYear = EPOCHYEAR; ; CurYear++) {
+		LeapYear = (CurYear % 4 == 0 && (CurYear % 100 != 0 || CurYear % 400 == 0)) ? 1 : 0;
 		if (Days < YearLengths[LeapYear]) break;
 
 		Days = Days - YearLengths[LeapYear];
@@ -583,8 +583,19 @@ NTSTATUS GetUserName(
 	//UNICODE_STRING UniDomain;
 	//ULONG DomainSize = 0;
 	SID_NAME_USE NameUse;
+	PSECURITY_SUBJECT_CONTEXT SubjectContext = NULL;
 
-	pToken = SeQuerySubjectContextToken(&(Data->Iopb->Parameters.Create.SecurityContext->AccessState->SubjectSecurityContext));
+	if (Data == NULL) {
+		SubjectContext = MyAllocNonPagedPool(sizeof(SECURITY_SUBJECT_CONTEXT), &g_NonPagedPoolCnt);
+		if (SubjectContext == NULL) return Status;
+
+		SeCaptureSubjectContext(SubjectContext);
+	}
+	else {
+		SubjectContext = &(Data->Iopb->Parameters.Create.SecurityContext->AccessState->SubjectSecurityContext);
+	}
+
+	pToken = SeQuerySubjectContextToken(SubjectContext);
 	if (pToken) {
 		Status = SeQueryInformationToken(pToken, TokenUser, &pUser);
 
@@ -615,6 +626,11 @@ NTSTATUS GetUserName(
 		if (pUser) ExFreePool(pUser);
 	}
 
+	if (Data == NULL) {
+		SeReleaseSubjectContext(SubjectContext);
+		MyFreeNonPagedPool(SubjectContext, &g_NonPagedPoolCnt);
+	}
+
 	return Status;
 }
 
@@ -632,8 +648,19 @@ NTSTATUS GetGroupName(
 	//UNICODE_STRING UniDomain;
 	//ULONG DomainSize = 0;
 	SID_NAME_USE NameUse;
+	PSECURITY_SUBJECT_CONTEXT SubjectContext = NULL;
 
-	pToken = SeQuerySubjectContextToken(&(Data->Iopb->Parameters.Create.SecurityContext->AccessState->SubjectSecurityContext));
+	if (Data == NULL) {
+		SubjectContext = MyAllocNonPagedPool(sizeof(SECURITY_SUBJECT_CONTEXT), &g_NonPagedPoolCnt);
+		if (SubjectContext == NULL) return Status;
+
+		SeCaptureSubjectContext(SubjectContext);
+	}
+	else {
+		SubjectContext = &(Data->Iopb->Parameters.Create.SecurityContext->AccessState->SubjectSecurityContext);
+	}
+
+	pToken = SeQuerySubjectContextToken(SubjectContext);
 	if (pToken) {
 		Status = SeQueryInformationToken(pToken, TokenGroups, &pGroups);
 
@@ -662,6 +689,11 @@ NTSTATUS GetGroupName(
 		}
 
 		if (pGroups) ExFreePool(pGroups);
+	}
+
+	if (Data == NULL) {
+		SeReleaseSubjectContext(SubjectContext);
+		MyFreeNonPagedPool(SubjectContext, &g_NonPagedPoolCnt);
 	}
 
 	return Status;
@@ -779,7 +811,7 @@ BOOL CheckLocalUser()
 	return bLocalUser;
 }
 
-BOOL CheckLocalUserOnlyCreate(
+BOOL CheckLocalUserSecSub(
 	_In_ PFLT_CALLBACK_DATA Data
 )
 {
@@ -787,8 +819,19 @@ BOOL CheckLocalUserOnlyCreate(
 	PACCESS_TOKEN pToken = NULL;
 	PTOKEN_SOURCE pSource = NULL;
 	BOOL bLocalUser = TRUE;
+	PSECURITY_SUBJECT_CONTEXT SubjectContext = NULL;
+	
+	if (Data == NULL) {
+		SubjectContext = MyAllocNonPagedPool(sizeof(SECURITY_SUBJECT_CONTEXT), &g_NonPagedPoolCnt);
+		if (SubjectContext == NULL) return bLocalUser;
 
-	pToken = SeQuerySubjectContextToken(&(Data->Iopb->Parameters.Create.SecurityContext->AccessState->SubjectSecurityContext));
+		SeCaptureSubjectContext(SubjectContext);
+	}
+	else {
+		SubjectContext = &(Data->Iopb->Parameters.Create.SecurityContext->AccessState->SubjectSecurityContext);
+	}
+
+	pToken = SeQuerySubjectContextToken(SubjectContext);
 	if (pToken) {
 		Status = SeQueryInformationToken(pToken, TokenSource, &pSource);
 
@@ -797,6 +840,11 @@ BOOL CheckLocalUserOnlyCreate(
 		}
 
 		if (pSource != NULL) ExFreePool(pSource);
+	}
+
+	if (Data == NULL) {
+		SeReleaseSubjectContext(SubjectContext);
+		MyFreeNonPagedPool(SubjectContext, &g_NonPagedPoolCnt);
 	}
 
 	return bLocalUser;

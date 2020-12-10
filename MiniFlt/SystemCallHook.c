@@ -220,6 +220,8 @@ NTSTATUS DecisionRegCallback(
 	NTSTATUS Status = STATUS_SUCCESS; // STATUS_ACCESS_DENIED
 	PMINIFLT_INFO MiniFltInfo;
 	BOOL bGetRegPath;
+	
+	UNREFERENCED_PARAMETER(Action);
 
 	if (!pRootObject) return Status;
 
@@ -242,6 +244,8 @@ NTSTATUS RegisterCallback(
 {
 	REG_NOTIFY_CLASS RegNotifyType = (REG_NOTIFY_CLASS)Argument1;
 	NTSTATUS Status = STATUS_SUCCESS;
+
+	UNREFERENCED_PARAMETER(CallbackContext);
 
 	switch (RegNotifyType) {
 		case RegNtPreCreateKeyEx: {

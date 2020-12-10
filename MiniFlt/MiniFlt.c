@@ -95,7 +95,7 @@ NTSTATUS InitializeCommPort()
 	return Status;
 }
 
-NTSTATUS FinalizeCommPort()
+VOID FinalizeCommPort()
 {
 	if (g_MiniData.ServerPort != NULL) {
 
@@ -388,7 +388,7 @@ VOID GetAlternateDataStream(PCFLT_RELATED_OBJECTS FltObjects)
 
 	InfoBlock = (PBYTE)MyAllocNonPagedPool((1024 * 64), &g_NonPagedPoolCnt);
 	
-	if (!InfoBlock) return FALSE;
+	if (!InfoBlock) return;
 	else memset(InfoBlock, 0, (1024 * 64));
 
 	pStreamInfo = (PFILE_STREAM_INFORMATION)InfoBlock;

@@ -48,7 +48,7 @@ VOID FreeMiniFltLogBuf(
 
 PRECORD_LIST CreateMiniFltLog()
 {
-	PRECORD_LIST LogBuf;
+	PRECORD_LIST LogBuf = NULL;
 	ULONG InitRecordType;
 
 	LogBuf = AllocateMiniFltLogBuf(&InitRecordType);
@@ -89,7 +89,7 @@ VOID SetMiniFltRecordName(
 	FLT_ASSERT(ObjPathW != NULL);
 
 	MyStrNCopyW(LogRecord->FileNameW, ObjPathW, -1, MAX_KPATH);
-	LogRecord->Length = ROUND_TO_SIZE((LogRecord->Length + MAX_KPATH + sizeof(WCHAR)), sizeof(PVOID));
+	LogRecord->Length = ROUND_TO_SIZE(((LogRecord->Length + MAX_KPATH) + sizeof(WCHAR)), sizeof(PVOID));
 
 	FLT_ASSERT(LogRecord->Length <= MAX_LOG_RECORD_LENGTH);
 }
@@ -98,13 +98,13 @@ VOID MiniFltLogInsert(
 	_In_ PMINIFLT_INFO MiniFltInfo
 )
 {
-	PRECORD_LIST RecordList;
-	PLOG_RECORD LogRecord;
+	PRECORD_LIST RecordList = NULL;
+	PLOG_RECORD LogRecord = NULL;
 	SYSTEMTIME SysTime;
 	KLOCK_QUEUE_HANDLE hLockQueue;
 
 	RecordList = CreateMiniFltLog();
-	if (!RecordList) return;
+	if (RecordList == NULL) return;
 
 	LogRecord = &RecordList->LogRecord;
 
@@ -123,7 +123,7 @@ VOID MiniFltLogInsert(
 
 	KeAcquireInStackQueuedSpinLock(&g_LogSpinLock, &hLockQueue);
 	RtlCopyMemory(&g_LastLog, LogRecord, sizeof(LOG_RECORD));
-	InsertTailList(&g_MiniData.LogBufList, &RecordList->List);
+	InsertTailList(&(g_MiniData.LogBufList), &(RecordList->List));
 	KeReleaseInStackQueuedSpinLock(&hLockQueue);
 
 }
@@ -228,7 +228,7 @@ NTSTATUS MiniFltGetLog(
 		__try {
 			RtlCopyMemory(OutBuffer, pLogRecord, pLogRecord->Length);
 		}
-		__except (PsKeExceptionFilter(GetExceptionInformation(), TRUE)) {
+		__except (MiniFltExceptionFilter(GetExceptionInformation(), TRUE)) {
 			InsertHeadList(&g_MiniData.LogBufList, pList);
 			KeReleaseInStackQueuedSpinLock(&hLockQueue);
 
