@@ -4,68 +4,6 @@ NPAGED_LOOKASIDE_LIST g_MiniFltLookaside;
 
 MINI_GLOBAL_DATA g_MiniData;
 
-DRIVER_INITIALIZE DriverEntry;
-NTSTATUS
-DriverEntry (
-    _In_ PDRIVER_OBJECT DriverObject,
-    _In_ PUNICODE_STRING RegistryPath
-    );
-
-NTSTATUS
-MiniFltUnload (
-    _In_ FLT_FILTER_UNLOAD_FLAGS Flags
-    );
-
-NTSTATUS
-MiniFltInstanceSetup (
-    _In_ PCFLT_RELATED_OBJECTS FltObjects,
-    _In_ FLT_INSTANCE_SETUP_FLAGS Flags,
-    _In_ DEVICE_TYPE VolumeDeviceType,
-    _In_ FLT_FILESYSTEM_TYPE VolumeFilesystemType
-    );
-
-NTSTATUS
-MiniFltInstanceQueryTeardown(
-  _In_ PCFLT_RELATED_OBJECTS FltObjects,
-  _In_ FLT_INSTANCE_QUERY_TEARDOWN_FLAGS Flags
-);
-
-FLT_PREOP_CALLBACK_STATUS
-MiniFltPreCreate(
-  _Inout_ PFLT_CALLBACK_DATA Data,
-  _In_ PCFLT_RELATED_OBJECTS FltObjects,
-  _Flt_CompletionContext_Outptr_ PVOID* CompletionContext
-);
-
-FLT_POSTOP_CALLBACK_STATUS
-MiniFltPostCreate(
-  _Inout_ PFLT_CALLBACK_DATA Data,
-  _In_ PCFLT_RELATED_OBJECTS FltObjects,
-  _Inout_opt_ PVOID CbdContext,
-  _In_ FLT_POST_OPERATION_FLAGS Flags
-);
-
-FLT_PREOP_CALLBACK_STATUS
-MiniFltPreCleanup(
-  _Inout_ PFLT_CALLBACK_DATA Data,
-  _In_ PCFLT_RELATED_OBJECTS FltObjects,
-  _Flt_CompletionContext_Outptr_ PVOID* CompletionContext
-);
-
-FLT_PREOP_CALLBACK_STATUS 
-MiniFltPreFileMapping(
-	_Inout_ PFLT_CALLBACK_DATA Data,
-	_In_ PCFLT_RELATED_OBJECTS FltObjects,
-	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
-);
-
-FLT_PREOP_CALLBACK_STATUS 
-MiniFltPreFsControl(
-	_Inout_ PFLT_CALLBACK_DATA Data,
-	_In_ PCFLT_RELATED_OBJECTS FltObjects,
-	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
-);
-
 NTSTATUS InitializeCommPort()
 {
 	NTSTATUS Status;
@@ -107,7 +45,6 @@ VOID FinalizeCommPort()
 		FltCloseCommunicationPort(g_MiniData.ServerLogPort);
 	}
 }
-
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text(INIT, DriverEntry)
@@ -164,39 +101,76 @@ FLT_REGISTRATION FilterRegistration = {
     NULL, NULL, NULL                                //  Unused naming support callbacks
 };
 
+NTSTATUS InitializeData(
+	_In_ PUNICODE_STRING RegistryPath
+)
+{
+	NTSTATUS Status = STATUS_SUCCESS;
+
+	RtlZeroMemory(&g_MiniData, sizeof(MINI_GLOBAL_DATA));
+
+	InitializeListHead(&g_MiniData.LogBufList);
+
+	ExInitializeNPagedLookasideList(&g_MiniFltLookaside, NULL, NULL, 0, sizeof(MINIFLT_INFO), TAG_MINIFLT, 0);
+
+	KeInitializeSpinLock(&g_LogSpinLock);
+	KeInitializeSpinLock(&g_MiniData.SpinLock);
+
+	g_MiniData.DriverObject = NULL;
+	g_MiniData.LogSequenceNumber = 0;
+	g_MiniData.MaxLogBufCnt = MAX_RECORDS_ALLOCATE;
+	g_MiniData.LogBufCnt = 0;
+	g_MiniData.bFirstInitLoad = FALSE;
+	g_MiniData.bFirstLoadReg = FALSE;
+
+	g_MiniData.RegistryPath.Buffer = (PWCHAR)MyAllocNonPagedPool(RegistryPath->MaximumLength, &g_NonPagedPoolCnt);
+	if (g_MiniData.RegistryPath.Buffer == NULL) DbgPrint("%s:RegistryPath allocation failed", __FUNCTION__);
+	else {
+		g_MiniData.RegistryPath.MaximumLength = RegistryPath->MaximumLength;
+		RtlCopyUnicodeString(&g_MiniData.RegistryPath, RegistryPath);
+	}
+
+	return Status;
+}
+
+NTSTATUS FinalizeDriver(
+	_In_ NTSTATUS Status
+)
+{
+	ExDeleteNPagedLookasideList(&g_MiniFltLookaside);
+
+	if (g_MiniData.RegistryPath.Buffer != NULL) MyFreeNonPagedPool(g_MiniData.RegistryPath.Buffer, &g_NonPagedPoolCnt);
+
+	if (g_MiniData.ServerPort != NULL) FltCloseCommunicationPort(g_MiniData.ServerPort);
+
+	if (g_MiniData.ServerLogPort != NULL) FltCloseCommunicationPort(g_MiniData.ServerLogPort);
+
+	if (g_MiniData.hFilter != NULL) FltUnregisterFilter(g_MiniData.hFilter);
+
+
+	return Status;
+}
+
 NTSTATUS
 DriverEntry (
     _In_ PDRIVER_OBJECT DriverObject,
     _In_ PUNICODE_STRING RegistryPath
     )
 {
-    NTSTATUS status;
+    NTSTATUS Status = STATUS_SUCCESS;
 
     ExInitializeDriverRuntime( DrvRtPoolNxOptIn );
 
-    UNREFERENCED_PARAMETER( RegistryPath );
+		InitializeData(RegistryPath);
+		InitializeProcess();
+    
+    Status = FltRegisterFilter(DriverObject, &FilterRegistration, &g_MiniData.hFilter);
+    if (!NT_SUCCESS(Status)) return FinalizeDriver(Status);
 
+		Status = FltStartFiltering(g_MiniData.hFilter);
+    if (!NT_SUCCESS(Status)) return FinalizeDriver(Status);
 
-		ExInitializeNPagedLookasideList(&g_MiniFltLookaside, NULL, NULL, 0, sizeof(MINIFLT_INFO), TAG_MINIFLT, 0);
-		KeInitializeSpinLock(&g_LogSpinLock);
-
-    status = FltRegisterFilter( DriverObject,
-                                &FilterRegistration,
-                                &g_MiniData.hFilter);
-		
-    if (!NT_SUCCESS( status )) {
-
-        return status;
-    }
-
-    status = FltStartFiltering(g_MiniData.hFilter);
-
-    if (!NT_SUCCESS( status )) {
-
-        FltUnregisterFilter(g_MiniData.hFilter);
-    }
-
-    return status;
+    return Status;
 }
 
 NTSTATUS
@@ -208,11 +182,7 @@ MiniFltUnload (
 
   PAGED_CODE();
 
-	ExDeleteNPagedLookasideList(&g_MiniFltLookaside);
-
-  FltUnregisterFilter(g_MiniData.hFilter);
-
-  return STATUS_SUCCESS;
+  return FinalizeDriver(STATUS_SUCCESS);
 }
 
 NTSTATUS

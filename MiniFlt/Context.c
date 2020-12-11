@@ -13,7 +13,7 @@ VOID MiniFltContextCleanup(
 	if (ContextType == FLT_FILE_CONTEXT) ContextName = "file";
 	else if (ContextType == FLT_STREAMHANDLE_CONTEXT) ContextName = "streamhandle";
 
-	DbgPrint("%s: Cleaning up %s context for FileName = %s (FileContext = %p)\n",
+	DbgPrint("%s: Cleaning up %s context for FileName = %s (FileContext = %p)",
 		__FUNCTION__, ContextName, MiniFltContext->ObjPath, MiniFltContext);
 }
 

@@ -37,6 +37,7 @@ typedef long BOOL, * PBOOL;
 #define MINI_LOG_PORT_NAME L"\\MiniFltLogPort"
 
 #define RECORD_SIZE 4096
+#define MAX_RECORDS_ALLOCATE 500
 
 extern NPAGED_LOOKASIDE_LIST g_MiniFltLookaside;
 
@@ -76,6 +77,9 @@ typedef struct _MINI_GLOBAL_DATA {
 
 	BOOL bFirstInitLoad;
 	BOOL bFirstLoadReg;
+
+	KSPIN_LOCK SpinLock;
+
 } MINI_GLOBAL_DATA, *PMINI_GLOBAL_DATA;
 
 extern MINI_GLOBAL_DATA g_MiniData;
@@ -127,6 +131,68 @@ typedef union _FILE_REFERENCE {
 
 	FILE_ID_128 FileId128;
 } FILE_REFERENCE, * PFILE_REFERENCE;
+
+DRIVER_INITIALIZE DriverEntry;
+NTSTATUS
+DriverEntry(
+	_In_ PDRIVER_OBJECT DriverObject,
+	_In_ PUNICODE_STRING RegistryPath
+);
+
+NTSTATUS
+MiniFltUnload(
+	_In_ FLT_FILTER_UNLOAD_FLAGS Flags
+);
+
+NTSTATUS
+MiniFltInstanceSetup(
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_In_ FLT_INSTANCE_SETUP_FLAGS Flags,
+	_In_ DEVICE_TYPE VolumeDeviceType,
+	_In_ FLT_FILESYSTEM_TYPE VolumeFilesystemType
+);
+
+NTSTATUS
+MiniFltInstanceQueryTeardown(
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_In_ FLT_INSTANCE_QUERY_TEARDOWN_FLAGS Flags
+);
+
+FLT_PREOP_CALLBACK_STATUS
+MiniFltPreCreate(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+);
+
+FLT_POSTOP_CALLBACK_STATUS
+MiniFltPostCreate(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Inout_opt_ PVOID CbdContext,
+	_In_ FLT_POST_OPERATION_FLAGS Flags
+);
+
+FLT_PREOP_CALLBACK_STATUS
+MiniFltPreCleanup(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+);
+
+FLT_PREOP_CALLBACK_STATUS
+MiniFltPreFileMapping(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+);
+
+FLT_PREOP_CALLBACK_STATUS
+MiniFltPreFsControl(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+);
 
 ULONGLONG GetFileId(
 	_In_ PCFLT_RELATED_OBJECTS FltObjects
