@@ -13,7 +13,10 @@ OB_PREOP_CALLBACK_STATUS ObPreCallBack(
 
 	UNREFERENCED_PARAMETER(RegContext);
 
-	if (KeGetCurrentIrql() != PASSIVE_LEVEL) DbgPrint("KeGetCurrentIrql[0x%X]", KeGetCurrentIrql());
+	if (KeGetCurrentIrql() != PASSIVE_LEVEL) {
+		DbgPrint("KeGetCurrentIrql[0x%X]", KeGetCurrentIrql());
+		return OB_PREOP_SUCCESS;
+	}
 
 	GetProcessFullPath(pEProcess, ProcNameW);
 	MyWideCharToChar(ProcNameW, ProcName, MAX_KPATH);
@@ -32,7 +35,7 @@ OB_PREOP_CALLBACK_STATUS ObPreCallBack(
 	return OB_PREOP_SUCCESS;
 }
 
-VOID ObPostCallBack(
+POB_POST_OPERATION_CALLBACK ObPostCallBack(
 	_In_ PVOID RegContext,
 	_Inout_ POB_POST_OPERATION_INFORMATION OperInfo
 )
@@ -66,30 +69,30 @@ VOID ObPostCallBack(
 
 }
 
-NTSTATUS StartProtectProcess()
+NTSTATUS RegisterCallbackProcess()
 {
 	NTSTATUS Status = STATUS_UNSUCCESSFUL;
-	OB_CALLBACK_REGISTRATION ObCBReg = { 0 };
 	OB_OPERATION_REGISTRATION ObOperReg = { 0 };
+	OB_CALLBACK_REGISTRATION ObCallBackReg = { 0 };
 
 	ObOperReg.ObjectType = PsProcessType;
 	ObOperReg.PreOperation = ObPreCallBack;
 	ObOperReg.PostOperation = ObPostCallBack;
 	ObOperReg.Operations = OB_OPERATION_HANDLE_CREATE;
 
-	ObCBReg.Version = OB_FLT_REGISTRATION_VERSION;
-	ObCBReg.OperationRegistrationCount = 1;
-	ObCBReg.OperationRegistration = &ObOperReg;
-	RtlInitUnicodeString(&ObCBReg.Altitude, L"370071");
-	ObCBReg.RegistrationContext = NULL;
+	ObCallBackReg.Version = OB_FLT_REGISTRATION_VERSION;
+	ObCallBackReg.OperationRegistrationCount = 1;
+	ObCallBackReg.OperationRegistration = &ObOperReg;
+	RtlInitUnicodeString(&ObCallBackReg.Altitude, L"370071");
+	ObCallBackReg.RegistrationContext = NULL;
 
-	Status = ObRegisterCallbacks(&ObCBReg, &g_RegHandle);
+	Status = ObRegisterCallbacks(&ObCallBackReg, &g_RegHandle);
 
 	DbgPrint("ObRegisterCallbacks Status[0x%X]", Status);
 	return Status;
 }
 
-VOID StopProtectProcess()
+VOID UnRegisterCallbackProcess()
 {
 	if (g_RegHandle != NULL) ObUnRegisterCallbacks(g_RegHandle);
 }

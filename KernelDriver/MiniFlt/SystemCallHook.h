@@ -9,13 +9,13 @@ OB_PREOP_CALLBACK_STATUS ObPreCallBack(
 	_Inout_ POB_PRE_OPERATION_INFORMATION ObPreOperInfo
 );
 
-VOID ObPostCallBack(
+POB_POST_OPERATION_CALLBACK ObPostCallBack(
 	_In_ PVOID RegContext,
 	_Inout_ POB_POST_OPERATION_INFORMATION OperInfo
 );
 
-NTSTATUS StartProtectProcess();
-VOID StopProtectProcess();
+NTSTATUS RegisterCallbackProcess();
+VOID UnRegisterCallbackProcess();
 
 #define MAX_REGPATH 1024
 
