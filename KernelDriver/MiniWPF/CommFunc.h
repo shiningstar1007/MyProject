@@ -3,6 +3,7 @@
 
 #define TAG_WFPFLT 'PFWM'
 
+extern LONG g_NonPagedPoolCnt;
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,
 	_Inout_ PLONG MemCnt

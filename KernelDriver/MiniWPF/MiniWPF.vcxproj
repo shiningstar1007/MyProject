@@ -163,6 +163,7 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CommFunc.c" />
     <ClCompile Include="MiniWPF.c" />
   </ItemGroup>
   <ItemGroup>
