@@ -23,5 +23,23 @@ typedef struct _IPV4ADDR
 	WCHAR RemoteIp[16];
 }IPV4ADDR, * PIPV4ADDR;
 
+typedef struct _IP_RANGE IP_RANGE, * PIP_RANGE;
+struct _IP_RANGE
+{
+	ULONG IPFrom;
+	ULONG IPTo;
+
+	PIP_RANGE NextIPRange;
+};
+
+typedef struct _PORT_RANGE PORT_RANGE, * PPORT_RANGE;
+struct _PORT_RANGE
+{
+	ULONG PortFrom;
+	ULONG PortTo;
+
+	PPORT_RANGE NextPortRange;
+};
+
 
 #endif
