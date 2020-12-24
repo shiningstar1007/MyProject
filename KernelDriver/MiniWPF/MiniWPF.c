@@ -20,6 +20,10 @@ DEFINE_GUID(MINI_WPF_ALE_FLOW_ESTABLISHED_V4,
 DEFINE_GUID(MINI_WPF_ALE_FLOW_ESTABLISHED_V6,
 	0xfa5654aa, 0x55a4, 0x4ac6, 0xb8, 0xd1, 0x8a, 0x3, 0x9d, 0xd1, 0x60, 0xad);
 
+HANDLE g_EngineHandle;
+UINT32 g_StreamIdV4;
+UINT32 g_StreamIdV6;
+
 
 DRIVER_INITIALIZE DriverEntry;
 EVT_WDF_DRIVER_UNLOAD MiniWpfDriverUnload;
@@ -37,7 +41,7 @@ NTSTATUS MiniWPFDataStreamNotify(
 	return STATUS_SUCCESS;
 }
 
-VOID MiniWpfDataStreamDelete(
+VOID MiniWpfStreamContextCleanup(
 	UINT16 LayerId,
 	UINT32 CalloutId,
 	UINT64 FlowContext
@@ -64,14 +68,6 @@ NTSTATUS MiniWpfAleFlowEstablishedNotify(
 
 	return STATUS_SUCCESS;
 }
-
-void MiniWpfDataStreamUnregCallout()
-{
-	//FwpmEngineClose(EngineHandle);
-
-	//FwpsCalloutUnregisterById(StreamIdV4);
-}
-
 
 NTSTATUS MiniWpfInitDriverObjects(
 	_Inout_ PDRIVER_OBJECT DriverObject,
@@ -121,6 +117,187 @@ NTSTATUS MiniWpfInitDriverObjects(
 	__finally {}
 
 	return Status;
+}
+
+NTSTATUS MiniWpfRegCallOutForLayer(
+	const GUID* LayerKey,
+	const GUID* CalloutKey,
+	_Inout_ PVOID DeviceObject,
+	_Out_ UINT32* CalloutId
+)
+{
+	NTSTATUS Status = STATUS_SUCCESS;
+	FWPM_FILTER FwpmFilter = { 0 };
+	FWPM_FILTER_CONDITION* FwpmFltCondi = NULL;
+	FWPM_CALLOUT FwpmCallout = { 0 };
+	FWPM_DISPLAY_DATA FwpmDispData = { 0 };
+	BOOL bCalloutReg = FALSE;
+	FWPS_CALLOUT FwpsCallout = { 0 };
+	FWP_RANGE0* PortRange = NULL;
+	PPORT_RANGE pPortRange;
+	INT i = 0;
+	FwpsCallout.calloutKey = *CalloutKey;
+	//FwpsCallout.classifyFn = ;
+	//FwpsCallout.notifyFn = ;
+
+	__try {
+
+		Status = FwpsCalloutRegister(DeviceObject, &FwpsCallout, CalloutId);
+		if (!NT_SUCCESS(Status)) {
+
+			__leave;
+		}
+
+		bCalloutReg = TRUE;
+		FwpmDispData.name = L"PsNe ALE Flow Established Callout";
+		FwpmDispData.description = L"Callout that gets the process path from a TCP stream";
+
+		FwpmCallout.calloutKey = *CalloutKey;
+		FwpmCallout.displayData = FwpmDispData;
+		FwpmCallout.applicableLayer = *LayerKey;
+
+		Status = FwpmCalloutAdd(g_EngineHandle, &FwpmCallout, NULL, NULL);
+		if (!NT_SUCCESS(Status)) {
+
+			__leave;
+		}
+
+		FwpmFltCondi = MyAllocNonPagedPool(NonPagedPool, sizeof(FWPM_FILTER_CONDITION), &g_NonPagedPoolCnt);
+		if (FwpmFltCondi == NULL) {
+
+			__leave;
+		}
+
+		memset(FwpmFltCondi, 0, sizeof(FWPM_FILTER_CONDITION));
+
+		PortRange = MyAllocNonPagedPool(sizeof(FWP_RANGE0), &g_NonPagedPoolCnt);
+		if (PortRange == NULL) {
+
+			__leave;
+		}
+
+		memset(PortRange, 0, sizeof(FWP_RANGE0));
+
+		FwpmFilter.layerKey = *LayerKey;
+		//FwpmFilter.displayData.name = ;
+		FwpmFilter.displayData.description = L"Filter that gets the process path from a TCP stream";
+
+		FwpmFilter.action.type = FWP_ACTION_CALLOUT_INSPECTION;
+		FwpmFilter.action.calloutKey = *CalloutKey;
+		FwpmFilter.filterCondition = FwpmFltCondi;
+		FwpmFilter.numFilterConditions = 1;
+		FwpmFilter.subLayerKey = FWPM_SUBLAYER_UNIVERSAL;
+		FwpmFilter.weight.type = FWP_EMPTY; // auto-weight.
+/*
+		for (pPortRange = g_FirstPort; pPortRange; pPortRange = pPortRange->NextPortRange) {
+
+			PortRange[i].valueHigh.type = FWP_UINT16;
+			PortRange[i].valueHigh.uint16 = (UINT16)pPortRange->PortTo;
+			PortRange[i].valueLow.type = FWP_UINT16;
+			PortRange[i].valueLow.uint16 = (UINT16)pPortRange->PortFrom;
+
+			if (PortRange[i].valueHigh.uint16 == 0) {
+				PortRange[i].valueHigh.uint16 = (UINT16)pPortRange->PortFrom;
+			}
+
+			FwpmFltCondi[i].matchType = FWP_MATCH_RANGE;
+			FwpmFltCondi[i].conditionValue.type = FWP_RANGE_TYPE;
+			FwpmFltCondi[i].fieldKey = FWPM_CONDITION_IP_REMOTE_PORT; //FWPM_CONDITION_IP_REMOTE_ADDRESS
+			FwpmFltCondi[i].conditionValue.rangeValue = &PortRange[i];
+
+			i++;
+		}
+*/
+		Status = FwpmFilterAdd(g_EngineHandle, &FwpmFilter, NULL, NULL);
+		if (!NT_SUCCESS(Status)) {
+
+			DbgPrint("[TEST] Status=0x%X", Status);
+			__leave;
+		}
+	}
+	__finally {
+
+		if (!NT_SUCCESS(Status)) {
+
+			if (bCalloutReg) {
+
+				FwpsCalloutUnregisterById(*CalloutId);
+			}
+		}
+
+		if (FwpmFltCondi) {
+
+			MyFreeNonPagedPool(FwpmFltCondi, &g_NonPagedPoolCnt);
+		}
+
+		if (PortRange) {
+
+			MyFreeNonPagedPool(PortRange, &g_NonPagedPoolCnt);
+		}
+	}
+
+	return Status;
+}
+
+NTSTATUS MiniWpfRegCallOut(
+	_Inout_ PVOID DeviceObject
+)
+{
+	NTSTATUS Status = STATUS_SUCCESS;
+	BOOL EngineOpened = FALSE;
+	BOOL InTransaction = FALSE;
+	FWPM_SESSION FwpmSession = { 0 };
+	FwpmSession.flags = FWPM_SESSION_FLAG_DYNAMIC;
+
+	__try {
+
+		Status = FwpmEngineOpen(NULL, RPC_C_AUTHN_WINNT, NULL, &FwpmSession, &g_EngineHandle);
+		if (!NT_SUCCESS(Status)) {
+
+			__leave;
+		}
+		EngineOpened = TRUE;
+		Status = FwpmTransactionBegin(g_EngineHandle, 0);
+		if (!NT_SUCCESS(Status)) {
+
+			__leave;
+		}
+
+		InTransaction = TRUE;
+		Status = FwpmTransactionCommit(g_EngineHandle);
+		if (!NT_SUCCESS(Status)) {
+
+			__leave;
+		}
+
+		InTransaction = FALSE;
+	}
+	__finally {
+
+		if (!NT_SUCCESS(Status)) {
+
+			if (InTransaction) {
+
+				NTSTATUS AbortStatus;
+				AbortStatus = FwpmTransactionAbort(g_EngineHandle);
+				_Analysis_assume_(NT_SUCCESS(AbortStatus));
+			}
+
+			if (EngineOpened) {
+
+				FwpmEngineClose(g_EngineHandle);
+				g_EngineHandle = NULL;
+			}
+		}
+	}
+
+	return Status;
+}
+
+void MiniWpfUnRegCallOut()
+{
+	FwpmEngineClose(g_EngineHandle);
+	g_EngineHandle = NULL;
 }
 
 _Function_class_(DRIVER_INITIALIZE)

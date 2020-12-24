@@ -27,6 +27,9 @@
     <ClCompile Include="MiniWPF.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CommFunc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MiniWPF.h">
