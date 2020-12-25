@@ -1,5 +1,5 @@
 ;
-; MiniWPF.inf
+; MiniWFP.inf
 ;
 
 [Version]
@@ -7,13 +7,13 @@ Signature="$WINDOWS NT$"
 Class=Sample ; TODO: edit Class
 ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
 Provider=%ManufacturerName%
-CatalogFile=MiniWPF.cat
+CatalogFile=MiniWFP.cat
 DriverVer= ; TODO: set DriverVer in stampinf property pages
 PnpLockDown=1
 
 [DestinationDirs]
 DefaultDestDir = 12
-MiniWPF_Device_CoInstaller_CopyFiles = 11
+MiniWFP_Device_CoInstaller_CopyFiles = 11
 
 ; ================= Class section =====================
 
@@ -28,7 +28,7 @@ HKR,,Icon,,-5
 1 = %DiskName%,,,""
 
 [SourceDisksFiles]
-MiniWPF.sys  = 1,,
+MiniWFP.sys  = 1,,
 WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
 
 ;*****************************************
@@ -39,49 +39,49 @@ WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with
 %ManufacturerName%=Standard,NT$ARCH$
 
 [Standard.NT$ARCH$]
-%MiniWPF.DeviceDesc%=MiniWPF_Device, Root\MiniWPF ; TODO: edit hw-id
+%MiniWFP.DeviceDesc%=MiniWFP_Device, Root\MiniWFP ; TODO: edit hw-id
 
-[MiniWPF_Device.NT]
+[MiniWFP_Device.NT]
 CopyFiles=Drivers_Dir
 
 [Drivers_Dir]
-MiniWPF.sys
+MiniWFP.sys
 
 ;-------------- Service installation
-[MiniWPF_Device.NT.Services]
-AddService = MiniWPF,%SPSVCINST_ASSOCSERVICE%, MiniWPF_Service_Inst
+[MiniWFP_Device.NT.Services]
+AddService = MiniWFP,%SPSVCINST_ASSOCSERVICE%, MiniWFP_Service_Inst
 
-; -------------- MiniWPF driver install sections
-[MiniWPF_Service_Inst]
-DisplayName    = %MiniWPF.SVCDESC%
+; -------------- MiniWFP driver install sections
+[MiniWFP_Service_Inst]
+DisplayName    = %MiniWFP.SVCDESC%
 ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
 StartType      = 3               ; SERVICE_DEMAND_START
 ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
-ServiceBinary  = %12%\MiniWPF.sys
+ServiceBinary  = %12%\MiniWFP.sys
 
 ;
-;--- MiniWPF_Device Coinstaller installation ------
+;--- MiniWFP_Device Coinstaller installation ------
 ;
 
-[MiniWPF_Device.NT.CoInstallers]
-AddReg=MiniWPF_Device_CoInstaller_AddReg
-CopyFiles=MiniWPF_Device_CoInstaller_CopyFiles
+[MiniWFP_Device.NT.CoInstallers]
+AddReg=MiniWFP_Device_CoInstaller_AddReg
+CopyFiles=MiniWFP_Device_CoInstaller_CopyFiles
 
-[MiniWPF_Device_CoInstaller_AddReg]
+[MiniWFP_Device_CoInstaller_AddReg]
 HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
 
-[MiniWPF_Device_CoInstaller_CopyFiles]
+[MiniWFP_Device_CoInstaller_CopyFiles]
 WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
 
-[MiniWPF_Device.NT.Wdf]
-KmdfService =  MiniWPF, MiniWPF_wdfsect
-[MiniWPF_wdfsect]
+[MiniWFP_Device.NT.Wdf]
+KmdfService =  MiniWFP, MiniWFP_wdfsect
+[MiniWFP_wdfsect]
 KmdfLibraryVersion = $KMDFVERSION$
 
 [Strings]
 SPSVCINST_ASSOCSERVICE= 0x00000002
 ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
 ClassName="Samples" ; TODO: edit ClassName
-DiskName = "MiniWPF Installation Disk"
-MiniWPF.DeviceDesc = "MiniWPF Device"
-MiniWPF.SVCDESC = "MiniWPF Service"
+DiskName = "MiniWFP Installation Disk"
+MiniWFP.DeviceDesc = "MiniWFP Device"
+MiniWFP.SVCDESC = "MiniWFP Service"

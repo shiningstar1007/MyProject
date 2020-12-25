@@ -1,3 +1,3 @@
-#include "MiniWPF.h"
+#include "MiniWFP.h"
 #include "CommFunc.h"
 

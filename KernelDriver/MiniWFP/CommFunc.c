@@ -1,6 +1,7 @@
 #include "Stdafx.h"
 
 LONG g_NonPagedPoolCnt = 0;
+LONG g_InjectNPPoolCnt = 0;
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,
 	_Inout_ PLONG MemCnt
@@ -10,7 +11,7 @@ PVOID MyAllocNonPagedPool(
 
 	if (BufSize == 0) return NULL;
 
-	Buffer = ExAllocatePoolWithTag(NonPagedPool, BufSize, TAG_WFPFLT);
+	Buffer = ExAllocatePoolWithTag(NonPagedPoolNx, BufSize, TAG_WFPFLT);
 	if (Buffer) InterlockedIncrement(MemCnt);
 
 	return Buffer;

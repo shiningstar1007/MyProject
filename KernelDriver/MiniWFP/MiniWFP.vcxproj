@@ -35,15 +35,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{50163078-CA18-498F-A259-3D9057D1DECD}</ProjectGuid>
+    <ProjectGuid>{8A15B531-C1A8-4978-B07F-F860D30A8ADB}</ProjectGuid>
     <TemplateGuid>{1bc93793-694f-48fe-9372-81e2b05556fd}</TemplateGuid>
     <TargetFrameworkVersion>
     </TargetFrameworkVersion>
     <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
     <Configuration>Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">Win32</Platform>
-    <RootNamespace>MiniWPF</RootNamespace>
+    <RootNamespace>MiniWFP</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <ProjectName>MiniWFP</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -157,18 +158,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Inf Include="MiniWPF.inf" />
+    <Inf Include="MiniWFP.inf" />
   </ItemGroup>
   <ItemGroup>
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommFunc.c" />
-    <ClCompile Include="MiniWPF.c" />
+    <ClCompile Include="FwpsInjection.c" />
+    <ClCompile Include="MiniWFP.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CalloutDriverKey.h" />
     <ClInclude Include="CommFunc.h" />
-    <ClInclude Include="MiniWPF.h" />
+    <ClInclude Include="FwpsInjection.h" />
+    <ClInclude Include="MiniWFP.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

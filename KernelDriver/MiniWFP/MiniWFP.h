@@ -1,5 +1,5 @@
-#ifndef __MINIWPF_H__
-#define __MINIWPF_H__
+#ifndef __MINIWFP_H__
+#define __MINIWFP_H__
 
 #include <ntifs.h>
 #include <wdf.h>

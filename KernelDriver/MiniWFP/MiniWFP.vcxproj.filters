@@ -19,27 +19,36 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="MiniWPF.inf">
-      <Filter>Driver Files</Filter>
-    </Inf>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="MiniWPF.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CommFunc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FwpsInjection.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MiniWFP.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MiniWPF.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="StdAfx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CommFunc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CalloutDriverKey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FwpsInjection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MiniWFP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="MiniWFP.inf">
+      <Filter>Driver Files</Filter>
+    </Inf>
   </ItemGroup>
 </Project>
