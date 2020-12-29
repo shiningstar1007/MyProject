@@ -99,7 +99,6 @@ VOID UnRegisterCallbackProcess()
 
 LARGE_INTEGER g_RegisterCookie = { 0 };
 
-
 //Registry
 REG_ROOTKEYW g_RootKeys[] = {
 	{L"\\REGISTRY\\MACHINE", L"HKEY_LOCAL_MACHINE", 0},
@@ -295,11 +294,16 @@ NTSTATUS RegisterCallback(
 	return Status;
 }
 
-VOID StartRegHook()
+VOID StartRegHook(_In_ PDEVICE_OBJECT DeviceObject)
 {
+	UNICODE_STRING AltitudeString;
+	
 	if (g_RegisterCookie.QuadPart != 0) return;
 
-	CmRegisterCallback(RegisterCallback, NULL, &g_RegisterCookie);
+	RtlInitUnicodeString(&AltitudeString, L"370071");
+
+	CmRegisterCallbackEx(RegisterCallback, &AltitudeString, 
+		DeviceObject->DriverObject, NULL, &g_RegisterCookie, NULL);
 }
 
 VOID StopRegHook()

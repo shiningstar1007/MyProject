@@ -37,5 +37,7 @@ typedef struct _REG_CTRLKEYW {
 } REG_CTRLKEYW, * PREG_CTRLKEYW;
 
 extern LARGE_INTEGER g_RegisterCookie;
+VOID StartRegHook(_In_ PDEVICE_OBJECT DeviceObject);
+VOID StopRegHook();
 
 #endif
