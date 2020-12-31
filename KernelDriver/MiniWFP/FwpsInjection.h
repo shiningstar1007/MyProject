@@ -2,16 +2,17 @@
 #define __FWPSINJECTION_H__
 
 #include <wdf.h>
+#include <ntdef.h>
 
 typedef struct _INJECTION_HANDLE
 {
-  HANDLE* pMACHandle;
-  HANDLE* pVSwitchEthernetHandle;
-  HANDLE* pForwardHandle;
-  HANDLE* pNetworkHandle;
-  HANDLE* pTransportHandle;
-  HANDLE* pStreamHandle;
-}INJECTION_HANDLE, *PINJECTION_HANDLE;
+  HANDLE *pMACHandle;
+  HANDLE *pVSwitchEthernetHandle;
+  HANDLE *pForwardHandle;
+  HANDLE *pNetworkHandle;
+  HANDLE *pTransportHandle;
+  HANDLE *pStreamHandle;
+} INJECTION_HANDLE, * PINJECTION_HANDLE;
 
 NTSTATUS InjectionHandleCreate(_Outptr_ INJECTION_HANDLE * *pInjectionHandle,
   _In_ ADDRESS_FAMILY AddressFamily,                      /* AF_INET */

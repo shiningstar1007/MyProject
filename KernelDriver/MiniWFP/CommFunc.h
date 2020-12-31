@@ -5,6 +5,8 @@
 
 extern LONG g_NonPagedPoolCnt;
 extern LONG g_InjectNPPoolCnt;
+extern LONG g_StreamEditPoolCnt;
+
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,
 	_Inout_ PLONG MemCnt

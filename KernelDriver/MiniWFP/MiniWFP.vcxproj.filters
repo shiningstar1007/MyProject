@@ -28,6 +28,9 @@
     <ClCompile Include="MiniWFP.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StreamEdit.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StdAfx.h">
@@ -43,6 +46,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MiniWFP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StreamEdit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

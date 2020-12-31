@@ -167,6 +167,7 @@
     <ClCompile Include="CommFunc.c" />
     <ClCompile Include="FwpsInjection.c" />
     <ClCompile Include="MiniWFP.c" />
+    <ClCompile Include="StreamEdit.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CalloutDriverKey.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="FwpsInjection.h" />
     <ClInclude Include="MiniWFP.h" />
     <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="StreamEdit.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

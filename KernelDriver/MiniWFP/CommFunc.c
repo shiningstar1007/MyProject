@@ -2,6 +2,8 @@
 
 LONG g_NonPagedPoolCnt = 0;
 LONG g_InjectNPPoolCnt = 0;
+LONG g_StreamEditPoolCnt = 0;
+
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,
 	_Inout_ PLONG MemCnt
