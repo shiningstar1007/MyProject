@@ -4,4 +4,6 @@
 #include <wsk.h>
 #include <Netioapi.h>
 
+#define SOCKET_ERROR -1
+
 #endif

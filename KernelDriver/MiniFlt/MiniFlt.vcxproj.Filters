@@ -37,6 +37,9 @@
     <ClCompile Include="MiniFltLog.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MiniWSK.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MiniFlt.h">
@@ -61,6 +64,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MiniFltLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MiniWSK.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
