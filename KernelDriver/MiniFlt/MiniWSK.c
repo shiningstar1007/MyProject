@@ -341,3 +341,90 @@ LONG NTAPI SendTo(
 
 	return BytesSent;
 }
+
+LONG NTAPI Receive(
+	__in  PWSK_SOCKET	WskSocket,
+	__out PVOID Buffer,
+	__in  ULONG BufferSize,
+	__in  ULONG Flags
+)
+{
+	KEVENT CompletionEvent = { 0 };
+	PIRP Irp = NULL;
+	WSK_BUF WskBuffer = { 0 };
+	LONG BytesReceived = SOCKET_ERROR;
+	NTSTATUS Status = STATUS_UNSUCCESSFUL;
+
+	if (g_SocketsState != INITIALIZED || !WskSocket || !Buffer || !BufferSize) return SOCKET_ERROR;
+
+	Status = InitWskBuffer(Buffer, BufferSize, &WskBuffer);
+	if (!NT_SUCCESS(Status)) {
+		KdPrint(("Receive(): InitWskData() failed with status 0x%08X\n", Status));
+		return SOCKET_ERROR;
+	}
+
+	Status = InitWskData(&Irp, &CompletionEvent);
+	if (!NT_SUCCESS(Status)) {
+		KdPrint(("Receive(): InitWskData() failed with status 0x%08X\n", Status));
+		FreeWskBuffer(&WskBuffer);
+		return SOCKET_ERROR;
+	}
+
+	Status = ((PWSK_PROVIDER_CONNECTION_DISPATCH)WskSocket->Dispatch)->WskReceive(
+		WskSocket, &WskBuffer, Flags, Irp);
+	if (Status == STATUS_PENDING) {
+		KeWaitForSingleObject(&CompletionEvent, Executive, KernelMode, FALSE, NULL);
+		Status = Irp->IoStatus.Status;
+	}
+
+	BytesReceived = NT_SUCCESS(Status) ? (LONG)Irp->IoStatus.Information : SOCKET_ERROR;
+
+	IoFreeIrp(Irp);
+	FreeWskBuffer(&WskBuffer);
+
+	return BytesReceived;
+}
+
+LONG NTAPI ReceiveFrom(
+	__in  PWSK_SOCKET	WskSocket,
+	__out PVOID Buffer,
+	__in  ULONG BufferSize,
+	__out_opt PSOCKADDR	RemoteAddress,
+	__out_opt PULONG	ControlFlags
+)
+{
+	KEVENT CompletionEvent = { 0 };
+	PIRP Irp = NULL;
+	WSK_BUF WskBuffer = { 0 };
+	LONG BytesReceived = SOCKET_ERROR;
+	NTSTATUS Status = STATUS_UNSUCCESSFUL;
+
+	if (g_SocketsState != INITIALIZED || !WskSocket || !Buffer || !BufferSize) return SOCKET_ERROR;
+
+	Status = InitWskBuffer(Buffer, BufferSize, &WskBuffer);
+	if (!NT_SUCCESS(Status)) {
+		KdPrint(("ReceiveFrom(): InitWskData() failed with status 0x%08X\n", Status));
+		return SOCKET_ERROR;
+	}
+
+	Status = InitWskData(&Irp, &CompletionEvent);
+	if (!NT_SUCCESS(Status)) {
+		KdPrint(("ReceiveFrom(): InitWskData() failed with status 0x%08X\n", Status));
+		FreeWskBuffer(&WskBuffer);
+		return SOCKET_ERROR;
+	}
+
+	Status = ((PWSK_PROVIDER_DATAGRAM_DISPATCH)WskSocket->Dispatch)->WskReceiveFrom(
+		WskSocket, &WskBuffer, 0, RemoteAddress, 0, NULL, ControlFlags, Irp);
+	if (Status == STATUS_PENDING) {
+		KeWaitForSingleObject(&CompletionEvent, Executive, KernelMode, FALSE, NULL);
+		Status = Irp->IoStatus.Status;
+	}
+
+	BytesReceived = NT_SUCCESS(Status) ? (LONG)Irp->IoStatus.Information : SOCKET_ERROR;
+
+	IoFreeIrp(Irp);
+	FreeWskBuffer(&WskBuffer);
+
+	return BytesReceived;
+}
