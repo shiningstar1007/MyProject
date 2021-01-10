@@ -457,3 +457,36 @@ NTSTATUS NTAPI Bind(
 
 	return Status;
 }
+
+PWSK_SOCKET NTAPI Accept(
+	__in PWSK_SOCKET WskSocket,
+	__out_opt PSOCKADDR	LocalAddress,
+	__out_opt PSOCKADDR	RemoteAddress
+)
+{
+	KEVENT CompletionEvent = { 0 };
+	PIRP Irp = NULL;
+	NTSTATUS Status = STATUS_UNSUCCESSFUL;
+	PWSK_SOCKET AcceptedSocket = NULL;
+
+	if (g_SocketsState != INITIALIZED || !WskSocket) return NULL;
+
+	Status = InitWskData(&Irp, &CompletionEvent);
+	if (!NT_SUCCESS(Status)) {
+		KdPrint(("Accept(): InitWskData() failed with status 0x%08X\n", Status));
+		return NULL;
+	}
+
+	Status = ((PWSK_PROVIDER_LISTEN_DISPATCH)WskSocket->Dispatch)->WskAccept(
+		WskSocket, 0, NULL, NULL, LocalAddress, RemoteAddress, Irp);
+	if (Status == STATUS_PENDING) {
+		KeWaitForSingleObject(&CompletionEvent, Executive, KernelMode, FALSE, NULL);
+		Status = Irp->IoStatus.Status;
+	}
+
+	AcceptedSocket = NT_SUCCESS(Status) ? (PWSK_SOCKET)Irp->IoStatus.Information : NULL;
+
+	IoFreeIrp(Irp);
+
+	return AcceptedSocket;
+}
