@@ -348,3 +348,84 @@ NTSTATUS MiniFltLogMessage(
 
 	return Status;
 }
+
+VOID ThreadWorkEnqueue(
+	_In_ PMINIFLT_LOG_OP_CONTEXT LogOpContext, 
+	_In_ PMINIFLT_OP_HANDLER_FN OpHandle
+) 
+{
+	PMINIFLT_WORK_QUEUE WorkQueue = LogOpContext->LogContext->WorkQueue;
+
+	LogOpContext->OpHandle = OpHandle;
+
+	if (!InterlockedPushEntrySList(&WorkQueue->Head, &LogOpContext->QueueEntry)) {
+		KeSetEvent(&WorkQueue->Event, 0, FALSE);
+	}
+}
+
+VOID MyWorkThread(
+	_In_ PVOID Context
+)
+{
+	PMINIFLT_WORK_QUEUE ExWorkQueue = (PMINIFLT_WORK_QUEUE)Context;
+	PSLIST_ENTRY pEntry, ListEntry, NextEntry;
+
+	while (TRUE) {
+		pEntry = InterlockedFlushSList(&ExWorkQueue->Head);
+
+		if (!pEntry) {
+			if (ExWorkQueue->Stop) break;
+
+			KeWaitForSingleObject(&ExWorkQueue->Event, Executive, KernelMode, FALSE, 0);
+			continue;
+		}
+
+		ListEntry = NULL;
+		while (pEntry != NULL) { //LIFO -> FIFO
+			NextEntry = pEntry->Next;
+			pEntry->Next = ListEntry;
+			ListEntry = pEntry;
+			pEntry = NextEntry;
+		}
+
+		while (ListEntry) {
+			PMINIFLT_LOG_OP_CONTEXT WorkContext = CONTAINING_RECORD(ListEntry, MINIFLT_LOG_OP_CONTEXT, QueueEntry);
+			PMINIFLT_OP_HANDLER_FN OpHandle = WorkContext->OpHandle;
+
+			ListEntry = ListEntry->Next;
+
+			OpHandle(WorkContext);
+		}
+	}
+
+	PsTerminateSystemThread(STATUS_SUCCESS);
+}
+
+NTSTATUS MyStartWorkQueue(
+	_In_ PMINIFLT_WORK_QUEUE WorkQueue
+) 
+{
+	NTSTATUS Status;
+	HANDLE hThread;
+
+	InitializeSListHead(&WorkQueue->Head);
+	KeInitializeEvent(&WorkQueue->Event, SynchronizationEvent, FALSE);
+	WorkQueue->Stop = FALSE;
+
+	Status = PsCreateSystemThread(&hThread, THREAD_ALL_ACCESS, NULL, NULL, NULL, MyWorkThread, WorkQueue);
+
+	if (!NT_SUCCESS(Status)) {
+		return Status;
+	}
+
+	Status = ObReferenceObjectByHandle(hThread, THREAD_ALL_ACCESS, NULL, KernelMode, &WorkQueue->Thread, NULL);
+
+	ZwClose(hThread);
+
+	if (!NT_SUCCESS(Status)) {
+		WorkQueue->Stop = TRUE;
+		KeSetEvent(&WorkQueue->Event, 0, FALSE);
+	}
+
+	return Status;
+}
