@@ -583,7 +583,7 @@ PCHAR MakeFileName(
 }
 
 PCHAR MakeFileNameByFileObj(
-	_In_ PVOLUME_CONTEXT	pVolContext,
+	_In_ PVOLUME_CONTEXT pVolContext,
 	_In_ PFILE_OBJECT FileObject
 )
 {

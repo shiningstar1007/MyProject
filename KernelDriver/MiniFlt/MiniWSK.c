@@ -13,7 +13,7 @@ enum
 	INITIALIZED
 };
 
-LONG	g_SocketsState = DEINITIALIZED;
+LONG g_SocketsState = DEINITIALIZED;
 
 NTSTATUS NTAPI CompletionRoutine(
 	__in PDEVICE_OBJECT	DeviceObject,
@@ -21,6 +21,8 @@ NTSTATUS NTAPI CompletionRoutine(
 	__in PKEVENT CompletionEvent
 )
 {
+	UNREFERENCED_PARAMETER(DeviceObject);
+	UNREFERENCED_PARAMETER(Irp);
 	ASSERT(CompletionEvent);
 
 	KeSetEvent(CompletionEvent, IO_NO_INCREMENT, FALSE);
@@ -49,9 +51,9 @@ NTSTATUS InitWskData(
 }
 
 NTSTATUS InitWskBuffer(
-	__in  PVOID		Buffer,
-	__in  ULONG		BufferSize,
-	__out PWSK_BUF	WskBuffer
+	__in  PVOID Buffer,
+	__in  ULONG BufferSize,
+	__out PWSK_BUF WskBuffer
 )
 {
 	NTSTATUS Status = STATUS_SUCCESS;

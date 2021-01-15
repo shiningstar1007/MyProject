@@ -363,7 +363,34 @@ VOID ThreadWorkEnqueue(
 	}
 }
 
-VOID MyWorkThread(
+PMINIFLT_LOG_CONTEXT MiniFltLogAllocateContext(
+	_In_ PMINIFLT_WORK_QUEUE WorkQueue
+) 
+{
+	PMINIFLT_LOG_CONTEXT LogContext;
+
+	LogContext = MyAllocNonPagedPool(sizeof(MINIFLT_LOG_CONTEXT), &g_LogAllocCnt);
+
+	if (LogContext != NULL) {
+		RtlZeroMemory(LogContext, sizeof(MINIFLT_LOG_CONTEXT));
+
+		LogContext->WorkQueue = WorkQueue;
+		LogContext->LogOpContext.LogContext = LogContext;
+
+		return LogContext;
+	}
+
+	return NULL;
+}
+
+VOID MiniFltLogAllocateFree(
+	_In_ PMINIFLT_LOG_CONTEXT LogContext
+) 
+{
+	if (LogContext != NULL) MyFreeNonPagedPool(LogContext, &g_LogAllocCnt);
+}
+
+VOID MiniFltWorkThread(
 	_In_ PVOID Context
 )
 {
@@ -401,7 +428,7 @@ VOID MyWorkThread(
 	PsTerminateSystemThread(STATUS_SUCCESS);
 }
 
-NTSTATUS MyStartWorkQueue(
+NTSTATUS MiniFltStartWorkQueue(
 	_In_ PMINIFLT_WORK_QUEUE WorkQueue
 ) 
 {
@@ -412,7 +439,7 @@ NTSTATUS MyStartWorkQueue(
 	KeInitializeEvent(&WorkQueue->Event, SynchronizationEvent, FALSE);
 	WorkQueue->Stop = FALSE;
 
-	Status = PsCreateSystemThread(&hThread, THREAD_ALL_ACCESS, NULL, NULL, NULL, MyWorkThread, WorkQueue);
+	Status = PsCreateSystemThread(&hThread, THREAD_ALL_ACCESS, NULL, NULL, NULL, MiniFltWorkThread, WorkQueue);
 
 	if (!NT_SUCCESS(Status)) {
 		return Status;
@@ -428,4 +455,15 @@ NTSTATUS MyStartWorkQueue(
 	}
 
 	return Status;
+}
+
+VOID MiniFltStopWorkQueue(
+	_In_ PMINIFLT_WORK_QUEUE WorkQueue
+) 
+{
+	WorkQueue->Stop = TRUE;
+	KeSetEvent(&WorkQueue->Event, 0, FALSE);
+	KeWaitForSingleObject(WorkQueue->Thread, Executive, KernelMode, FALSE, NULL);
+	ObDereferenceObject(WorkQueue->Thread);
+
 }
