@@ -4,6 +4,7 @@
 #include "CommFunc.h"
 
 typedef struct _MINI_FLT_CONTEXT {
+	BOOL bLocal;
 	CHAR ObjPath[MAX_KPATH];
 	CHAR ProcPath[MAX_KPATH];
 	CHAR UserName[MAX_NAME];

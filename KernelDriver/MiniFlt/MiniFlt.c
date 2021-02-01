@@ -73,6 +73,8 @@ FLT_OPERATION_REGISTRATION Callbacks[] = {
 			0, 
 			MiniFltPreFsControl,
 			NULL },
+		
+		{ IRP_MJ_MDL_READ, 0, MiniFltPreMDLReadBuffers, NULL },
 
     { IRP_MJ_OPERATION_END }
 };
@@ -769,8 +771,7 @@ FLT_POSTOP_CALLBACK_STATUS MiniFltPostCreate(
 	return FLT_POSTOP_FINISHED_PROCESSING;
 }
 
-FLT_PREOP_CALLBACK_STATUS
-MiniFltPreCleanup(
+FLT_PREOP_CALLBACK_STATUS MiniFltPreCleanup(
   _Inout_ PFLT_CALLBACK_DATA Data,
   _In_ PCFLT_RELATED_OBJECTS FltObjects,
   _Flt_CompletionContext_Outptr_ PVOID* CompletionContext
@@ -896,6 +897,49 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreFsControl(
 		if (VolumeContext != NULL) {
 
 			FltReleaseContext(VolumeContext);
+		}
+	}
+
+	return RetStatus;
+}
+
+FLT_PREOP_CALLBACK_STATUS MiniFltPreMDLReadBuffers(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+)
+{
+	FLT_PREOP_CALLBACK_STATUS RetStatus = FLT_PREOP_SUCCESS_NO_CALLBACK;
+	PMINI_FLT_CONTEXT MiniContext = NULL;
+	NTSTATUS Status;
+
+	UNREFERENCED_PARAMETER(CompletionContext);
+
+	__try {
+
+		if (!FltSupportsStreamHandleContexts(FltObjects->FileObject)) {
+
+			__leave;
+		}
+
+		Status = FltGetStreamHandleContext(FltObjects->Instance, FltObjects->FileObject, &MiniContext);
+		if (!NT_SUCCESS(Status)) {
+
+			MiniContext = NULL;
+			__leave;
+		}
+
+		if (FLT_IS_FASTIO_OPERATION(Data)) {
+
+			RetStatus = FLT_PREOP_DISALLOW_FASTIO;
+			__leave;
+		}
+	}
+	__finally {
+
+		if (MiniContext != NULL) {
+
+			FltReleaseContext(MiniContext);
 		}
 	}
 
