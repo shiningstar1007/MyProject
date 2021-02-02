@@ -742,6 +742,7 @@ FLT_POSTOP_CALLBACK_STATUS MiniFltPostCreate(
 	NTSTATUS NtStatus;
 	ULONG Action, Disp = (Data->Iopb->Parameters.Create.Options >> 24) & 0xFF;
 	PMINIFLT_INFO MiniFltInfo = (PMINIFLT_INFO)CbdContext;
+	PMINI_FLT_CONTEXT MiniContext = NULL;
 
 	if (FlagOn(Flags, FLTFL_POST_OPERATION_DRAINING) || !NT_SUCCESS(Data->IoStatus.Status)) return Status;
 
@@ -752,6 +753,33 @@ FLT_POSTOP_CALLBACK_STATUS MiniFltPostCreate(
 		NtStatus = GetProcessImageName(Data, MiniFltInfo);
 
 		Action = GetAction(Data->Iopb->Parameters.Create.SecurityContext->DesiredAccess);
+
+		__try {
+			Status = FltGetFileContext(FltObjects->Instance, FltObjects->FileObject, &MiniContext);
+			if (!NT_SUCCESS(Status)) {
+				Status = CreateMiniFltContext(FLT_FILE_CONTEXT, Data, g_MiniData.hFilter, &MiniContext, MiniFltInfo);
+				if (!NT_SUCCESS(Status)) {
+					DbgPrint("PostCreate: Failed to Create File Context (FileObject = %p)", FltObjects->FileObject);
+				}
+			}
+
+			if (MiniContext != NULL) {
+
+				FltReleaseContext(MiniContext);
+				MiniContext = NULL;
+			}
+
+			Status = CreateMiniFltContext(FLT_STREAMHANDLE_CONTEXT, Data, g_MiniData.hFilter, &MiniContext, MiniFltInfo);
+			if (!NT_SUCCESS(Status)) {
+				DbgPrint("PostCreate: Failed to Create StreamHandle Context (FileObject = %p)", FltObjects->FileObject);
+			}
+		}
+		__finally {
+			if (MiniContext != NULL) {
+
+				FltReleaseContext(MiniContext);
+			}
+		}
 
 		if (Data->IoStatus.Information == FILE_CREATE) {
 			FILE_DISPOSITION_INFORMATION DeleteInfo;

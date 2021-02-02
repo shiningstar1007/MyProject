@@ -25,7 +25,8 @@ NTSTATUS CreateMiniFltContext(
 	_In_ FLT_CONTEXT_TYPE ContextType,
 	_In_ PFLT_CALLBACK_DATA Data,
 	_In_ PFLT_FILTER hFilter,
-	_Outptr_ PMINI_FLT_CONTEXT* pMiniFltContext
+	_Outptr_ PMINI_FLT_CONTEXT* pMiniFltContext,
+	_In_ PMINIFLT_INFO MiniFltInfo
 );
 
 #endif

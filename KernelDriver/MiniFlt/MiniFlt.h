@@ -105,10 +105,10 @@ struct _MINIFLT_INFO {
 	CHAR RegPath[MAX_KPATH];
 	WCHAR RegPathW[MAX_KPATH];
 
+	BOOL bLocal;
 	DRIVE_TYPE DrvType;
 	FLT_FILESYSTEM_TYPE FSType;
 	PCFLT_RELATED_OBJECTS FltObjects;
-
 };
 
 typedef struct _VOLUME_CONTEXT {
