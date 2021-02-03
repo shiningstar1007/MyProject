@@ -133,62 +133,71 @@ typedef union _FILE_REFERENCE {
 } FILE_REFERENCE, * PFILE_REFERENCE;
 
 DRIVER_INITIALIZE DriverEntry;
-NTSTATUS
-DriverEntry(
+NTSTATUS DriverEntry(
 	_In_ PDRIVER_OBJECT DriverObject,
 	_In_ PUNICODE_STRING RegistryPath
 );
 
-NTSTATUS
-MiniFltUnload(
+NTSTATUS MiniFltUnload(
 	_In_ FLT_FILTER_UNLOAD_FLAGS Flags
 );
 
-NTSTATUS
-MiniFltInstanceSetup(
+NTSTATUS MiniFltInstanceSetup(
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
 	_In_ FLT_INSTANCE_SETUP_FLAGS Flags,
 	_In_ DEVICE_TYPE VolumeDeviceType,
 	_In_ FLT_FILESYSTEM_TYPE VolumeFilesystemType
 );
 
-NTSTATUS
-MiniFltInstanceQueryTeardown(
+NTSTATUS MiniFltInstanceQueryTeardown(
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
 	_In_ FLT_INSTANCE_QUERY_TEARDOWN_FLAGS Flags
 );
 
-FLT_PREOP_CALLBACK_STATUS
-MiniFltPreCreate(
+FLT_PREOP_CALLBACK_STATUS MiniFltPreCreate(
 	_Inout_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
 	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
 );
 
-FLT_POSTOP_CALLBACK_STATUS
-MiniFltPostCreate(
+FLT_POSTOP_CALLBACK_STATUS MiniFltPostCreate(
 	_Inout_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
 	_Inout_opt_ PVOID CbdContext,
 	_In_ FLT_POST_OPERATION_FLAGS Flags
 );
 
-FLT_PREOP_CALLBACK_STATUS
-MiniFltPreCleanup(
+FLT_PREOP_CALLBACK_STATUS MiniFltPreCleanup(
 	_Inout_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
 	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
 );
 
-FLT_PREOP_CALLBACK_STATUS
-MiniFltPreFileMapping(
+FLT_PREOP_CALLBACK_STATUS MiniFltPreSetSecurity(
 	_Inout_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
 	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
 );
 
-FLT_PREOP_CALLBACK_STATUS
-MiniFltPreFsControl(
+FLT_PREOP_CALLBACK_STATUS MiniFltPreSetInformation(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+);
+
+FLT_PREOP_CALLBACK_STATUS MiniFltPreFileMapping(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+);
+
+FLT_PREOP_CALLBACK_STATUS MiniFltPreFsControl(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+);
+
+FLT_PREOP_CALLBACK_STATUS MiniFltPreMDLReadBuffers(
 	_Inout_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
 	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext

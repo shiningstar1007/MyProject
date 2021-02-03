@@ -73,8 +73,21 @@ FLT_OPERATION_REGISTRATION Callbacks[] = {
 			0, 
 			MiniFltPreFsControl,
 			NULL },
+
+		{ IRP_MJ_SET_SECURITY, 
+			0, 
+			MiniFltPreSetSecurity, 
+			NULL },
+
+		{ IRP_MJ_SET_INFORMATION, 
+			FLTFL_OPERATION_REGISTRATION_SKIP_PAGING_IO, 
+			MiniFltPreSetInformation, 
+			NULL },
 		
-		{ IRP_MJ_MDL_READ, 0, MiniFltPreMDLReadBuffers, NULL },
+		{ IRP_MJ_MDL_READ, 
+			0, 
+			MiniFltPreMDLReadBuffers, 
+			NULL },
 
     { IRP_MJ_OPERATION_END }
 };
@@ -812,6 +825,28 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreCleanup(
   PAGED_CODE();
 
   return FLT_PREOP_SUCCESS_NO_CALLBACK;
+}
+
+FLT_PREOP_CALLBACK_STATUS MiniFltPreSetSecurity(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+)
+{
+	FLT_PREOP_CALLBACK_STATUS Status = FLT_PREOP_SUCCESS_NO_CALLBACK;
+	PMINIFLT_INFO MiniFltInfo = NULL;
+
+	UNREFERENCED_PARAMETER(CompletionContext);
+
+	PAGED_CODE();
+	//write operation
+
+	MiniFltInfo = GetMiniFltInfo(Data, FltObjects, "MiniFltPreSetSecurity");
+	if (!MiniFltInfo) return Status;
+
+	if (MiniFltInfo != NULL) ExFreeToNPagedLookasideList(&g_MiniFltLookaside, MiniFltInfo);
+
+	return Status;
 }
 
 FLT_PREOP_CALLBACK_STATUS MiniFltPreSetInformation(
