@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 
 NPAGED_LOOKASIDE_LIST g_MiniFltLookaside;
+NPAGED_LOOKASIDE_LIST g_MiniSwapLookaside;
 
 MINI_GLOBAL_DATA g_MiniData;
 
@@ -58,6 +59,11 @@ FLT_OPERATION_REGISTRATION Callbacks[] = {
       0,
       MiniFltPreCreate,
       MiniFltPostCreate },
+
+		{ IRP_MJ_READ, 
+			0, 
+			MiniFltPreRead,
+			MiniFltPostRead },
 
     { IRP_MJ_CLEANUP,
       FLTFL_OPERATION_REGISTRATION_SKIP_PAGING_IO,
@@ -127,6 +133,7 @@ NTSTATUS InitializeData(
 	InitializeListHead(&g_MiniData.LogBufList);
 
 	ExInitializeNPagedLookasideList(&g_MiniFltLookaside, NULL, NULL, 0, sizeof(MINIFLT_INFO), TAG_MINIFLT, 0);
+	ExInitializeNPagedLookasideList(&g_MiniSwapLookaside, NULL, NULL, 0, sizeof(MINI_SWAP_CONTEXT), TAG_MINIFLT, 0);
 
 	KeInitializeSpinLock(&g_LogSpinLock);
 	KeInitializeSpinLock(&g_MiniData.SpinLock);
@@ -153,6 +160,7 @@ NTSTATUS FinalizeDriver(
 )
 {
 	ExDeleteNPagedLookasideList(&g_MiniFltLookaside);
+	ExDeleteNPagedLookasideList(&g_MiniSwapLookaside);
 
 	if (g_MiniData.RegistryPath.Buffer != NULL) MyFreeNonPagedPool(g_MiniData.RegistryPath.Buffer, &g_NonPagedPoolCnt);
 
@@ -770,9 +778,9 @@ FLT_POSTOP_CALLBACK_STATUS MiniFltPostCreate(
 		__try {
 			Status = FltGetFileContext(FltObjects->Instance, FltObjects->FileObject, &MiniContext);
 			if (!NT_SUCCESS(Status)) {
-				Status = CreateMiniFltContext(FLT_FILE_CONTEXT, Data, g_MiniData.hFilter, &MiniContext, MiniFltInfo);
+				Status = CreateMiniFltContext(FLT_STREAM_CONTEXT, Data, g_MiniData.hFilter, &MiniContext, MiniFltInfo);
 				if (!NT_SUCCESS(Status)) {
-					DbgPrint("PostCreate: Failed to Create File Context (FileObject = %p)", FltObjects->FileObject);
+					DbgPrint("PostCreate: Failed to Create Stream Context (FileObject = %p)", FltObjects->FileObject);
 				}
 			}
 
@@ -810,6 +818,85 @@ FLT_POSTOP_CALLBACK_STATUS MiniFltPostCreate(
 	if (MiniFltInfo != NULL) ExFreeToNPagedLookasideList(&g_MiniFltLookaside, MiniFltInfo);
 
 	return FLT_POSTOP_FINISHED_PROCESSING;
+}
+
+FLT_PREOP_CALLBACK_STATUS MiniFltPreRead(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+)
+{
+	NTSTATUS Status;
+	PFLT_IO_PARAMETER_BLOCK pIopb = Data->Iopb;
+	FLT_PREOP_CALLBACK_STATUS RetStatus = FLT_PREOP_SUCCESS_NO_CALLBACK;
+	PVOID NewBuf = NULL;
+	PMDL NewMdl = NULL;
+	PVOLUME_CONTEXT VolContext = NULL;
+	PMINI_FLT_CONTEXT MiniContext = NULL;
+	PMINI_SWAP_CONTEXT SwapContext = NULL;
+	ULONG ReadLen = pIopb->Parameters.Read.Length;
+
+	__try {
+		if (ReadLen == 0) __leave;
+
+		Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolContext);
+		if (!NT_SUCCESS(Status)) __leave;
+
+		if (FlagOn(IRP_NOCACHE, pIopb->IrpFlags)) ReadLen = (ULONG)ROUND_TO_SIZE(ReadLen, VolContext->SectorSize);
+
+		NewBuf = FltAllocatePoolAlignedWithTag(FltObjects->Instance, NonPagedPool, (SIZE_T)ReadLen, TAG_MINIFLT);
+		if (NewBuf == NULL) __leave;
+
+		if (FlagOn(Data->Flags, FLTFL_CALLBACK_DATA_IRP_OPERATION)) {
+			NewMdl = IoAllocateMdl(NewBuf, ReadLen, FALSE, FALSE, NULL);
+			if (NewMdl == NULL) __leave;
+
+			MmBuildMdlForNonPagedPool(NewMdl);
+		}
+
+		SwapContext = ExAllocateFromNPagedLookasideList(&g_MiniSwapLookaside);
+		if (SwapContext == NULL) __leave;
+
+		pIopb->Parameters.Read.ReadBuffer = NewBuf;
+		pIopb->Parameters.Read.MdlAddress = NewMdl;
+		FltSetCallbackDataDirty(Data);
+
+		SwapContext->SwappedBuffer = NewBuf;
+		SwapContext->VolContext = VolContext;
+		SwapContext->MiniContext = MiniContext;
+
+		RetStatus = FLT_PREOP_SUCCESS_WITH_CALLBACK;
+	}
+	__finally {
+
+		if (RetStatus != FLT_PREOP_SUCCESS_WITH_CALLBACK) {
+
+			if (NewBuf != NULL) FltFreePoolAlignedWithTag(FltObjects->Instance, NewBuf, TAG_MINIFLT);
+			
+			if (NewMdl != NULL) IoFreeMdl(NewMdl);
+
+			if (VolContext != NULL) FltReleaseContext(VolContext);
+
+			if (MiniContext != NULL) FltReleaseContext(MiniContext);
+		}
+	}
+
+
+	return RetStatus;
+}
+
+FLT_POSTOP_CALLBACK_STATUS MiniFltPostRead(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_In_ PVOID CompletionContext,
+	_In_ FLT_POST_OPERATION_FLAGS Flags
+)
+{
+	PFLT_IO_PARAMETER_BLOCK pIopb = Data->Iopb;
+	FLT_POSTOP_CALLBACK_STATUS RetStatus = FLT_POSTOP_FINISHED_PROCESSING;
+
+
+	return RetStatus;
 }
 
 FLT_PREOP_CALLBACK_STATUS MiniFltPreCleanup(
