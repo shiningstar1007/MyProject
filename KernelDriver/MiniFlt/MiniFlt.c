@@ -865,6 +865,8 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreRead(
 		SwapContext->VolContext = VolContext;
 		SwapContext->MiniContext = MiniContext;
 
+		*CompletionContext = SwapContext;
+
 		RetStatus = FLT_PREOP_SUCCESS_WITH_CALLBACK;
 	}
 	__finally {
@@ -881,7 +883,6 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreRead(
 		}
 	}
 
-
 	return RetStatus;
 }
 
@@ -894,9 +895,80 @@ FLT_POSTOP_CALLBACK_STATUS MiniFltPostRead(
 {
 	PFLT_IO_PARAMETER_BLOCK pIopb = Data->Iopb;
 	FLT_POSTOP_CALLBACK_STATUS RetStatus = FLT_POSTOP_FINISHED_PROCESSING;
+	PMINI_SWAP_CONTEXT SwapContext = CompletionContext;
+	PVOID OrgBuf = NULL;
+	BOOL bFreeBuf = TRUE;
 
+	FLT_ASSERT(!FlagOn(Flags, FLTFL_POST_OPERATION_DRAINING));
+
+	__try {
+		if (!NT_SUCCESS(Data->IoStatus.Status) || (Data->IoStatus.Information == 0)) __leave;
+
+		if (pIopb->Parameters.Read.MdlAddress != NULL) {
+
+			FLT_ASSERT(((PMDL)pIopb->Parameters.Read.MdlAddress)->Next == NULL);
+
+			OrgBuf = MmGetSystemAddressForMdlSafe(pIopb->Parameters.Read.MdlAddress, NormalPagePriority | MdlMappingNoExecute);
+
+			if (OrgBuf == NULL) {
+				Data->IoStatus.Status = STATUS_INSUFFICIENT_RESOURCES;
+				Data->IoStatus.Information = 0;
+				__leave;
+			}
+		}
+		else if (FlagOn(Data->Flags, FLTFL_CALLBACK_DATA_SYSTEM_BUFFER) || FlagOn(Data->Flags, FLTFL_CALLBACK_DATA_FAST_IO_OPERATION)) {
+			OrgBuf = pIopb->Parameters.Read.ReadBuffer;
+		}
+		else {
+			if (FltDoCompletionProcessingWhenSafe(Data, FltObjects, CompletionContext, Flags, MiniFltPostReadWhenSafe, &RetStatus)) {
+				bFreeBuf = FALSE;
+			}
+			else {
+				Data->IoStatus.Status = STATUS_UNSUCCESSFUL;
+				Data->IoStatus.Information = 0;
+			}
+
+			__leave;
+		}
+
+		__try {
+			RtlCopyMemory(OrgBuf, SwapContext->SwappedBuffer, Data->IoStatus.Information);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+
+			Data->IoStatus.Status = GetExceptionCode();
+			Data->IoStatus.Information = 0;
+		}
+	}
+	__finally {
+
+		if (bFreeBuf) {
+
+			FltFreePoolAlignedWithTag(FltObjects->Instance, SwapContext->SwappedBuffer, TAG_MINIFLT);
+			FltReleaseContext(SwapContext->MiniContext);
+			FltReleaseContext(SwapContext->VolContext);
+
+			ExFreeToNPagedLookasideList(&g_MiniSwapLookaside, SwapContext);
+		}
+	}
 
 	return RetStatus;
+}
+
+FLT_POSTOP_CALLBACK_STATUS MiniFltPostReadWhenSafe(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_In_ PVOID CompletionContext,
+	_In_ FLT_POST_OPERATION_FLAGS Flags
+)
+{
+	PFLT_IO_PARAMETER_BLOCK pIopb = Data->Iopb;
+	PMINI_SWAP_CONTEXT SwapContext = CompletionContext;
+	PVOID OrgBuf;
+	NTSTATUS Status;
+
+
+	return Status;
 }
 
 FLT_PREOP_CALLBACK_STATUS MiniFltPreCleanup(
