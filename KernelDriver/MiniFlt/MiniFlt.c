@@ -964,9 +964,35 @@ FLT_POSTOP_CALLBACK_STATUS MiniFltPostReadWhenSafe(
 {
 	PFLT_IO_PARAMETER_BLOCK pIopb = Data->Iopb;
 	PMINI_SWAP_CONTEXT SwapContext = CompletionContext;
-	PVOID OrgBuf;
-	NTSTATUS Status;
+	PVOID OrgBuf = NULL;
+	NTSTATUS Status = STATUS_SUCCESS;
 
+	UNREFERENCED_PARAMETER(FltObjects);
+	UNREFERENCED_PARAMETER(Flags);
+	FLT_ASSERT(Data->IoStatus.Information != 0);
+
+	Status = FltLockUserBuffer(Data);
+
+	if (!NT_SUCCESS(Status)) {
+		Data->IoStatus.Status = Status;
+		Data->IoStatus.Information = 0;
+	}
+	else {
+		OrgBuf = MmGetSystemAddressForMdlSafe(pIopb->Parameters.Read.MdlAddress, NormalPagePriority);
+		if (OrgBuf == NULL) {
+			Data->IoStatus.Status = STATUS_INSUFFICIENT_RESOURCES;
+			Data->IoStatus.Information = 0;
+		}
+		else {
+			RtlCopyMemory(OrgBuf, SwapContext->SwappedBuffer, Data->IoStatus.Information);
+		}
+	}
+
+	FltFreePoolAlignedWithTag(FltObjects->Instance, SwapContext->SwappedBuffer, TAG_MINIFLT);
+	FltReleaseContext(SwapContext->MiniContext);
+	FltReleaseContext(SwapContext->VolContext);
+
+	ExFreeToNPagedLookasideList(&g_MiniSwapLookaside, SwapContext);
 
 	return Status;
 }
