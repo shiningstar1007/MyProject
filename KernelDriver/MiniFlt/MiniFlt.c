@@ -997,6 +997,103 @@ FLT_POSTOP_CALLBACK_STATUS MiniFltPostReadWhenSafe(
 	return Status;
 }
 
+FLT_PREOP_CALLBACK_STATUS MiniFltPreWrite(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+)
+{
+	PFLT_IO_PARAMETER_BLOCK pIopb = Data->Iopb;
+	FLT_PREOP_CALLBACK_STATUS RetValue = FLT_PREOP_SUCCESS_NO_CALLBACK;
+	PVOID NewBuf = NULL;
+	PMDL NewMdl = NULL;
+	PVOLUME_CONTEXT VolContext = NULL;
+	PMINI_SWAP_CONTEXT SwapContext = NULL;
+	PVOID OrgBuf = NULL;
+	NTSTATUS Status = STATUS_SUCCESS;
+	ULONG WriteLen = Data->Iopb->Parameters.Write.Length;
+
+	__try {
+		if (WriteLen == 0) leave;
+
+		Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolContext);
+		if (!NT_SUCCESS(Status)) {
+			__leave;
+		}
+
+		if (FlagOn(IRP_NOCACHE, pIopb->IrpFlags)) {
+			WriteLen = (ULONG)ROUND_TO_SIZE(WriteLen, VolContext->SectorSize);
+		}
+
+		NewBuf = FltAllocatePoolAlignedWithTag(FltObjects->Instance, NonPagedPool, (SIZE_T)WriteLen, TAG_MINIFLT);
+		if (NewBuf == NULL) {
+			__leave;
+		}
+
+		if (FlagOn(Data->Flags, FLTFL_CALLBACK_DATA_IRP_OPERATION)) {
+			NewMdl = IoAllocateMdl(NewBuf, WriteLen, FALSE, FALSE, NULL);
+
+			if (NewMdl == NULL) {
+				__leave;
+			}
+
+			MmBuildMdlForNonPagedPool(NewMdl);
+		}
+
+		if (pIopb->Parameters.Write.MdlAddress != NULL) {
+			FLT_ASSERT(((PMDL)pIopb->Parameters.Write.MdlAddress)->Next == NULL);
+
+			OrgBuf = MmGetSystemAddressForMdlSafe(pIopb->Parameters.Write.MdlAddress, NormalPagePriority | MdlMappingNoExecute);
+
+			if (OrgBuf == NULL) {
+				Data->IoStatus.Status = STATUS_INSUFFICIENT_RESOURCES;
+				Data->IoStatus.Information = 0;
+				RetValue = FLT_PREOP_COMPLETE;
+				__leave;
+			}
+		}
+		else {
+			OrgBuf = pIopb->Parameters.Write.WriteBuffer;
+		}
+
+		__try {
+			RtlCopyMemory(NewBuf, OrgBuf, WriteLen);
+		} 
+		__except(EXCEPTION_EXECUTE_HANDLER) {
+
+			Data->IoStatus.Status = GetExceptionCode();
+			Data->IoStatus.Information = 0;
+			RetValue = FLT_PREOP_COMPLETE;
+			__leave;
+		}
+
+		SwapContext = ExAllocateFromNPagedLookasideList(&g_MiniSwapLookaside);
+		if (SwapContext == NULL) __leave;
+
+		pIopb->Parameters.Write.WriteBuffer = NewBuf;
+		pIopb->Parameters.Write.MdlAddress = NewMdl;
+		FltSetCallbackDataDirty(Data);
+
+		SwapContext->SwappedBuffer = NewBuf;
+		SwapContext->VolContext = VolContext;
+		*CompletionContext = SwapContext;
+
+		RetValue = FLT_PREOP_SUCCESS_WITH_CALLBACK;
+	}
+	__finally {
+		if (RetValue != FLT_PREOP_SUCCESS_WITH_CALLBACK) {
+
+			if (NewBuf != NULL) FltFreePoolAlignedWithTag(FltObjects->Instance, NewBuf, TAG_MINIFLT);
+
+			if (NewMdl != NULL) IoFreeMdl(NewMdl);
+
+			if (VolContext != NULL) FltReleaseContext(VolContext);
+		}
+	}
+
+	return RetValue;
+}
+
 FLT_PREOP_CALLBACK_STATUS MiniFltPreCleanup(
   _Inout_ PFLT_CALLBACK_DATA Data,
   _In_ PCFLT_RELATED_OBJECTS FltObjects,
