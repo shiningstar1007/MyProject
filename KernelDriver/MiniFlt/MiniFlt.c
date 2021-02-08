@@ -1094,6 +1094,25 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreWrite(
 	return RetValue;
 }
 
+FLT_POSTOP_CALLBACK_STATUS MiniFltPostWrite(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_In_ PVOID CompletionContext,
+	_In_ FLT_POST_OPERATION_FLAGS Flags
+)
+{
+	PMINI_SWAP_CONTEXT SwapContext = CompletionContext;
+	UNREFERENCED_PARAMETER(Flags);
+	UNREFERENCED_PARAMETER(Data);
+
+	FltFreePoolAlignedWithTag(FltObjects->Instance, SwapContext->SwappedBuffer, TAG_MINIFLT);
+	FltReleaseContext(SwapContext->VolContext);
+
+	ExFreeToNPagedLookasideList(&g_MiniSwapLookaside, SwapContext);
+
+	return FLT_POSTOP_FINISHED_PROCESSING;
+}
+
 FLT_PREOP_CALLBACK_STATUS MiniFltPreCleanup(
   _Inout_ PFLT_CALLBACK_DATA Data,
   _In_ PCFLT_RELATED_OBJECTS FltObjects,
