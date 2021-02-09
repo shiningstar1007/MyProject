@@ -1267,6 +1267,52 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreFsControl(
 	return RetStatus;
 }
 
+FLT_PREOP_CALLBACK_STATUS MiniFltPreDeviceControl(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+)
+{
+	FLT_PREOP_CALLBACK_STATUS RetStatus = FLT_PREOP_SUCCESS_NO_CALLBACK;
+	PVOLUME_CONTEXT VolumeContext = NULL;
+	PMINI_FLT_CONTEXT MiniContext = NULL;
+	NTSTATUS Status;
+
+	UNREFERENCED_PARAMETER(CompletionContext);
+	PAGED_CODE();
+
+	__try {
+
+		Status = FltGetFileContext(FltObjects->Instance, FltObjects->FileObject, &MiniContext);
+		if (NT_SUCCESS(Status)) {
+
+			Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolumeContext);
+			if (NT_SUCCESS(Status) && (VolumeContext->DriveType == DRIVE_NETWORK)) {
+
+				if ((Data->Iopb->Parameters.DeviceIoControl.Common.IoControlCode == IOCTL_QUERY_REMOTE_SERVER_NAME) ||
+					(Data->Iopb->Parameters.DeviceIoControl.Common.IoControlCode == IOCTL_COPYCHUNK)) {
+
+					Data->IoStatus.Status = STATUS_NOT_SUPPORTED;
+					RetStatus = FLT_PREOP_COMPLETE;
+				}
+			}
+		}
+	}
+	__finally {
+		if (MiniContext != NULL) {
+
+			FltReleaseContext(MiniContext);
+		}
+
+		if (VolumeContext != NULL) {
+
+			FltReleaseContext(VolumeContext);
+		}
+	}
+
+	return RetStatus;
+}
+
 FLT_PREOP_CALLBACK_STATUS MiniFltPreMDLReadBuffers(
 	_Inout_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,

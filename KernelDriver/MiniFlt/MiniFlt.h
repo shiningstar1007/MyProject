@@ -15,6 +15,8 @@
 #define BUF_UNIT 32768
 
 #define IOCTL_LMR_DISABLE_LOCAL_BUFFERING 0x140390
+#define IOCTL_QUERY_REMOTE_SERVER_NAME 0x140410
+#define IOCTL_COPYCHUNK 0x140412
 
 typedef unsigned int UINT;
 typedef char CHAR, * PCHAR;
@@ -181,6 +183,19 @@ FLT_POSTOP_CALLBACK_STATUS MiniFltPostRead(
 );
 
 FLT_POSTOP_CALLBACK_STATUS MiniFltPostReadWhenSafe(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_In_ PVOID CompletionContext,
+	_In_ FLT_POST_OPERATION_FLAGS Flags
+);
+
+FLT_PREOP_CALLBACK_STATUS MiniFltPreWrite(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext
+);
+
+FLT_POSTOP_CALLBACK_STATUS MiniFltPostWrite(
 	_Inout_ PFLT_CALLBACK_DATA Data,
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
 	_In_ PVOID CompletionContext,
