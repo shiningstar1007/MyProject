@@ -839,6 +839,18 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreRead(
 	__try {
 		if (ReadLen == 0) __leave;
 
+		Status = FltGetStreamHandleContext(FltObjects->Instance, FltObjects->FileObject, &MiniContext);
+		if (!NT_SUCCESS(Status)) {
+
+			MiniContext = NULL;
+			Status = FltGetFileContext(FltObjects->Instance, FltObjects->FileObject, &MiniContext);
+			if (!NT_SUCCESS(Status)) {
+
+				MiniContext = NULL;
+				__leave;
+			}
+		}
+
 		Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolContext);
 		if (!NT_SUCCESS(Status)) __leave;
 
@@ -1008,6 +1020,7 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreWrite(
 	PVOID NewBuf = NULL;
 	PMDL NewMdl = NULL;
 	PVOLUME_CONTEXT VolContext = NULL;
+	PMINI_FLT_CONTEXT MiniContext = NULL;
 	PMINI_SWAP_CONTEXT SwapContext = NULL;
 	PVOID OrgBuf = NULL;
 	NTSTATUS Status = STATUS_SUCCESS;
@@ -1015,6 +1028,18 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreWrite(
 
 	__try {
 		if (WriteLen == 0) leave;
+
+		Status = FltGetStreamHandleContext(FltObjects->Instance, FltObjects->FileObject, &MiniContext);
+		if (!NT_SUCCESS(Status)) {
+
+			MiniContext = NULL;
+			Status = FltGetFileContext(FltObjects->Instance, FltObjects->FileObject, &MiniContext);
+			if (!NT_SUCCESS(Status)) {
+
+				MiniContext = NULL;
+				__leave;
+			}
+		}
 
 		Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolContext);
 		if (!NT_SUCCESS(Status)) {
@@ -1089,6 +1114,8 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreWrite(
 
 			if (VolContext != NULL) FltReleaseContext(VolContext);
 		}
+
+		if (MiniContext != NULL) FltReleaseContext(MiniContext);
 	}
 
 	return RetValue;
@@ -1206,21 +1233,27 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreFileMapping(
 	ULONG Option = (PAGE_READONLY | PAGE_READWRITE);
 	ULONG PageProtection = Data->Iopb->Parameters.AcquireForSectionSynchronization.PageProtection;
 	PVOLUME_CONTEXT VolumeContext = NULL;
+	PMINI_FLT_CONTEXT MiniContext = NULL;
 	UNREFERENCED_PARAMETER(CompletionContext);
 
 	PAGED_CODE();
 
 	if (SyncType == SyncTypeCreateSection) {
-		Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolumeContext);
+		Status = FltGetStreamHandleContext(FltObjects->Instance, FltObjects->FileObject, &MiniContext);
 		if (NT_SUCCESS(Status)) {
+			Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolumeContext);
+			if (NT_SUCCESS(Status)) {
 
-			if (VolumeContext->DriveType == DRIVE_NETWORK) {
+				if (VolumeContext->DriveType == DRIVE_NETWORK) {
 
-			}
-			else {
+				}
+				else {
 
+				}
 			}
 		}
+
+		if (MiniContext != NULL) FltReleaseContext(MiniContext);
 
 		if (VolumeContext != NULL) FltReleaseContext(VolumeContext);
 	}
@@ -1236,32 +1269,35 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreFsControl(
 {
 	FLT_PREOP_CALLBACK_STATUS RetStatus = FLT_PREOP_SUCCESS_NO_CALLBACK;
 	PVOLUME_CONTEXT VolumeContext = NULL;
+	PMINI_FLT_CONTEXT MiniContext = NULL;
 	NTSTATUS Status;
 
 	UNREFERENCED_PARAMETER(CompletionContext);
 	PAGED_CODE();
 
 	__try {
-		Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolumeContext);
-		if (!NT_SUCCESS(Status)) {
+		Status = FltGetFileContext(FltObjects->Instance, FltObjects->FileObject, &MiniContext);
+		if (NT_SUCCESS(Status)) {
+			Status = FltGetVolumeContext(FltObjects->Filter, FltObjects->Volume, &VolumeContext);
+			if (!NT_SUCCESS(Status)) {
 
-			__leave;
-		}
+				__leave;
+			}
 
-		if ((VolumeContext->DriveType == DRIVE_NETWORK) &&
-			(Data->Iopb->Parameters.FileSystemControl.Common.FsControlCode == IOCTL_LMR_DISABLE_LOCAL_BUFFERING)) {
+			if ((VolumeContext->DriveType == DRIVE_NETWORK) &&
+				(Data->Iopb->Parameters.FileSystemControl.Common.FsControlCode == IOCTL_LMR_DISABLE_LOCAL_BUFFERING)) {
 
-			Data->IoStatus.Status = STATUS_NOT_SUPPORTED;
-			RetStatus = FLT_PREOP_COMPLETE;
-			DbgPrint("%s: IOCTL_LMR_DISABLE_LOCAL_BUFFERING", __FUNCTION__);
+				Data->IoStatus.Status = STATUS_NOT_SUPPORTED;
+				RetStatus = FLT_PREOP_COMPLETE;
+				DbgPrint("%s: IOCTL_LMR_DISABLE_LOCAL_BUFFERING", __FUNCTION__);
+			}
 		}
 	}
 	__finally {
 
-		if (VolumeContext != NULL) {
+		if (MiniContext != NULL) FltReleaseContext(MiniContext);
 
-			FltReleaseContext(VolumeContext);
-		}
+		if (VolumeContext != NULL) FltReleaseContext(VolumeContext);
 	}
 
 	return RetStatus;
@@ -1299,15 +1335,10 @@ FLT_PREOP_CALLBACK_STATUS MiniFltPreDeviceControl(
 		}
 	}
 	__finally {
-		if (MiniContext != NULL) {
 
-			FltReleaseContext(MiniContext);
-		}
+		if (MiniContext != NULL) FltReleaseContext(MiniContext);
 
-		if (VolumeContext != NULL) {
-
-			FltReleaseContext(VolumeContext);
-		}
+		if (VolumeContext != NULL) FltReleaseContext(VolumeContext);
 	}
 
 	return RetStatus;
