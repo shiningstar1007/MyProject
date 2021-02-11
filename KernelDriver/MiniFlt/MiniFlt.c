@@ -227,6 +227,17 @@ MiniFltInstanceSetup(
 
 	PAGED_CODE();
 
+	if (!g_MiniData.bFirstInitLoad) {
+		Status = FltGetDeviceObject(FltObjects->Volume, &DeviceObj);
+		if (NT_SUCCESS(Status)) {
+			g_MiniData.DriverObject = DeviceObj->DriverObject;
+
+			ObDereferenceObject(DeviceObj);
+			DeviceObj = NULL;
+			g_MiniData.bFirstInitLoad = TRUE;
+		}
+	}
+
 	if (VolumeDeviceType == FILE_DEVICE_DISK_FILE_SYSTEM)
 		DeviceType = "FILE_DEVICE_DISK_FILE_SYSTEM";
 	else if (VolumeDeviceType == FILE_DEVICE_CD_ROM_FILE_SYSTEM)
