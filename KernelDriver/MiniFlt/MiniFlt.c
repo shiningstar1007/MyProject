@@ -65,6 +65,11 @@ FLT_OPERATION_REGISTRATION Callbacks[] = {
 			MiniFltPreRead,
 			MiniFltPostRead },
 
+		{ IRP_MJ_WRITE,
+			0,
+			MiniFltPreWrite,
+			MiniFltPostWrite },
+
     { IRP_MJ_CLEANUP,
       FLTFL_OPERATION_REGISTRATION_SKIP_PAGING_IO,
       MiniFltPreCleanup,

@@ -2,36 +2,44 @@
 
 LONG g_ACLNonPagedPoolCnt = 0;
 
-MINICODE ACLEntriesAdd()
+ONOFF_MODE StrToOnOffMode(
+	_In_ PCHAR OnOffModeStr
+)
 {
-	MINICODE ErrCode = ERROR_MINI_SUCCESS;
+	if (!_stricmp(OnOffModeStr, OFM_ON_STR)) return OFM_ON;
 
-
-	return ErrCode;
+	return OFM_OFF;
 }
 
-MINICODE ACLEntriesModify()
+PCHAR OnOffModeToStr(
+	_In_ ONOFF_MODE OnOffMode
+)
 {
-	MINICODE ErrCode = ERROR_MINI_SUCCESS;
+	if (OnOffMode == OFM_ON) return OFM_ON_STR;
 
-
-	return ErrCode;
+	return OFM_OFF_STR;
 }
 
-MINICODE ACLEntriesRemove()
+TYPE_SUBJECT StrToSubType(
+	_In_ PCHAR SubTypeStr
+)
 {
-	MINICODE ErrCode = ERROR_MINI_SUCCESS;
+	if (!_stricmp(SubTypeStr, SUBJECT_USER_STR)) return SUBJECT_USER;
+	else if (!_stricmp(SubTypeStr, SUBJECT_GROUP_STR)) return SUBJECT_GROUP;
+	else if (!_stricmp(SubTypeStr, SUBJECT_PROC_STR)) return SUBJECT_PROC;
 
-
-	return ErrCode;
+	return SUBJECT_UNKNOWN;
 }
 
-MINICODE ACLEntriesList()
+PCHAR SubTypeToStr(
+	_In_ TYPE_SUBJECT SubType
+)
 {
-	MINICODE ErrCode = ERROR_MINI_SUCCESS;
+	if (SubType == SUBJECT_USER) return SUBJECT_USER_STR;
+	if (SubType == SUBJECT_GROUP) return SUBJECT_GROUP_STR;
+	else if (SubType == SUBJECT_PROC) return SUBJECT_PROC_STR;
 
-
-	return ErrCode;
+	return NULL;
 }
 
 PACL_OBJECT g_FirstObject = NULL, g_LastObject = NULL;
