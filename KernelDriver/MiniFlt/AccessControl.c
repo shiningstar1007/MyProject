@@ -42,6 +42,66 @@ PCHAR SubTypeToStr(
 	return NULL;
 }
 
+TYPE_OBJECT StrToObjType(
+	_In_ PCHAR ObjTypeStr
+)
+{
+	if (!_stricmp(ObjTypeStr, OBJECT_FILE_STR)) return OBJECT_FILE;
+	else if (!_stricmp(ObjTypeStr, OBJECT_DIR_STR)) return OBJECT_DIR;
+
+	return OBJECT_UNKNOWN;
+}
+
+PCHAR ObjTypeToStr(
+	_In_ TYPE_OBJECT ObjType
+)
+{
+	if (ObjType == OBJECT_FILE) return OBJECT_FILE_STR;
+	else if (ObjType == OBJECT_DIR) return OBJECT_DIR_STR;
+
+	return "";
+}
+
+EFFECT_MODE StrToEffectMode(
+	_In_ PCHAR EffectModeStr
+)
+{
+	if (!_stricmp(EffectModeStr, EFT_ALLOW_STR)) return EFT_ALLOW;
+	else if (!_stricmp(EffectModeStr, EFT_DENY_STR)) return EFT_DENY;
+
+	return EFT_UNKNOWN;
+}
+
+PCHAR EffectModeToStr(
+	_In_ EFFECT_MODE EffectMode
+)
+{
+	if (EffectMode == EFT_ALLOW) return EFT_ALLOW_STR;
+	else if (EffectMode == EFT_DENY) return EFT_DENY_STR;
+
+	return EFT_UNKNOWN_STR;
+}
+
+ULONG StrToRunMode(
+	_In_ PCHAR RunModeStr
+)
+{
+	if (!_stricmp(RunModeStr, RUN_TEST_STR)) return RUN_TEST;
+	else if (!_stricmp(RunModeStr, RUN_DISABLE_STR)) return RUN_DISABLE;
+
+	return RUN_NORMAL;
+}
+
+PCHAR RunModeToStr(
+	_In_ RUN_MODE RunMode
+)
+{
+	if (RunMode == RUN_TEST) return RUN_TEST_STR;
+	else if (RunMode == RUN_DISABLE) return RUN_DISABLE_STR;
+
+	return RUN_NORMAL_STR;
+}
+
 PACL_OBJECT g_FirstObject = NULL, g_LastObject = NULL;
 PACL_OBJECT SearchObject(PACL_OBJECT Object)
 {

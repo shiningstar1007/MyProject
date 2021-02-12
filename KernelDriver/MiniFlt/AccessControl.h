@@ -41,6 +41,16 @@ typedef enum _ONOFF_MODE {
 #define OFM_ON_STR  "on"
 #define OFM_OFF_STR "off"
 
+typedef enum _RUN_MODE {
+	RUN_NORMAL = 0,
+	RUN_TEST,
+	RUN_DISABLE,
+} RUN_MODE, * PRUN_MODE;
+
+#define RUN_NORMAL_STR  "normal"
+#define RUN_TEST_STR    "test"
+#define RUN_DISABLE_STR "disable"
+
 typedef struct _ACL_OBJECT ACL_OBJECT, * PACL_OBJECT;
 typedef struct _ACL_SUBJECT ACL_SUBJECT, *PACL_SUBJECT;
 
