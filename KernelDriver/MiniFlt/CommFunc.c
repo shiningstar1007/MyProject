@@ -167,6 +167,137 @@ ULONG MySNPrintfW(
 	return (ULONG)wcslen(DestBuf);
 }
 
+PCHAR Trim(
+	_Inout_ PCHAR SourceStr
+)
+{
+	if (!SourceStr) return NULL;
+
+	while (*SourceStr) {
+		if (*SourceStr != '\n' && isspace((int)*SourceStr)) SourceStr++;
+		else break;
+	}
+
+	return SourceStr;
+}
+
+PCHAR MyStrTok(
+	_Inout_ PCHAR SourceStr,
+	_In_ PCHAR SepChars,
+	_Inout_ PCHAR* NextStr,
+	_In_ BOOL UseQuota
+)
+{
+	PCHAR TargetChr = NULL, NextChr;
+	BOOL DelQuota = FALSE;
+
+	if (!UseQuota && strcmp(SepChars, SEP_NEWLN)) SourceStr = Trim(SourceStr);
+
+	if (!SourceStr || (!UseQuota && !*SourceStr)) {
+		if (NextStr) *NextStr = NULL;
+
+		return NULL;
+	}
+
+	if (SepChars) {
+		if (UseQuota && *SourceStr == CHR_QUOTA) {
+			TargetChr = ++SourceStr;
+			while (*TargetChr) {
+				NextChr = TargetChr + 1;
+				if (*TargetChr == CHR_QUOTA) {
+					if (*NextChr == CHR_QUOTA) TargetChr++;
+					else if (!*NextChr || *NextChr == *SepChars) {
+						*TargetChr++ = 0;
+						DelQuota = TRUE;
+						break;
+					}
+				}
+
+				TargetChr++;
+			}
+		}
+		else {
+			while (*SepChars) {
+				if (TargetChr = strchr(SourceStr, *SepChars++)) break;
+			}
+		}
+
+		if (TargetChr && *TargetChr) *TargetChr++ = 0;
+		else TargetChr = NULL;
+
+		if (UseQuota && DelQuota) QuotaDelete(SourceStr);
+	}
+
+	if (NextStr) *NextStr = TargetChr;
+
+	return SourceStr;
+}
+
+PCHAR QuotaAdd(
+	_Inout_ PCHAR SourceStr,
+	_Inout_ PCHAR TargetStr
+)
+{
+	PCHAR SourceBuf = NULL, Source, Target;
+
+	if (!SourceStr || !*SourceStr) return SourceStr;
+
+	if (TargetStr) {
+		Target = TargetStr;
+		Source = SourceStr;
+	}
+	else {
+		ULONG SourceLen = (ULONG)strlen(SourceStr) + 1;
+
+		Target = TargetStr = SourceStr;
+		SourceBuf = (PCHAR)PsKeAllocPool(NonPagedPool, SourceLen, &g_FuncAllocCnt);
+		if (SourceBuf) {
+			PsKeStrNCopy(SourceBuf, SourceStr, SourceLen);
+			Source = SourceBuf;
+		}
+		else return SourceStr;
+	}
+
+	*Target++ = CHR_QUOTA;
+	for (; *Source; Source++, Target++) {
+		if (*Source == CHR_QUOTA) *Target++ = *Source;
+
+		*Target = *Source;
+	}
+	*Target++ = CHR_QUOTA;
+	*Target = 0;
+
+	if (SourceBuf) PsKeFreePool(SourceBuf, &g_FuncAllocCnt);
+
+	return TargetStr;
+}
+
+PCHAR QuotaDelete(
+	_Inout_ PCHAR SourceStr
+)
+{
+	PCHAR SourceBuf, SourceChr, TargetStr = SourceStr;
+	ULONG SourceLen;
+
+	if (!SourceStr || !*SourceStr) return SourceStr;
+
+	SourceLen = (ULONG)strlen(SourceStr) + 1;
+	SourceBuf = (PCHAR)PsKeAllocPool(NonPagedPool, SourceLen, &g_FuncAllocCnt);
+	if (SourceBuf) {
+		PsKeStrNCopy(SourceBuf, SourceStr, SourceLen);
+		for (SourceChr = SourceBuf; *SourceChr; SourceChr++, TargetStr++) {
+			if (*SourceChr == CHR_QUOTA && *(SourceChr + 1) == CHR_QUOTA) SourceChr++;
+
+			*TargetStr = *SourceChr;
+		}
+		*TargetStr = 0;
+
+		PsKeFreePool(SourceBuf, &g_FuncAllocCnt);
+	}
+
+	return SourceStr;
+}
+
 WINDOWS_VERSION g_WinVersion;
 VOID GetVersion()
 {

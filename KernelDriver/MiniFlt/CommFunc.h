@@ -130,6 +130,13 @@ typedef struct _SYSTEMTIME {
 #define ACTION_VALUE_DELETE 0x00000800
 #define ACTION_ALL          0xFFFFFFFF
 
+#define SEP_SPACE " \r\n"
+#define SEP_COMMA ",\r\n"
+#define SEP_NEWLN "\n"
+#define SEP_VALUE "="
+#define SEP_QUOTA "\""
+#define CHR_QUOTA '\"'
+
 typedef struct _USERSID {
 	BYTE                    Revision;
 	BYTE                    SubAuthorityCount;

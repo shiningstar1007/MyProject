@@ -102,6 +102,58 @@ PCHAR RunModeToStr(
 	return RUN_NORMAL_STR;
 }
 
+ULONG StrToAction(
+	_In_ PCHAR ActionStr
+)
+{
+	PCHAR Value, NextStr = ActionStr;
+	ULONG Action = 0;
+
+	if (!ActionStr || !*ActionStr) return 0;
+
+	if (!_stricmp(ActionStr, ACT_ALL_STR)) return ACT_ALL;
+
+	while (NextStr) {
+		Value = MyStrTok(NextStr, SEP_COMMA, &NextStr, FALSE);
+		if (!Value) break;
+
+		if (!_stricmp(Value, ACT_READ_STR)) Action |= ACT_READ;
+		else if (!_stricmp(Value, ACT_WRITE_STR)) Action |= ACT_WRITE;
+		else if (!_stricmp(Value, ACT_TRAVERSE_STR)) Action |= ACT_TRAVERSE;
+		else if (!_stricmp(Value, ACT_EXECUTE_STR)) Action |= ACT_EXECUTE;
+		else if (!_stricmp(Value, ACT_DELETE_STR)) Action |= ACT_DELETE;
+		else if (!_stricmp(Value, ACT_CREATE_STR)) Action |= ACT_CREATE;
+		else if (!_stricmp(Value, ACT_RENAME_STR)) Action |= ACT_RENAME;
+	}
+
+	return Action;
+}
+
+PCHAR ActionToStr(
+	_In_ ULONG Action,
+	_Out_ PCHAR ActionStrBuf,
+	_In_ ULONG MaxLen
+)
+{
+	ULONG OffSet = 0;
+
+	if (Action == ACT_ALL) MyStrNCopy(ActionStrBuf, ACT_ALL_STR, MaxLen);
+	else {
+		if (Action & ACT_READ) OffSet = MySNPrintf(ActionStrBuf, MaxLen, "%s,", ACT_READ_STR);
+		if (Action & ACT_WRITE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACT_WRITE_STR);
+		if (Action & ACT_TRAVERSE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACT_TRAVERSE_STR);
+		if (Action & ACT_EXECUTE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACT_EXECUTE_STR);
+		if (Action & ACT_DELETE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACT_DELETE_STR);
+		if (Action & ACT_CREATE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACT_CREATE_STR);
+		if (Action & ACT_RENAME) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACT_RENAME_STR);
+
+		if (OffSet == 0) *ActionStrBuf = 0;
+		else ActionStrBuf[OffSet - 1] = 0;
+	}
+
+	return ActionStrBuf;
+}
+
 PACL_OBJECT g_FirstObject = NULL, g_LastObject = NULL;
 PACL_OBJECT SearchObject(PACL_OBJECT Object)
 {
