@@ -250,9 +250,9 @@ PCHAR QuotaAdd(
 		ULONG SourceLen = (ULONG)strlen(SourceStr) + 1;
 
 		Target = TargetStr = SourceStr;
-		SourceBuf = (PCHAR)PsKeAllocPool(NonPagedPool, SourceLen, &g_FuncAllocCnt);
+		SourceBuf = (PCHAR)MyAllocNonPagedPool(SourceLen, &g_NonPagedPoolCnt);
 		if (SourceBuf) {
-			PsKeStrNCopy(SourceBuf, SourceStr, SourceLen);
+			MyStrNCopy(SourceBuf, SourceStr, SourceLen);
 			Source = SourceBuf;
 		}
 		else return SourceStr;
@@ -267,7 +267,7 @@ PCHAR QuotaAdd(
 	*Target++ = CHR_QUOTA;
 	*Target = 0;
 
-	if (SourceBuf) PsKeFreePool(SourceBuf, &g_FuncAllocCnt);
+	if (SourceBuf) MyFreeNonPagedPool(SourceBuf, &g_NonPagedPoolCnt);
 
 	return TargetStr;
 }
@@ -282,7 +282,7 @@ PCHAR QuotaDelete(
 	if (!SourceStr || !*SourceStr) return SourceStr;
 
 	SourceLen = (ULONG)strlen(SourceStr) + 1;
-	SourceBuf = (PCHAR)PsKeAllocPool(NonPagedPool, SourceLen, &g_FuncAllocCnt);
+	SourceBuf = (PCHAR)MyAllocNonPagedPool(SourceLen, &g_NonPagedPoolCnt);
 	if (SourceBuf) {
 		PsKeStrNCopy(SourceBuf, SourceStr, SourceLen);
 		for (SourceChr = SourceBuf; *SourceChr; SourceChr++, TargetStr++) {
@@ -292,7 +292,7 @@ PCHAR QuotaDelete(
 		}
 		*TargetStr = 0;
 
-		PsKeFreePool(SourceBuf, &g_FuncAllocCnt);
+		MyFreeNonPagedPool(SourceBuf, &g_NonPagedPoolCnt);
 	}
 
 	return SourceStr;

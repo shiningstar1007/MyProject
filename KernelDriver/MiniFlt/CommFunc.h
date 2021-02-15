@@ -124,11 +124,25 @@ typedef struct _SYSTEMTIME {
 #define ACTION_DELETE       0x00000008
 #define ACTION_CREATE       0x00000010
 #define ACTION_EXECUTE      0x00000020
+#define ACTION_RENAME       0x00000040
 #define ACTION_KEY_CREATE   0x00000100
 #define ACTION_KEY_DELETE   0x00000200
 #define ACTION_VALUE_WRITE  0x00000400
 #define ACTION_VALUE_DELETE 0x00000800
 #define ACTION_ALL          0xFFFFFFFF
+
+#define ACTION_READ_STR         "read"
+#define ACTION_WRITE_STR        "write"
+#define ACTION_TRAVERSE_STR     "traverse"
+#define ACTION_DELETE_STR       "delete"
+#define ACTION_CREATE_STR       "create"
+#define ACTION_EXECUTE_STR      "execute"
+#define ACTION_RENAME_STR       "rename"
+#define ACTION_KEY_CREATE_STR   "keycreate"
+#define ACTION_KEY_DELETE_STR   "keydel"
+#define ACTION_VALUE_WRITE_STR  "valwrite"
+#define ACTION_VALUE_DELETE_STR "valdel"
+#define ACTION_ALL_STR          "all"
 
 #define SEP_SPACE " \r\n"
 #define SEP_COMMA ",\r\n"

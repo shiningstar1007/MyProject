@@ -51,24 +51,6 @@ typedef enum _RUN_MODE {
 #define RUN_TEST_STR    "test"
 #define RUN_DISABLE_STR "disable"
 
-#define ACT_READ     0x00000001
-#define ACT_WRITE    0x00000002
-#define ACT_TRAVERSE 0x00000004
-#define ACT_EXECUTE  0x00000008
-#define ACT_DELETE   0x00000010
-#define ACT_CREATE   0x00000020
-#define ACT_RENAME   0x00000040
-#define ACT_ALL      0xFFFFFFFF
-
-#define ACT_READ_STR     "read"
-#define ACT_WRITE_STR    "write"
-#define ACT_TRAVERSE_STR "traverse"
-#define ACT_EXECUTE_STR  "execute"
-#define ACT_DELETE_STR   "delete"
-#define ACT_CREATE_STR   "create"
-#define ACT_RENAME_STR   "rename"
-#define ACT_ALL_STR      "all"
-
 typedef struct _ACL_OBJECT ACL_OBJECT, * PACL_OBJECT;
 typedef struct _ACL_SUBJECT ACL_SUBJECT, *PACL_SUBJECT;
 
