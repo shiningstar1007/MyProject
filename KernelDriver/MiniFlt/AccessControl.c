@@ -162,6 +162,23 @@ PCHAR ActionToStr(
 	return ActionStrBuf;
 }
 
+RUN_MODE g_ACLMode = RUN_NORMAL;
+MINICODE ACLSet(
+	_In_ RUN_MODE ACLRunMode
+)
+{
+	g_ACLMode = ACLRunMode;
+
+	return ERROR_MINI_SUCCESS;
+}
+
+MINICODE ACLMode()
+{
+	DbgPrint("aclmode=%s", RunModeToStr(g_ACLMode));
+
+	return ERROR_MINI_SUCCESS;
+}
+
 PACL_OBJECT g_FirstObject = NULL, g_LastObject = NULL;
 PACL_OBJECT SearchObject(PACL_OBJECT Object)
 {
