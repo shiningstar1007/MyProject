@@ -179,6 +179,32 @@ MINICODE ACLMode()
 	return ERROR_MINI_SUCCESS;
 }
 
+PACL_DATA FindData(
+	_In_ PVOID Data,
+	_In_ PACL_LINK ACLLink,
+	_In_ PVOID AnyData
+)
+{
+	PACL_DATA ACLData;
+	PSUB_PERM TargetPerm, ComparePerm;
+
+	for (ACLData = ACLLink->FirstData; ACLData; ACLData = ACLData->NextData) {
+		if (ACLData->Data == Data) {
+			if (AnyData) {
+				TargetPerm = (PSUB_PERM)ACLData->AnyData;
+				ComparePerm = (PSUB_PERM)AnyData;
+
+				if ((TargetPerm->ProcUser.SubType != ComparePerm->ProcUser.SubType) ||
+					(_stricmp(TargetPerm->ProcUser.SubName, ComparePerm->ProcUser.SubName))) continue;
+			}
+
+			return ACLData;
+		}
+	}
+
+	return NULL;
+}
+
 PACL_OBJECT g_FirstObject = NULL, g_LastObject = NULL;
 PACL_OBJECT SearchObject(PACL_OBJECT Object)
 {

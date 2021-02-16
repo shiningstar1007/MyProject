@@ -51,6 +51,41 @@ typedef enum _RUN_MODE {
 #define RUN_TEST_STR    "test"
 #define RUN_DISABLE_STR "disable"
 
+typedef struct _ACL_DATA ACL_DATA, * PACL_DATA;
+struct _ACL_DATA {
+	PVOID Data;
+	PVOID AnyData;
+
+	PACL_DATA NextData;
+};
+
+typedef struct _ACL_LINK {
+	PACL_DATA FirstData;
+	PACL_DATA LastData;
+
+	ULONG LinkCnt;
+} ACL_LINK, * PACL_LINK;
+
+typedef struct _PROC_USER PROC_USER, * PPROC_USER;
+struct _PROC_USER
+{
+	TYPE_SUBJECT SubType;
+	CHAR SubName[MAX_KPATH];
+
+	USERSID UserSId;
+	CHAR UserSIdBuf[MAX_NAME];
+};
+
+typedef struct _SUB_PERM SUB_PERM, * PSUB_PERM;
+struct _SUB_PERM
+{
+	EFFECT_MODE Effect;
+	ULONG Action;
+
+	EFFECT_MODE DecPerm;
+	PROC_USER ProcUser;
+};
+
 typedef struct _ACL_OBJECT ACL_OBJECT, * PACL_OBJECT;
 typedef struct _ACL_SUBJECT ACL_SUBJECT, *PACL_SUBJECT;
 
