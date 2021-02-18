@@ -205,6 +205,39 @@ PACL_DATA FindData(
 	return NULL;
 }
 
+PACL_DATA AddDataEx(
+	_In_ PVOID Data,
+	_Inout_ PACL_LINK ACLLink,
+	_In_ PVOID AnyData
+)
+{
+	PACL_DATA ACLData = FindData(Data, ACLLink, AnyData);
+	if (ACLData) return ACLData;
+
+	ACLData = (PACL_DATA)MyAllocNonPagedPool(sizeof(ACL_DATA), &g_ACLNonPagedPoolCnt);
+	if (!ACLData) return NULL;
+	else memset(ACLData, 0, sizeof(ACL_DATA));
+
+	ACLData->Data = Data;
+	if (ACLLink->LinkCnt) {
+		ACLLink->LastData->NextData = ACLData;
+		ACLLink->LastData = ACLData;
+	}
+	else ACLLink->FirstData = ACLLink->LastData = ACLData;
+
+	ACLLink->LinkCnt++;
+
+	return ACLData;
+}
+
+PACL_DATA AddData(
+	_In_ PVOID Data,
+	_Inout_ PACL_LINK ACLLink
+)
+{
+	return AddDataEx(Data, ACLLink, NULL);
+}
+
 PACL_OBJECT g_FirstObject = NULL, g_LastObject = NULL;
 PACL_OBJECT SearchObject(PACL_OBJECT Object)
 {
