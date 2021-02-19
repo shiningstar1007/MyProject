@@ -238,6 +238,32 @@ PACL_DATA AddData(
 	return AddDataEx(Data, ACLLink, NULL);
 }
 
+VOID DelData(
+	_In_ PVOID Data,
+	_Inout_ PACL_LINK ACLLink
+)
+{
+	DelDataEx(Data, ACLLink, NULL);
+}
+
+VOID ClearData(
+	_In_ PACL_LINK ACLLink
+)
+{
+	PACL_DATA TargetData, NextData;
+
+	for (TargetData = ACLLink->FirstData; TargetData; TargetData = NextData) {
+		NextData = TargetData->NextData;
+
+		if (TargetData->AnyData) PsKeFreePool(TargetData->AnyData, &g_ACLAllocCnt);
+
+		PsKeFreePool(TargetData, &g_ACLAllocCnt);
+	}
+
+	ACLLink->FirstData = ACLLink->LastData = NULL;
+	ACLLink->LinkCnt = 0;
+}
+
 PACL_OBJECT g_FirstObject = NULL, g_LastObject = NULL;
 PACL_OBJECT SearchObject(PACL_OBJECT Object)
 {
