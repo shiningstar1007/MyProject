@@ -255,9 +255,9 @@ VOID ClearData(
 	for (TargetData = ACLLink->FirstData; TargetData; TargetData = NextData) {
 		NextData = TargetData->NextData;
 
-		if (TargetData->AnyData) PsKeFreePool(TargetData->AnyData, &g_ACLAllocCnt);
+		if (TargetData->AnyData) MyFreeNonPagedPool(TargetData->AnyData, &g_ACLNonPagedPoolCnt);
 
-		PsKeFreePool(TargetData, &g_ACLAllocCnt);
+		MyFreeNonPagedPool(TargetData, &g_ACLNonPagedPoolCnt);
 	}
 
 	ACLLink->FirstData = ACLLink->LastData = NULL;
@@ -454,4 +454,66 @@ VOID ACLSubjectClear()
 	}
 
 	g_FirstSubject = g_LastSubject = NULL;
+}
+
+KECODE AddACLObjFromPol(
+	_In_ PCHAR DataBuf
+)
+{
+	KECODE KECode;
+	ACL_POL TmpPol, * ACLPol;
+	ACL_OBJ TmpObj, * ACLObj;
+	CHAR* TmpBuf = NULL;
+
+	__try
+	{
+		TmpBuf = (CHAR*)ExAllocatePool(NonPagedPool, MAX_DATA_BUF);
+		if (TmpBuf == NULL) {
+
+			KECode = ERR_NO_BUFFER;
+			__leave;
+		}
+
+		PsKeStrNCopy(TmpBuf, DataBuf, MAX_DATA_BUF);
+
+		KECode = GetACLObjInfo(TmpBuf, &TmpObj);
+		if (KECode != ERR_KE_SUCCESS) {
+
+			__leave;
+		}
+
+		ACLObj = ACLObjectFind(TmpObj.ObjType, TmpObj.ObjKey, TmpObj.ObjPath);
+		if (ACLObj == NULL) {
+
+			KECode = ERR_ACLOBJ_NOT_EXIST;
+			__leave;
+		}
+
+		PsKeStrNCopy(TmpBuf, DataBuf, MAX_DATA_BUF);
+
+		KECode = GetACLPolInfo(TmpBuf, &TmpPol);
+		if (KECode != ERR_KE_SUCCESS) {
+
+			__leave;
+		}
+
+		ACLPol = ACLPolicyFind(TmpPol.PolName);
+		if (ACLPol == NULL) {
+
+			KECode = ERR_ACLPOL_NOT_EXIST;
+			__leave;
+		}
+
+		AddData((PVOID)ACLObj, &ACLPol->ACLObjs);
+		AddData((PVOID)ACLPol, &ACLObj->ACLPols);
+	}
+	__finally {
+
+		if (TmpBuf != NULL) {
+
+			ExFreePool(TmpBuf);
+		}
+	}
+
+	return KECode;
 }
