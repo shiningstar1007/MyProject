@@ -456,100 +456,46 @@ VOID ACLSubjectClear()
 	g_FirstSubject = g_LastSubject = NULL;
 }
 
-MINICODE AddACLObjFromPol(
-	_In_ PCHAR DataBuf
+MINICODE AddACLSubFromObj(
+	_In_ PACL_OBJECT ParamObj,
+	_In_ PACL_SUBJECT ParamSub
 )
 {
-	MINICODE ErrCode;
-	ACL_OBJECT TmpObj, * ACLObj;
+	MINICODE ErrCode = ERROR_MINI_SUCCESS;
+	PACL_OBJECT ACLObj;
+	PACL_SUBJECT ACLSub;
 	CHAR* TmpBuf = NULL;
 
-	__try
-	{
-		TmpBuf = (CHAR*)ExAllocatePool(NonPagedPool, MAX_DATA_BUF);
-		if (TmpBuf == NULL) {
+	ACLObj = SearchObject(ParamObj);
+	if (ACLObj == NULL) return ERROR_MINI_SUCCESS;
 
-			KECode = ERR_NO_BUFFER;
-			__leave;
-		}
+	ACLSub = SearchSubject(ParamSub);
+	if (ACLSub == NULL) return ERROR_MINI_SUCCESS;
 
-		PsKeStrNCopy(TmpBuf, DataBuf, MAX_DATA_BUF);
-
-		KECode = GetACLObjInfo(TmpBuf, &TmpObj);
-		if (KECode != ERR_KE_SUCCESS) {
-
-			__leave;
-		}
-
-		ACLObj = ACLObjectFind(TmpObj.ObjType, TmpObj.ObjKey, TmpObj.ObjPath);
-		if (ACLObj == NULL) {
-
-			KECode = ERR_ACLOBJ_NOT_EXIST;
-			__leave;
-		}
-
-		PsKeStrNCopy(TmpBuf, DataBuf, MAX_DATA_BUF);
-
-
-		AddData((PVOID)ACLObj, &ACLPol->ACLObjs);
-		AddData((PVOID)ACLPol, &ACLObj->ACLPols);
-	}
-	__finally {
-
-		if (TmpBuf != NULL) {
-
-			ExFreePool(TmpBuf);
-		}
-	}
+	AddData((PVOID)ACLObj, &ACLSub->ObjectLink);
+	AddData((PVOID)ACLSub, &ACLObj->ObjectName);
 
 	return ErrCode;
 }
 
-MINICODE DelACLObjFromPol(
-	_In_ PCHAR DataBuf
+MINICODE DelACLSubFromObj(
+	_In_ PACL_OBJECT ParamObj,
+	_In_ PACL_SUBJECT ParamSub
 )
 {
-	MINICODE ErrCode;
-	ACL_OBJECT TmpObj, * ACLObj;
+	MINICODE ErrCode = ERROR_MINI_SUCCESS;
+	PACL_OBJECT ACLObj;
+	PACL_SUBJECT ACLSub;
 	CHAR* TmpBuf = NULL;
 
-	__try {
+	ACLObj = SearchObject(ParamObj);
+	if (ACLObj == NULL) return ERROR_MINI_SUCCESS;
 
-		TmpBuf = (CHAR*)ExAllocatePool(NonPagedPool, MAX_DATA_BUF);
-		if (TmpBuf == NULL) {
+	ACLSub = SearchSubject(ParamSub);
+	if (ACLSub == NULL) return ERROR_MINI_SUCCESS;
 
-			KECode = ERR_NO_BUFFER;
-			__leave;
-		}
-
-		PsKeStrNCopy(TmpBuf, DataBuf, MAX_DATA_BUF);
-
-		KECode = GetACLObjInfo(TmpBuf, &TmpObj);
-		if (KECode != ERR_KE_SUCCESS) {
-
-			__leave;
-		}
-
-		ACLObj = ACLObjectFind(TmpObj.ObjType, TmpObj.ObjKey, TmpObj.ObjPath);
-		if (ACLObj == NULL) {
-
-			KECode = ERR_ACLOBJ_NOT_EXIST;
-			__leave;
-		}
-
-		PsKeStrNCopy(TmpBuf, DataBuf, MAX_DATA_BUF);
-
-
-		DelData((PVOID)ACLObj, &ACLPol->ACLObjs);
-		DelData((PVOID)ACLPol, &ACLObj->ACLPols);
-	}
-	__finally {
-
-		if (TmpBuf != NULL) {
-
-			ExFreePool(TmpBuf);
-		}
-	}
+	DelData((PVOID)ACLObj, &ACLSub->ObjectLink);
+	DelData((PVOID)ACLSub, &ACLObj->ObjectName);
 
 	return ErrCode;
 }

@@ -95,7 +95,7 @@ struct _ACL_SUBJECT
 	ULONG Permissions;
 	USERSID UserSId;
 
-	PACL_OBJECT ObjectLink;
+	ACL_LINK ObjectLink;
 
 	PACL_SUBJECT NextSubjectLink;
 };
@@ -106,7 +106,7 @@ struct _ACL_OBJECT
 	ULONG Permissions;
 
 
-	PACL_SUBJECT SubjectLink;
+	ACL_LINK SubjectLink;
 
 	PACL_OBJECT NextObjectLink;
 };
