@@ -499,3 +499,17 @@ MINICODE DelACLSubFromObj(
 
 	return ErrCode;
 }
+
+VOID ClearACLSubFromObj(
+	_Inout_ PACL_OBJECT ACLObj
+)
+{
+	PACL_DATA ACLData;
+
+	if (ACLObj->SubjectLink.LinkCnt > 0) {
+		for (ACLData = ACLObj->SubjectLink.FirstData; ACLData; ACLData = ACLData->NextData) {
+			DelData((PVOID)ACLObj, &((PACL_SUBJECT)ACLData->Data)->ObjectLink);
+		}
+		ClearData(&ACLObj->SubjectLink);
+	}
+}
