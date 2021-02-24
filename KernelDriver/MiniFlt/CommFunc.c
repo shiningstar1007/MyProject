@@ -1007,6 +1007,32 @@ ULONG GetAction(
 	return Action;
 }
 
+BOOL UserSIdEqual(
+	_In_opt_ PUSERSID UserSId1,
+	_In_opt_ PUSERSID UserSId2
+)
+{
+	ULONG i;
+
+	if (!UserSId1 || !UserSId2) return FALSE;
+
+	__try {
+		if (UserSId1->Revision != UserSId2->Revision) return FALSE;
+		if (UserSId1->SubAuthorityCount != UserSId2->SubAuthorityCount) return FALSE;
+		if (RtlCompareMemory(&UserSId1->IdentifierAuthority, &UserSId2->IdentifierAuthority,
+			sizeof(SID_IDENTIFIER_AUTHORITY) != sizeof(SID_IDENTIFIER_AUTHORITY)))
+			return FALSE;
+
+		for (i = 0; i < UserSId1->SubAuthorityCount; i++)
+			if (UserSId1->SubAuthority[i] != UserSId2->SubAuthority[i]) return FALSE;
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 NTSTATUS MiniFltConnect(
 	_In_ PFLT_PORT ClientPort,
 	_In_ PVOID ServerPortCookie,
