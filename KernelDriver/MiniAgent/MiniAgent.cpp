@@ -43,3 +43,36 @@ BOOL CService::Install(LPCTSTR serviceName)
 
 	return TRUE;
 }
+
+BOOL CService::Uninstall(LPCTSTR serviceName)
+{
+	SC_HANDLE ServiceControlManager = NULL;
+	SC_HANDLE ServiceHandle = NULL;
+
+	if (!serviceName)
+		return FALSE;
+
+	ServiceControlManager = OpenSCManager(NULL, NULL, SC_MANAGER_CREATE_SERVICE);
+	if (!ServiceControlManager)
+		return FALSE;
+
+	ServiceHandle = OpenService(ServiceControlManager, serviceName, DELETE);
+	if (!ServiceHandle)
+	{
+		CloseServiceHandle(ServiceControlManager);
+		return FALSE;
+	}
+
+	if (!DeleteService(ServiceHandle))
+	{
+		CloseServiceHandle(ServiceHandle);
+		CloseServiceHandle(ServiceControlManager);
+
+		return FALSE;
+	}
+
+	CloseServiceHandle(ServiceHandle);
+	CloseServiceHandle(ServiceControlManager);
+
+	return TRUE;
+}
