@@ -76,3 +76,34 @@ BOOL CService::Uninstall(LPCTSTR serviceName)
 
 	return TRUE;
 }
+
+BOOL CService::Begin(LPTSTR serviceName)
+{
+	if (!serviceName)
+		return FALSE;
+
+	SERVICE_TABLE_ENTRY DispatchTable[] =
+	{
+		{serviceName,	::RunCallback},
+		{NULL,			NULL}
+	};
+
+	_tcscpy(mServiceName, serviceName);
+
+	OnStarted();
+
+	if (!StartServiceCtrlDispatcher(DispatchTable))
+	{
+		_tprintf(_T("## Debug console mode ##\n"));
+		getchar();
+	}
+
+	return TRUE;
+}
+
+BOOL CService::End(VOID)
+{
+	OnStopped();
+
+	return TRUE;
+}
