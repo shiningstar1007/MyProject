@@ -107,3 +107,42 @@ BOOL CService::End(VOID)
 
 	return TRUE;
 }
+
+using namespace std;
+
+int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
+{
+	int nRetCode = 0;
+
+	HMODULE hModule = ::GetModuleHandle(NULL);
+
+	if (hModule != NULL)
+	{
+		if (!AfxWinInit(hModule, NULL, ::GetCommandLine(), 0))
+		{
+			_tprintf(_T("심각한 오류: MFC를 초기화하지 못했습니다.\n"));
+			nRetCode = 1;
+		}
+		else
+		{
+			CUpdateService upServ;
+			if (argc == 2) {
+				if (_tcscmp(argv[1], _T("-i")) == 0) {
+					upServ.Install(_T("MiniAgent"));
+				}
+				else if (_tcscmp(argv[1], _T("-u")) == 0) {
+					upServ.Uninstall(_T("MiniAgent"));
+				}
+				return true;
+			}
+			upServ.main();
+		}
+	}
+	else
+	{
+		_tprintf(_T("심각한 오류: GetModuleHandle 실패\n"));
+		nRetCode = 1;
+	}
+
+	return nRetCode;
+}
