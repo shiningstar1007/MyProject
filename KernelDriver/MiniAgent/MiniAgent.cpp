@@ -108,6 +108,30 @@ BOOL CService::End(VOID)
 	return TRUE;
 }
 
+VOID CService::CtrlHandlerCallback(DWORD opCode)
+{
+	switch (opCode)
+	{
+	case SERVICE_CONTROL_PAUSE:
+		mServiceStatus.dwCurrentState = SERVICE_PAUSED;
+		break;
+	case SERVICE_CONTROL_CONTINUE:
+		mServiceStatus.dwCurrentState = SERVICE_RUNNING;
+		break;
+	case SERVICE_CONTROL_STOP:
+		mServiceStatus.dwWin32ExitCode = 0;
+		mServiceStatus.dwCurrentState = SERVICE_STOPPED;
+		mServiceStatus.dwCheckPoint = 0;
+		mServiceStatus.dwWaitHint = 0;
+		break;
+	case SERVICE_CONTROL_INTERROGATE:
+		break;
+	}
+
+	if (!SetServiceStatus(mServiceStatusHandle, &mServiceStatus))
+		return;
+}
+
 using namespace std;
 
 int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
