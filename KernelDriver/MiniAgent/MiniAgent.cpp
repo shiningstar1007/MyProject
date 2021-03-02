@@ -108,6 +108,33 @@ BOOL CService::End(VOID)
 	return TRUE;
 }
 
+VOID CService::RunCallback(DWORD argumentCount, LPTSTR* arguments)
+{
+	DWORD Status;
+
+	mServiceStatus.dwServiceType = SERVICE_WIN32;
+	mServiceStatus.dwCurrentState = SERVICE_START_PENDING;
+	mServiceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PAUSE_CONTINUE;
+	mServiceStatus.dwWin32ExitCode = 0;
+	mServiceStatus.dwServiceSpecificExitCode = 0;
+	mServiceStatus.dwCheckPoint = 0;
+	mServiceStatus.dwWaitHint = 0;
+
+	mServiceStatusHandle = RegisterServiceCtrlHandler(mServiceName, ::CtrlHandlerCallback);
+
+	if (mServiceStatusHandle == (SERVICE_STATUS_HANDLE)0)
+		return;
+
+	Status = NO_ERROR;
+
+	mServiceStatus.dwCurrentState = SERVICE_RUNNING;
+	mServiceStatus.dwCheckPoint = 0;
+	mServiceStatus.dwWaitHint = 0;
+
+	if (!SetServiceStatus(mServiceStatusHandle, &mServiceStatus))
+		return;
+}
+
 VOID CService::CtrlHandlerCallback(DWORD opCode)
 {
 	switch (opCode)
