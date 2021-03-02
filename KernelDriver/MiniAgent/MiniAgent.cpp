@@ -108,6 +108,29 @@ BOOL CService::End(VOID)
 	return TRUE;
 }
 
+CService* gOwner = NULL;
+
+VOID WINAPI RunCallback(DWORD argumentCount, LPTSTR* arguments)
+{
+	gOwner->RunCallback(argumentCount, arguments);
+}
+
+VOID WINAPI CtrlHandlerCallback(DWORD opCode)
+{
+	gOwner->CtrlHandlerCallback(opCode);
+}
+
+CService::CService(VOID)
+{
+	ZeroMemory(mServiceName, sizeof(mServiceName));
+
+	gOwner = this;
+}
+
+CService::~CService(VOID)
+{
+}
+
 VOID CService::RunCallback(DWORD argumentCount, LPTSTR* arguments)
 {
 	DWORD Status;
