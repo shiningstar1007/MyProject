@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiniWFP", "..\MiniWFP\MiniW
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiniAgent", "..\MiniAgent\MiniAgent.vcxproj", "{DF6B5858-3A1A-4BCE-A9C7-E0637AE75872}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiniAgentDLL", "..\MiniAgentDLL\MiniAgentDLL.vcxproj", "{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -69,6 +71,18 @@ Global
 		{DF6B5858-3A1A-4BCE-A9C7-E0637AE75872}.Release|Win32.Build.0 = Release|Win32
 		{DF6B5858-3A1A-4BCE-A9C7-E0637AE75872}.Release|x64.ActiveCfg = Release|x64
 		{DF6B5858-3A1A-4BCE-A9C7-E0637AE75872}.Release|x64.Build.0 = Release|x64
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Debug|ARM.ActiveCfg = Debug|Win32
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Debug|Win32.Build.0 = Debug|Win32
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Debug|x64.ActiveCfg = Debug|x64
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Debug|x64.Build.0 = Debug|x64
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Release|ARM.ActiveCfg = Release|Win32
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Release|ARM64.ActiveCfg = Release|Win32
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Release|Win32.ActiveCfg = Release|Win32
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Release|Win32.Build.0 = Release|Win32
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Release|x64.ActiveCfg = Release|x64
+		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

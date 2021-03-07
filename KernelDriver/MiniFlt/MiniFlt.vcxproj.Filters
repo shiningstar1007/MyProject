@@ -1,44 +1,44 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;*</Extensions>
-      <UniqueIdentifier>{8515EDEE-048D-4FD9-B5B1-283B25BF72ED}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files">
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
       <UniqueIdentifier>{703B8340-893B-4D3E-8A70-249AC7C8F758}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files">
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms;man;xml</Extensions>
-      <UniqueIdentifier>{66893B48-50CE-4012-BEEF-0F519EF6110E}</UniqueIdentifier>
     </Filter>
     <Filter Include="Driver Files">
       <Extensions>inf;inv;inx;mof;mc;</Extensions>
       <UniqueIdentifier>{90FB5FA4-26B9-4F48-B140-1D029567D5D6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Resource Files">
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms;man;xml</Extensions>
+      <UniqueIdentifier>{66893B48-50CE-4012-BEEF-0F519EF6110E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Source Files">
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;*</Extensions>
+      <UniqueIdentifier>{8515EDEE-048D-4FD9-B5B1-283B25BF72ED}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MiniFlt.c">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CommFunc.c">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Context.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AccessControl.c">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SystemCallHook.c">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MiniFltLog.c">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MiniWSK.c">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AccessControl.c">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -60,13 +60,13 @@
     <ClInclude Include="ErrorCode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SystemCallHook.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MiniFltLog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MiniWSK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemCallHook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -77,7 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiniFlt.rc">
-      <Filter>Resource Files</Filter>
+      <Filter>Header Files\Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>
