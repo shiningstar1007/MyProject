@@ -48,4 +48,24 @@ public :
 
 		return "";
 	}
+
+	TYPE_OBJECT StrToObjType(
+		string ObjTypeStr
+	)
+	{
+		if (!ObjTypeStr.compare(OBJECT_FILE_STR)) return TYPE_OBJECT::OBJECT_FILE;
+		else if (!ObjTypeStr.compare(OBJECT_DIR_STR)) return TYPE_OBJECT::OBJECT_DIR;
+
+		return TYPE_OBJECT::OBJECT_UNKNOWN;
+	}
+
+	string ObjTypeToStr(
+		_In_ TYPE_OBJECT ObjType
+	)
+	{
+		if (ObjType == TYPE_OBJECT::OBJECT_FILE) return OBJECT_FILE_STR;
+		else if (ObjType == TYPE_OBJECT::OBJECT_DIR) return OBJECT_DIR_STR;
+
+		return "";
+	}
 };
