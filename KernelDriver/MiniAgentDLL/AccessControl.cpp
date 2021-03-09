@@ -68,4 +68,24 @@ public :
 
 		return "";
 	}
+
+	EFFECT_MODE StrToEffectMode(
+		_In_ PCHAR EffectModeStr
+	)
+	{
+		if (!_stricmp(EffectModeStr, EFT_ALLOW_STR)) return EFT_ALLOW;
+		else if (!_stricmp(EffectModeStr, EFT_DENY_STR)) return EFT_DENY;
+
+		return EFT_UNKNOWN;
+	}
+
+	PCHAR EffectModeToStr(
+		_In_ EFFECT_MODE EffectMode
+	)
+	{
+		if (EffectMode == EFT_ALLOW) return EFT_ALLOW_STR;
+		else if (EffectMode == EFT_DENY) return EFT_DENY_STR;
+
+		return EFT_UNKNOWN_STR;
+	}
 };
