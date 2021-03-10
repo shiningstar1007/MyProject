@@ -88,4 +88,64 @@ public :
 
 		return EFT_UNKNOWN_STR;
 	}
+
+	ULONG StrToAction(
+		_In_ PCHAR ActionStr
+	)
+	{
+		PCHAR Value, NextStr = ActionStr;
+		ULONG Action = 0;
+
+		if (!ActionStr || !*ActionStr) return 0;
+
+		if (!_stricmp(ActionStr, ACTION_ALL_STR)) return ACTION_ALL;
+
+		while (NextStr) {
+			Value = MyStrTok(NextStr, SEP_COMMA, &NextStr, FALSE);
+			if (!Value) break;
+
+			if (!_stricmp(Value, ACTION_READ_STR)) Action |= ACTION_READ;
+			else if (!_stricmp(Value, ACTION_WRITE_STR)) Action |= ACTION_WRITE;
+			else if (!_stricmp(Value, ACTION_TRAVERSE_STR)) Action |= ACTION_TRAVERSE;
+			else if (!_stricmp(Value, ACTION_EXECUTE_STR)) Action |= ACTION_EXECUTE;
+			else if (!_stricmp(Value, ACTION_DELETE_STR)) Action |= ACTION_DELETE;
+			else if (!_stricmp(Value, ACTION_CREATE_STR)) Action |= ACTION_CREATE;
+			else if (!_stricmp(Value, ACTION_RENAME_STR)) Action |= ACTION_RENAME;
+			else if (!_stricmp(Value, ACTION_KEY_CREATE_STR)) Action |= ACTION_KEY_CREATE;
+			else if (!_stricmp(Value, ACTION_KEY_DELETE_STR)) Action |= ACTION_KEY_DELETE;
+			else if (!_stricmp(Value, ACTION_VALUE_WRITE_STR)) Action |= ACTION_VALUE_WRITE;
+			else if (!_stricmp(Value, ACTION_VALUE_DELETE_STR)) Action |= ACTION_VALUE_DELETE;
+		}
+
+		return Action;
+	}
+
+	PCHAR ActionToStr(
+		_In_ ULONG Action,
+		_Out_ PCHAR ActionStrBuf,
+		_In_ ULONG MaxLen
+	)
+	{
+		ULONG OffSet = 0;
+
+		if (Action == ACTION_ALL) MyStrNCopy(ActionStrBuf, ACTION_ALL_STR, MaxLen);
+		else {
+			if (Action & ACTION_READ) OffSet = MySNPrintf(ActionStrBuf, MaxLen, "%s,", ACTION_READ_STR);
+			if (Action & ACTION_WRITE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_WRITE_STR);
+			if (Action & ACTION_TRAVERSE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_TRAVERSE_STR);
+			if (Action & ACTION_EXECUTE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_EXECUTE_STR);
+			if (Action & ACTION_DELETE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_DELETE_STR);
+			if (Action & ACTION_CREATE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_CREATE_STR);
+			if (Action & ACTION_RENAME) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_RENAME_STR);
+			if (Action & ACTION_KEY_CREATE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_KEY_CREATE_STR);
+			if (Action & ACTION_KEY_DELETE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_KEY_DELETE_STR);
+			if (Action & ACTION_VALUE_WRITE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_VALUE_WRITE_STR);
+			if (Action & ACTION_VALUE_DELETE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_VALUE_DELETE_STR);
+
+			if (OffSet == 0) *ActionStrBuf = 0;
+			else ActionStrBuf[OffSet - 1] = 0;
+		}
+
+		return ActionStrBuf;
+	}
 };
