@@ -69,36 +69,71 @@ public :
 		return "";
 	}
 
+	enum class EFFECT_MODE {
+		EFT_DENY = 0,
+		EFT_ALLOW,
+		EFT_UNKNOWN
+	};
+
+	const string EFT_ALLOW_STR = "allow";
+	const string EFT_DENY_STR = "deny";
+	const string EFT_UNKNOWN_STR = "unknown";
+
 	EFFECT_MODE StrToEffectMode(
-		_In_ PCHAR EffectModeStr
+		_In_ string EffectModeStr
 	)
 	{
-		if (!_stricmp(EffectModeStr, EFT_ALLOW_STR)) return EFT_ALLOW;
-		else if (!_stricmp(EffectModeStr, EFT_DENY_STR)) return EFT_DENY;
+		if (EffectModeStr.compare(EFT_ALLOW_STR)) return EFFECT_MODE::EFT_ALLOW;
+		else if (EffectModeStr.compare(EFT_DENY_STR)) return EFFECT_MODE::EFT_DENY;
 
-		return EFT_UNKNOWN;
+		return EFFECT_MODE::EFT_UNKNOWN;
 	}
 
-	PCHAR EffectModeToStr(
+	string EffectModeToStr(
 		_In_ EFFECT_MODE EffectMode
 	)
 	{
-		if (EffectMode == EFT_ALLOW) return EFT_ALLOW_STR;
-		else if (EffectMode == EFT_DENY) return EFT_DENY_STR;
+		if (EffectMode == EFFECT_MODE::EFT_ALLOW) return EFT_ALLOW_STR;
+		else if (EffectMode == EFFECT_MODE::EFT_DENY) return EFT_DENY_STR;
 
 		return EFT_UNKNOWN_STR;
 	}
 
+	const ULONG ACTION_READ = 0x00000001;
+	const ULONG ACTION_WRITE = 0x00000002;
+	const ULONG ACTION_TRAVERSE = 0x00000004;
+	const ULONG ACTION_DELETE = 0x00000008;
+	const ULONG ACTION_CREATE = 0x00000010;
+	const ULONG ACTION_EXECUTE = 0x00000020;
+	const ULONG ACTION_RENAME = 0x00000040;
+	const ULONG ACTION_KEY_CREATE = 0x00000100;
+	const ULONG ACTION_KEY_DELETE = 0x00000200;
+	const ULONG ACTION_VALUE_WRITE = 0x00000400;
+	const ULONG ACTION_VALUE_DELETE = 0x00000800;
+	const ULONG ACTION_ALL = 0xFFFFFFFF;
+
+	const string ACTION_READ_STR = "read";
+	const string ACTION_WRITE_STR = "write";
+	const string ACTION_TRAVERSE_STR = "traverse";
+	const string ACTION_DELETE_STR = "delete";
+	const string ACTION_CREATE_STR = "create";
+	const string ACTION_EXECUTE_STR = "execute";
+	const string ACTION_RENAME_STR = "rename";
+	const string ACTION_KEY_CREATE_STR = "keycreate";
+	const string ACTION_KEY_DELETE_STR = "keydel";
+	const string ACTION_VALUE_WRITE_STR = "valwrite";
+	const string ACTION_VALUE_DELETE_STR = "valdel";
+	const string ACTION_ALL_STR = "all";
+
 	ULONG StrToAction(
-		_In_ PCHAR ActionStr
+		_In_ string ActionStr
 	)
 	{
-		PCHAR Value, NextStr = ActionStr;
 		ULONG Action = 0;
 
-		if (!ActionStr || !*ActionStr) return 0;
+		if (!ActionStr.empty()) return 0;
 
-		if (!_stricmp(ActionStr, ACTION_ALL_STR)) return ACTION_ALL;
+		if (ActionStr.compare(ACTION_ALL_STR)) return ACTION_ALL;
 
 		while (NextStr) {
 			Value = MyStrTok(NextStr, SEP_COMMA, &NextStr, FALSE);
@@ -120,7 +155,7 @@ public :
 		return Action;
 	}
 
-	PCHAR ActionToStr(
+	string ActionToStr(
 		_In_ ULONG Action,
 		_Out_ PCHAR ActionStrBuf,
 		_In_ ULONG MaxLen
