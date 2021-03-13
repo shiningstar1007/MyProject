@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiniAgent", "..\MiniAgent\M
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiniAgentDLL", "..\MiniAgentDLL\MiniAgentDLL.vcxproj", "{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiniLog", "..\MiniLog\MiniLog.vcxproj", "{0720A648-095B-439E-BB27-C85BC1594178}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -83,6 +85,18 @@ Global
 		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Release|Win32.Build.0 = Release|Win32
 		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Release|x64.ActiveCfg = Release|x64
 		{A71568E0-62F8-4BA1-8A40-AB174DDF4C51}.Release|x64.Build.0 = Release|x64
+		{0720A648-095B-439E-BB27-C85BC1594178}.Debug|ARM.ActiveCfg = Debug|Win32
+		{0720A648-095B-439E-BB27-C85BC1594178}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{0720A648-095B-439E-BB27-C85BC1594178}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0720A648-095B-439E-BB27-C85BC1594178}.Debug|Win32.Build.0 = Debug|Win32
+		{0720A648-095B-439E-BB27-C85BC1594178}.Debug|x64.ActiveCfg = Debug|x64
+		{0720A648-095B-439E-BB27-C85BC1594178}.Debug|x64.Build.0 = Debug|x64
+		{0720A648-095B-439E-BB27-C85BC1594178}.Release|ARM.ActiveCfg = Release|Win32
+		{0720A648-095B-439E-BB27-C85BC1594178}.Release|ARM64.ActiveCfg = Release|Win32
+		{0720A648-095B-439E-BB27-C85BC1594178}.Release|Win32.ActiveCfg = Release|Win32
+		{0720A648-095B-439E-BB27-C85BC1594178}.Release|Win32.Build.0 = Release|Win32
+		{0720A648-095B-439E-BB27-C85BC1594178}.Release|x64.ActiveCfg = Release|x64
+		{0720A648-095B-439E-BB27-C85BC1594178}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
