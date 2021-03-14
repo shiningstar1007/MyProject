@@ -1,3 +1,5 @@
+#include "MiniLogDLL.h"
+
 
 HRESULT SendMessageDriver(MINI_COMMAND Cmd, PBYTE InByte, ULONG InSize, PBYTE OutBuf, ULONG OutSize, PULONG Result)
 {
