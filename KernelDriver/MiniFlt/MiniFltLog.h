@@ -4,6 +4,15 @@
 #include "CommFunc.h"
 #include "MiniFlt.h"
 
+#define MAX_KPATH 264 
+#define MAX_NAME 64
+#define MAX_USER_NAME 48
+#define MAX_DATA_BUF 4096
+#define BUF_UNIT 32768
+
+#define MINI_PORT_NAME     L"\\MiniFltPort"
+#define MINI_LOG_PORT_NAME L"\\MiniFltLogPort"
+
 #define RECORD_TYPE_NORMAL                       0x00000000
 #define RECORD_TYPE_FILETAG                      0x00000004
 #define RECORD_TYPE_FLAG_STATIC                  0x80000000
