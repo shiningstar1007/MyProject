@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AccessControl.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MiniAgentDLL.h" />
     <ClInclude Include="pch.h" />
