@@ -98,18 +98,21 @@ public:
 		return EFT_UNKNOWN_STR;
 	}
 
-	const ULONG ACTION_READ = 0x00000001;
-	const ULONG ACTION_WRITE = 0x00000002;
-	const ULONG ACTION_TRAVERSE = 0x00000004;
-	const ULONG ACTION_DELETE = 0x00000008;
-	const ULONG ACTION_CREATE = 0x00000010;
-	const ULONG ACTION_EXECUTE = 0x00000020;
-	const ULONG ACTION_RENAME = 0x00000040;
-	const ULONG ACTION_KEY_CREATE = 0x00000100;
-	const ULONG ACTION_KEY_DELETE = 0x00000200;
-	const ULONG ACTION_VALUE_WRITE = 0x00000400;
-	const ULONG ACTION_VALUE_DELETE = 0x00000800;
-	const ULONG ACTION_ALL = 0xFFFFFFFF;
+	enum class ACL_ACTION {
+		ACTION_UNKNOWN = 0,
+		ACTION_READ = 0x00000001,
+		ACTION_WRITE = 0x00000002,
+		ACTION_TRAVERSE = 0x0000000,
+		ACTION_DELETE = 0x00000008,
+		ACTION_CREATE = 0x00000010,
+		ACTION_EXECUTE = 0x00000020,
+		ACTION_RENAME = 0x00000040,
+		ACTION_KEY_CREATE = 0x00000100,
+		ACTION_KEY_DELETE = 0x00000200,
+		ACTION_VALUE_WRITE = 0x00000400,
+		ACTION_VALUE_DELETE = 0x00000800,
+		ACTION_ALL = 0xFFFFFFFF
+	};
 
 	const string ACTION_READ_STR = "read";
 	const string ACTION_WRITE_STR = "write";
@@ -124,31 +127,31 @@ public:
 	const string ACTION_VALUE_DELETE_STR = "valdel";
 	const string ACTION_ALL_STR = "all";
 
-	ULONG StrToAction(
+	ACL_ACTION StrToAction(
 		_In_ string ActionStr
 	)
 	{
 		ULONG Action = 0;
 
-		if (!ActionStr.empty()) return 0;
+		if (!ActionStr.empty()) return ACL_ACTION::ACTION_UNKNOWN;
 
-		if (ActionStr.compare(ACTION_ALL_STR)) return ACTION_ALL;
+		if (ActionStr.compare(ACTION_ALL_STR)) return ACL_ACTION::ACTION_ALL;
 
 		while (NextStr) {
 			Value = MyStrTok(NextStr, SEP_COMMA, &NextStr, FALSE);
 			if (!Value) break;
 
-			if (!_stricmp(Value, ACTION_READ_STR)) Action |= ACTION_READ;
-			else if (!_stricmp(Value, ACTION_WRITE_STR)) Action |= ACTION_WRITE;
-			else if (!_stricmp(Value, ACTION_TRAVERSE_STR)) Action |= ACTION_TRAVERSE;
-			else if (!_stricmp(Value, ACTION_EXECUTE_STR)) Action |= ACTION_EXECUTE;
-			else if (!_stricmp(Value, ACTION_DELETE_STR)) Action |= ACTION_DELETE;
-			else if (!_stricmp(Value, ACTION_CREATE_STR)) Action |= ACTION_CREATE;
-			else if (!_stricmp(Value, ACTION_RENAME_STR)) Action |= ACTION_RENAME;
-			else if (!_stricmp(Value, ACTION_KEY_CREATE_STR)) Action |= ACTION_KEY_CREATE;
-			else if (!_stricmp(Value, ACTION_KEY_DELETE_STR)) Action |= ACTION_KEY_DELETE;
-			else if (!_stricmp(Value, ACTION_VALUE_WRITE_STR)) Action |= ACTION_VALUE_WRITE;
-			else if (!_stricmp(Value, ACTION_VALUE_DELETE_STR)) Action |= ACTION_VALUE_DELETE;
+			if (Value (Value, ACTION_READ_STR)) Action |= (ULONG)ACL_ACTION::ACTION_READ;
+			else if (!_stricmp(Value, ACTION_WRITE_STR)) Action |= (ULONG)ACL_ACTION::ACTION_WRITE;
+			else if (!_stricmp(Value, ACTION_TRAVERSE_STR)) Action |= (ULONG)ACL_ACTION::ACTION_TRAVERSE;
+			else if (!_stricmp(Value, ACTION_EXECUTE_STR)) Action |= (ULONG)ACL_ACTION::ACTION_EXECUTE;
+			else if (!_stricmp(Value, ACTION_DELETE_STR)) Action |= (ULONG)ACL_ACTION::ACTION_DELETE;
+			else if (!_stricmp(Value, ACTION_CREATE_STR)) Action |= (ULONG)ACL_ACTION::ACTION_CREATE;
+			else if (!_stricmp(Value, ACTION_RENAME_STR)) Action |= (ULONG)ACL_ACTION::ACTION_RENAME;
+			else if (!_stricmp(Value, ACTION_KEY_CREATE_STR)) Action |= (ULONG)ACL_ACTION::ACTION_KEY_CREATE;
+			else if (!_stricmp(Value, ACTION_KEY_DELETE_STR)) Action |= (ULONG)ACL_ACTION::ACTION_KEY_DELETE;
+			else if (!_stricmp(Value, ACTION_VALUE_WRITE_STR)) Action |= (ULONG)ACL_ACTION::ACTION_VALUE_WRITE;
+			else if (!_stricmp(Value, ACTION_VALUE_DELETE_STR)) Action |= (ULONG)ACL_ACTION::ACTION_VALUE_DELETE;
 		}
 
 		return Action;
@@ -162,19 +165,19 @@ public:
 	{
 		ULONG OffSet = 0;
 
-		if (Action == ACTION_ALL) MyStrNCopy(ActionStrBuf, ACTION_ALL_STR, MaxLen);
+		if (Action == (ULONG)ACL_ACTION::ACTION_ALL) MyStrNCopy(ActionStrBuf, ACTION_ALL_STR, MaxLen);
 		else {
-			if (Action & ACTION_READ) OffSet = MySNPrintf(ActionStrBuf, MaxLen, "%s,", ACTION_READ_STR);
-			if (Action & ACTION_WRITE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_WRITE_STR);
-			if (Action & ACTION_TRAVERSE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_TRAVERSE_STR);
-			if (Action & ACTION_EXECUTE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_EXECUTE_STR);
-			if (Action & ACTION_DELETE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_DELETE_STR);
-			if (Action & ACTION_CREATE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_CREATE_STR);
-			if (Action & ACTION_RENAME) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_RENAME_STR);
-			if (Action & ACTION_KEY_CREATE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_KEY_CREATE_STR);
-			if (Action & ACTION_KEY_DELETE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_KEY_DELETE_STR);
-			if (Action & ACTION_VALUE_WRITE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_VALUE_WRITE_STR);
-			if (Action & ACTION_VALUE_DELETE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_VALUE_DELETE_STR);
+			if (Action & (ULONG)ACL_ACTION::ACTION_READ) OffSet = MySNPrintf(ActionStrBuf, MaxLen, "%s,", ACTION_READ_STR);
+			if (Action & (ULONG)ACL_ACTION::ACTION_WRITE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_WRITE_STR);
+			if (Action & (ULONG)ACL_ACTION::ACTION_TRAVERSE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_TRAVERSE_STR);
+			if (Action & (ULONG)ACL_ACTION::ACTION_EXECUTE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_EXECUTE_STR);
+			if (Action & (ULONG)ACL_ACTION::ACTION_DELETE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_DELETE_STR);
+			if (Action & (ULONG)ACL_ACTION::ACTION_CREATE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_CREATE_STR);
+			if (Action & (ULONG)ACL_ACTION::ACTION_RENAME) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_RENAME_STR);
+			if (Action & (ULONG)ACL_ACTION::ACTION_KEY_CREATE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_KEY_CREATE_STR);
+			if (Action & (ULONG)ACL_ACTION::ACTION_KEY_DELETE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_KEY_DELETE_STR);
+			if (Action & (ULONG)ACL_ACTION::ACTION_VALUE_WRITE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_VALUE_WRITE_STR);
+			if (Action & (ULONG)ACL_ACTION::ACTION_VALUE_DELETE) OffSet += MySNPrintf(ActionStrBuf + OffSet, MaxLen - OffSet, "%s,", ACTION_VALUE_DELETE_STR);
 
 			if (OffSet == 0) *ActionStrBuf = 0;
 			else ActionStrBuf[OffSet - 1] = 0;

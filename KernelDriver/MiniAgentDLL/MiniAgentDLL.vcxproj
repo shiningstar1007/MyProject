@@ -155,6 +155,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="MiniAgentDLL.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AccessControl.cpp" />
