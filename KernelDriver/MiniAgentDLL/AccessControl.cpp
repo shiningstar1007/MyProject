@@ -6,27 +6,6 @@ using std::string;
 class AccessControl {
 
 public:
-	enum class TYPE_OBJECT {
-		OBJECT_FILE = 0,
-		OBJECT_DIR,
-		OBJECT_UNKNOWN
-	};
-
-	const string OBJECT_FILE_STR = "file";
-	const string OBJECT_DIR_STR = "dir";
-
-	enum class TYPE_SUBJECT {
-		SUBJECT_USER = 0,
-		SUBJECT_GROUP,
-		SUBJECT_PROC,
-		SUBJECT_UNKNOWN
-	};
-
-	const string SUBJECT_USER_STR = "user";
-	const string SUBJECT_GROUP_STR = "group";
-	const string SUBJECT_PROC_STR = "proc";
-
-
 	TYPE_SUBJECT StrToSubType(
 		string SubTypeStr
 	)
@@ -186,4 +165,34 @@ public:
 
 		return ActionStrBuf;
 	}
+};
+
+class ACLObject {
+
+public:
+	enum class TYPE_OBJECT {
+		OBJECT_FILE = 0,
+		OBJECT_DIR,
+		OBJECT_UNKNOWN
+	};
+
+	const string OBJECT_FILE_STR = "file";
+	const string OBJECT_DIR_STR = "dir";
+
+};
+
+class ACLSubject {
+
+public:
+	enum class TYPE_SUBJECT {
+		SUBJECT_USER = 0,
+		SUBJECT_GROUP,
+		SUBJECT_PROC,
+		SUBJECT_UNKNOWN
+	};
+
+	const string SUBJECT_USER_STR = "user";
+	const string SUBJECT_GROUP_STR = "group";
+	const string SUBJECT_PROC_STR = "proc";
+
 };
