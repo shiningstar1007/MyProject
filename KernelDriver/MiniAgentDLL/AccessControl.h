@@ -77,5 +77,8 @@ public:
 
 	ACL_ACTION StrToAction(_In_ string ActionStr);
 	string ActionToStr(_In_ ULONG Action, _Out_ PCHAR ActionStrBuf, _In_ ULONG MaxLen);
+
+	ACL_SUBJECT SearchSubject(string subjectName);
+	void ACLSubjectAdd(string subjectName, INT32 permissions);
 	
 };

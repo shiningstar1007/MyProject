@@ -21,42 +21,43 @@ vector<string> split(const string& s, char delim) {
 	return elems;
 }
 
+enum class TYPE_SUBJECT {
+	SUBJECT_USER = 0,
+	SUBJECT_GROUP,
+	SUBJECT_PROC,
+	SUBJECT_UNKNOWN
+};
+
+const string SUBJECT_USER_STR = "user";
+const string SUBJECT_GROUP_STR = "group";
+const string SUBJECT_PROC_STR = "proc";
+
+
+TYPE_SUBJECT AccessControl::StrToSubType(
+	string SubTypeStr
+)
+{
+	if (!SubTypeStr.compare(SUBJECT_USER_STR)) return TYPE_SUBJECT::SUBJECT_USER;
+	else if (!SubTypeStr.compare(SUBJECT_GROUP_STR)) return TYPE_SUBJECT::SUBJECT_GROUP;
+	else if (!SubTypeStr.compare(SUBJECT_PROC_STR)) return TYPE_SUBJECT::SUBJECT_PROC;
+
+	return TYPE_SUBJECT::SUBJECT_UNKNOWN;
+}
+
+string AccessControl::SubTypeToStr(
+	TYPE_SUBJECT SubType
+)
+{
+	if (SubType == TYPE_SUBJECT::SUBJECT_USER) return SUBJECT_USER_STR;
+	if (SubType == TYPE_SUBJECT::SUBJECT_GROUP) return SUBJECT_GROUP_STR;
+	else if (SubType == TYPE_SUBJECT::SUBJECT_PROC) return SUBJECT_PROC_STR;
+
+	return "";
+}
+
 class AccessControl {
 
 public:
-
-	enum class TYPE_SUBJECT {
-		SUBJECT_USER = 0,
-		SUBJECT_GROUP,
-		SUBJECT_PROC,
-		SUBJECT_UNKNOWN
-	};
-
-	const string SUBJECT_USER_STR = "user";
-	const string SUBJECT_GROUP_STR = "group";
-	const string SUBJECT_PROC_STR = "proc";
-
-	TYPE_SUBJECT StrToSubType(
-		string SubTypeStr
-	)
-	{
-		if (!SubTypeStr.compare(SUBJECT_USER_STR)) return TYPE_SUBJECT::SUBJECT_USER;
-		else if (!SubTypeStr.compare(SUBJECT_GROUP_STR)) return TYPE_SUBJECT::SUBJECT_GROUP;
-		else if (!SubTypeStr.compare(SUBJECT_PROC_STR)) return TYPE_SUBJECT::SUBJECT_PROC;
-
-		return TYPE_SUBJECT::SUBJECT_UNKNOWN;
-	}
-
-	string SubTypeToStr(
-		TYPE_SUBJECT SubType
-	)
-	{
-		if (SubType == TYPE_SUBJECT::SUBJECT_USER) return SUBJECT_USER_STR;
-		if (SubType == TYPE_SUBJECT::SUBJECT_GROUP) return SUBJECT_GROUP_STR;
-		else if (SubType == TYPE_SUBJECT::SUBJECT_PROC) return SUBJECT_PROC_STR;
-
-		return "";
-	}
 
 	enum class TYPE_OBJECT {
 		OBJECT_FILE = 0,
@@ -218,9 +219,11 @@ public:
 	const string OBJECT_FILE_STR = "file";
 	const string OBJECT_DIR_STR = "dir";
 
+	string objectName;
+
 };
 
-class ACLSubject {
+class ACL_SUBJECT {
 
 public:
 	enum class TYPE_SUBJECT {
@@ -233,5 +236,33 @@ public:
 	const string SUBJECT_USER_STR = "user";
 	const string SUBJECT_GROUP_STR = "group";
 	const string SUBJECT_PROC_STR = "proc";
-
 };
+
+ACL_SUBJECT AccessControl::SearchSubject(string subjectName)
+{
+	ACL_SUBJECT aclSub = NULL;
+
+	foreach(var sub in aclSubject)
+	{
+		if (sub.subjectName == subjectName)
+		{
+			aclSub = sub;
+			break;
+		}
+	}
+
+	return aclSub;
+}
+void AccessControl::ACLSubjectAdd(string subjectName, INT32 permissions)
+{
+	ACL_Subject aclSub;
+
+	aclSub = SearchSubject(subjectName);
+	if (aclSub != null) return;
+	else aclSub = new ACL_Subject();
+
+	aclSub.subjectName = subjectName;
+	aclSub.permissions = permissions;
+
+	aclSubject.Add(aclSub);
+}
