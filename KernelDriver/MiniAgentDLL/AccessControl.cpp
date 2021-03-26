@@ -55,38 +55,38 @@ string AccessControl::SubTypeToStr(
 	return "";
 }
 
+enum class TYPE_OBJECT {
+	OBJECT_FILE = 0,
+	OBJECT_DIR,
+	OBJECT_UNKNOWN
+};
+
+const string OBJECT_FILE_STR = "file";
+const string OBJECT_DIR_STR = "dir";
+
+TYPE_OBJECT AccessControl::StrToObjType(
+	string ObjTypeStr
+)
+{
+	if (!ObjTypeStr.compare(OBJECT_FILE_STR)) return TYPE_OBJECT::OBJECT_FILE;
+	else if (!ObjTypeStr.compare(OBJECT_DIR_STR)) return TYPE_OBJECT::OBJECT_DIR;
+
+	return TYPE_OBJECT::OBJECT_UNKNOWN;
+}
+
+string AccessControl::ObjTypeToStr(
+	_In_ TYPE_OBJECT ObjType
+)
+{
+	if (ObjType == TYPE_OBJECT::OBJECT_FILE) return OBJECT_FILE_STR;
+	else if (ObjType == TYPE_OBJECT::OBJECT_DIR) return OBJECT_DIR_STR;
+
+	return "";
+}
+
 class AccessControl {
 
 public:
-
-	enum class TYPE_OBJECT {
-		OBJECT_FILE = 0,
-		OBJECT_DIR,
-		OBJECT_UNKNOWN
-	};
-
-	const string OBJECT_FILE_STR = "file";
-	const string OBJECT_DIR_STR = "dir";
-
-	TYPE_OBJECT StrToObjType(
-		string ObjTypeStr
-	)
-	{
-		if (!ObjTypeStr.compare(OBJECT_FILE_STR)) return TYPE_OBJECT::OBJECT_FILE;
-		else if (!ObjTypeStr.compare(OBJECT_DIR_STR)) return TYPE_OBJECT::OBJECT_DIR;
-
-		return TYPE_OBJECT::OBJECT_UNKNOWN;
-	}
-
-	string ObjTypeToStr(
-		_In_ TYPE_OBJECT ObjType
-	)
-	{
-		if (ObjType == TYPE_OBJECT::OBJECT_FILE) return OBJECT_FILE_STR;
-		else if (ObjType == TYPE_OBJECT::OBJECT_DIR) return OBJECT_DIR_STR;
-
-		return "";
-	}
 
 	enum class EFFECT_MODE {
 		EFT_DENY = 0,
