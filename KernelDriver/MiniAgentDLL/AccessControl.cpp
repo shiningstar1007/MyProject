@@ -84,39 +84,40 @@ string AccessControl::ObjTypeToStr(
 	return "";
 }
 
+enum class EFFECT_MODE {
+	EFT_DENY = 0,
+	EFT_ALLOW,
+	EFT_UNKNOWN
+};
+
+const string EFT_ALLOW_STR = "allow";
+const string EFT_DENY_STR = "deny";
+const string EFT_UNKNOWN_STR = "unknown";
+
+EFFECT_MODE AccessControl::StrToEffectMode(
+	_In_ string EffectModeStr
+)
+{
+	if (EffectModeStr.compare(EFT_ALLOW_STR)) return EFFECT_MODE::EFT_ALLOW;
+	else if (EffectModeStr.compare(EFT_DENY_STR)) return EFFECT_MODE::EFT_DENY;
+
+	return EFFECT_MODE::EFT_UNKNOWN;
+}
+
+string AccessControl::EffectModeToStr(
+	_In_ EFFECT_MODE EffectMode
+)
+{
+	if (EffectMode == EFFECT_MODE::EFT_ALLOW) return EFT_ALLOW_STR;
+	else if (EffectMode == EFFECT_MODE::EFT_DENY) return EFT_DENY_STR;
+
+	return EFT_UNKNOWN_STR;
+}
+
 class AccessControl {
 
 public:
 
-	enum class EFFECT_MODE {
-		EFT_DENY = 0,
-		EFT_ALLOW,
-		EFT_UNKNOWN
-	};
-
-	const string EFT_ALLOW_STR = "allow";
-	const string EFT_DENY_STR = "deny";
-	const string EFT_UNKNOWN_STR = "unknown";
-
-	EFFECT_MODE StrToEffectMode(
-		_In_ string EffectModeStr
-	)
-	{
-		if (EffectModeStr.compare(EFT_ALLOW_STR)) return EFFECT_MODE::EFT_ALLOW;
-		else if (EffectModeStr.compare(EFT_DENY_STR)) return EFFECT_MODE::EFT_DENY;
-
-		return EFFECT_MODE::EFT_UNKNOWN;
-	}
-
-	string EffectModeToStr(
-		_In_ EFFECT_MODE EffectMode
-	)
-	{
-		if (EffectMode == EFFECT_MODE::EFT_ALLOW) return EFT_ALLOW_STR;
-		else if (EffectMode == EFFECT_MODE::EFT_DENY) return EFT_DENY_STR;
-
-		return EFT_UNKNOWN_STR;
-	}
 
 	enum class ACL_ACTION {
 		ACTION_UNKNOWN = 0,
