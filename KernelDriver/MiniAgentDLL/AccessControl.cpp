@@ -250,7 +250,7 @@ ACL_SUBJECT AccessControl::SearchSubject(string subjectName)
 }
 void AccessControl::ACLSubjectAdd(string subjectName, INT32 permissions)
 {
-	ACL_Subject aclSub;
+	ACL_SUBJECT aclSub;
 
 	aclSub = SearchSubject(subjectName);
 	if (aclSub != null) return;
@@ -260,4 +260,29 @@ void AccessControl::ACLSubjectAdd(string subjectName, INT32 permissions)
 	aclSub.permissions = permissions;
 
 	aclSubject.Add(aclSub);
+}
+
+void AccessControl::ACLSubjectRemove(string subjectName)
+{
+	INT32 index = -1;
+	ACL_SUBJECT aclSub;
+
+	foreach(var aclSub in aclSubject)
+	{
+		if (aclSub.subjectName == subjectName)
+		{
+			index = aclSubject.IndexOf(aclSub);
+			break;
+		}
+	}
+
+	if (index != -1) aclSubject.RemoveAt(index);
+}
+
+void AccessControl::ACLSubjectList()
+{
+	foreach(var aclSub in aclSubject)
+	{
+		Console.WriteLine("SubjectName={0}, permissions={1}", aclSub.subjectName, aclSub.permissions);
+	}
 }
