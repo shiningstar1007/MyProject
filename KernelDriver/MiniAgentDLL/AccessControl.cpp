@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <iterator>
+#include <queue>
 
 using namespace std;
 
@@ -202,37 +203,6 @@ string AccessControl::ActionToStr(
 	return ActionStrBuf;
 }
 
-class ACLObject {
-
-public:
-	enum class TYPE_OBJECT {
-		OBJECT_FILE = 0,
-		OBJECT_DIR,
-		OBJECT_UNKNOWN
-	};
-
-	const string OBJECT_FILE_STR = "file";
-	const string OBJECT_DIR_STR = "dir";
-
-	string objectName;
-
-};
-
-class ACL_SUBJECT {
-
-public:
-	enum class TYPE_SUBJECT {
-		SUBJECT_USER = 0,
-		SUBJECT_GROUP,
-		SUBJECT_PROC,
-		SUBJECT_UNKNOWN
-	};
-
-	const string SUBJECT_USER_STR = "user";
-	const string SUBJECT_GROUP_STR = "group";
-	const string SUBJECT_PROC_STR = "proc";
-};
-
 ACL_SUBJECT AccessControl::SearchSubject(string subjectName)
 {
 	ACL_SUBJECT aclSub = NULL;
@@ -285,4 +255,34 @@ void AccessControl::ACLSubjectList()
 	{
 		Console.WriteLine("SubjectName={0}, permissions={1}", aclSub.subjectName, aclSub.permissions);
 	}
+}
+
+ACL_OBJECT AccessControl::SearchObject(string objectName)
+{
+	ACL_Object aclObj = null;
+
+	foreach(var obj in aclObject)
+	{
+		if (obj.objectName == objectName)
+		{
+			aclObj = obj;
+			break;
+		}
+	}
+
+	return aclObj;
+}
+
+void AccessControl::ACLObjectAdd(string objectName, UINT64 permissions)
+{
+	ACL_Object aclObj;
+
+	aclObj = SearchObject(objectName);
+	if (aclObj != null) return;
+	else aclObj = new ACL_Object();
+
+	aclObj.objectName = objectName;
+	aclObj.permissions = permissions;
+
+	aclObject.Add(aclObj);
 }

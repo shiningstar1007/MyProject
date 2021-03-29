@@ -2,9 +2,44 @@
 
 using std::string;
 
+class ACL_SUBJECT {
+
+public:
+	enum class TYPE_SUBJECT {
+		SUBJECT_USER = 0,
+		SUBJECT_GROUP,
+		SUBJECT_PROC,
+		SUBJECT_UNKNOWN
+	};
+
+	const string SUBJECT_USER_STR = "user";
+	const string SUBJECT_GROUP_STR = "group";
+	const string SUBJECT_PROC_STR = "proc";
+};
+
+class ACL_OBJECT {
+
+public:
+	enum class TYPE_OBJECT {
+		OBJECT_FILE = 0,
+		OBJECT_DIR,
+		OBJECT_UNKNOWN
+	};
+
+	const string OBJECT_FILE_STR = "file";
+	const string OBJECT_DIR_STR = "dir";
+
+	string objectName;
+
+};
+
 class AccessControl {
 
 public:
+
+	std::queue<ACL_SUBJECT> aclSubList;
+	std::queue<ACL_OBJECT> aclObjList;
+
 	enum class TYPE_OBJECT {
 		OBJECT_FILE = 0,
 		OBJECT_DIR,
