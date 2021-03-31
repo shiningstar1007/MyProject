@@ -286,3 +286,27 @@ void AccessControl::ACLObjectAdd(string objectName, UINT64 permissions)
 
 	aclObject.Add(aclObj);
 }
+
+void AccessControl::ACLObjectRemove(string objectName)
+{
+	Int32 index = -1;
+
+	foreach(var aclObj in aclObject)
+	{
+		if (aclObj.objectName == objectName)
+		{
+			index = aclObject.IndexOf(aclObj);
+			break;
+		}
+	}
+
+	if (index != -1) aclObject.RemoveAt(index);
+}
+
+void AccessControl::ACLObjectList()
+{
+	foreach(var aclObj in aclObject)
+	{
+		Console.WriteLine("ObjectName={0}, permissions={1}", aclObj.objectName, aclObj.permissions);
+	}
+}
