@@ -9,36 +9,36 @@
       <Extensions>inf;inv;inx;mof;mc;</Extensions>
       <UniqueIdentifier>{90FB5FA4-26B9-4F48-B140-1D029567D5D6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Resource Files">
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms;man;xml</Extensions>
-      <UniqueIdentifier>{66893B48-50CE-4012-BEEF-0F519EF6110E}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Source Files">
+    <Filter Include="Source Files">
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx;*</Extensions>
       <UniqueIdentifier>{8515EDEE-048D-4FD9-B5B1-283B25BF72ED}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms;man;xml</Extensions>
+      <UniqueIdentifier>{66893B48-50CE-4012-BEEF-0F519EF6110E}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MiniFlt.c">
-      <Filter>Header Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CommFunc.c">
-      <Filter>Header Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Context.c">
-      <Filter>Header Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SystemCallHook.c">
-      <Filter>Header Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MiniFltLog.c">
-      <Filter>Header Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MiniWSK.c">
-      <Filter>Header Files\Source Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AccessControl.c">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -77,7 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiniFlt.rc">
-      <Filter>Header Files\Resource Files</Filter>
+      <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>

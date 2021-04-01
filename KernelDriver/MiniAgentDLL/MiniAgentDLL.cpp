@@ -142,19 +142,19 @@ void UserList()
 						if (!pTempBuf) break;
 
 						if ((pTempBuf->usri20_flags & UF_ACCOUNTDISABLE) != UF_ACCOUNTDISABLE) {
-							Len = WideCharToMultiByte(CP_ACP, 0, pTempBuf->usri20_name, -1, UserName, MAX_KPATH, NULL, FALSE);
+							Len = WideCharToMultiByte(CP_ACP, 0, pTempBuf->usri20_name, -1, UserName, MAX_PATH, NULL, FALSE);
 
 							if (CheckWindows8OrGreater()) {
 								if (NetUserGetInfo(NULL, pTempBuf->usri20_name, 24, (LPBYTE*)&pUserInfo) == NERR_Success) {
 									if (pUserInfo->usri24_internet_identity) {
-										Len = WideCharToMultiByte(CP_ACP, 0, pUserInfo->usri24_internet_principal_name, -1, UserName, MAX_KPATH, NULL, FALSE);
+										Len = WideCharToMultiByte(CP_ACP, 0, pUserInfo->usri24_internet_principal_name, -1, UserName, MAX_PATH, NULL, FALSE);
 									}
-									else Len = WideCharToMultiByte(CP_ACP, 0, pTempBuf->usri20_name, -1, UserName, MAX_KPATH, NULL, FALSE);
+									else Len = WideCharToMultiByte(CP_ACP, 0, pTempBuf->usri20_name, -1, UserName, MAX_PATH, NULL, FALSE);
 
 									NetApiBufferFree(pUserInfo);
 								}
 							}
-							else Len = WideCharToMultiByte(CP_ACP, 0, pTempBuf->usri20_name, -1, UserName, MAX_KPATH, NULL, FALSE);
+							else Len = WideCharToMultiByte(CP_ACP, 0, pTempBuf->usri20_name, -1, UserName, MAX_PATH, NULL, FALSE);
 
 							if (OffSet > 0) CopyLineBuf(&KEParam->StrBuf, &OffSet, SEP_NEWLN, (ULONG)strlen(SEP_NEWLN));
 
@@ -176,6 +176,52 @@ void UserList()
 	} while (KECode == ERR_MORE_BUFFER);
 
 	if (pBuf != NULL) NetApiBufferFree(pBuf);
+
+	return KECode;
+}
+
+void GroupList()
+{
+	PLOCALGROUP_INFO_0 pGroups = NULL, pTmpGroup;
+	DWORD dwEntriesRead = 0, dwTotalEntries = 0, i;
+	NET_API_STATUS nStatus;
+	CHAR GroupName[MAX_PATH];
+	ULONG Len = 0, OffSet;
+
+	do {
+		Len = OffSet = 0;
+
+		do {
+			nStatus = NetLocalGroupEnum(NULL, 0, (LPBYTE*)&pGroups, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, NULL);
+			if ((nStatus == NERR_Success) || (nStatus == ERROR_MORE_DATA)) {
+				pTmpGroup = pGroups;
+				if (pTmpGroup != NULL) {
+					for (i = 0; i < dwEntriesRead; i++) {
+						if (!pTmpGroup) break;
+
+						Len = WideCharToMultiByte(CP_ACP, 0, pTmpGroup->lgrpi0_name, -1, GroupName, MAX_KPATH, NULL, FALSE);
+
+						if (OffSet > 0) CopyLineBuf(&KEParam->StrBuf, &OffSet, SEP_NEWLN, (ULONG)strlen(SEP_NEWLN));
+
+						KECode = CopyLineBuf(&KEParam->StrBuf, &OffSet, GroupName, (Len - 1));
+						if (KECode != ERR_KE_SUCCESS) break;
+
+						pTmpGroup++;
+					}
+				}
+			}
+
+			if (pGroups != NULL) {
+				NetApiBufferFree(pGroups);
+				pGroups = NULL;
+			}
+		} while (KECode == ERR_KE_SUCCESS && nStatus == ERROR_MORE_DATA);
+
+	} while (KECode == ERR_MORE_BUFFER);
+
+	if (pGroups != NULL) NetApiBufferFree(pGroups);
+
+	KEParam->StrBuf.BufSize = OffSet;
 
 	return KECode;
 }
