@@ -1,5 +1,7 @@
 #include <Windows.h>
 #include <fltUser.h>
+#pragma comment(lib, "netapi32.lib")
+#include <lm.h>
 
 #define MINI_PORT_NAME     L"\\MiniFltPort"
 

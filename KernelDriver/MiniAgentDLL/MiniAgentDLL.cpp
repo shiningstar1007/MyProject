@@ -109,3 +109,73 @@ BOOL GetWinVer(DWORD& dwMajor, DWORD& dwMinor)
 
 	return ret;
 }
+
+BOOL CheckWindows8OrGreater()
+{
+	DWORD major, minor;
+
+	GetWinVer(major, minor);
+
+	return (major >= 6 && minor >= 2) ? TRUE : FALSE;
+}
+
+void UserList()
+{
+	LPUSER_INFO_20 pBuf = NULL, pTempBuf;
+	LPUSER_INFO_24 pUserInfo = NULL;
+	DWORD dwPreMaxLen = (DWORD)-1, dwEntriesRead = 0;
+	DWORD dwTotalEntries = 0, dwResumeHandle = 0, i;
+	NET_API_STATUS nStatus;
+	CHAR UserName[MAX_PATH];
+	ULONG Len = 0, OffSet;
+
+	do {
+
+		Len = OffSet = 0;
+
+		do {
+			nStatus = NetUserEnum(NULL, 20, 0, (LPBYTE*)&pBuf, dwPreMaxLen, &dwEntriesRead, &dwTotalEntries, &dwResumeHandle);
+			if ((nStatus == NERR_Success) || (nStatus == ERROR_MORE_DATA)) {
+				pTempBuf = pBuf;
+				if (pTempBuf != NULL) {
+					for (i = 0; i < dwEntriesRead; i++) {
+						if (!pTempBuf) break;
+
+						if ((pTempBuf->usri20_flags & UF_ACCOUNTDISABLE) != UF_ACCOUNTDISABLE) {
+							Len = WideCharToMultiByte(CP_ACP, 0, pTempBuf->usri20_name, -1, UserName, MAX_KPATH, NULL, FALSE);
+
+							if (CheckWindows8OrGreater()) {
+								if (NetUserGetInfo(NULL, pTempBuf->usri20_name, 24, (LPBYTE*)&pUserInfo) == NERR_Success) {
+									if (pUserInfo->usri24_internet_identity) {
+										Len = WideCharToMultiByte(CP_ACP, 0, pUserInfo->usri24_internet_principal_name, -1, UserName, MAX_KPATH, NULL, FALSE);
+									}
+									else Len = WideCharToMultiByte(CP_ACP, 0, pTempBuf->usri20_name, -1, UserName, MAX_KPATH, NULL, FALSE);
+
+									NetApiBufferFree(pUserInfo);
+								}
+							}
+							else Len = WideCharToMultiByte(CP_ACP, 0, pTempBuf->usri20_name, -1, UserName, MAX_KPATH, NULL, FALSE);
+
+							if (OffSet > 0) CopyLineBuf(&KEParam->StrBuf, &OffSet, SEP_NEWLN, (ULONG)strlen(SEP_NEWLN));
+
+							KECode = CopyLineBuf(&KEParam->StrBuf, &OffSet, UserName, (Len - 1));
+							if (KECode != ERR_KE_SUCCESS) break;
+						}
+
+						pTempBuf++;
+					}
+				}
+			}
+
+			if (pBuf != NULL) {
+				NetApiBufferFree(pBuf);
+				pBuf = NULL;
+			}
+		} while (KECode == ERR_KE_SUCCESS && nStatus == ERROR_MORE_DATA);
+
+	} while (KECode == ERR_MORE_BUFFER);
+
+	if (pBuf != NULL) NetApiBufferFree(pBuf);
+
+	return KECode;
+}
