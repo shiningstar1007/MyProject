@@ -225,3 +225,51 @@ void GroupList()
 
 	return KECode;
 }
+
+public static bool CheckStreamFile(string FileName)
+{
+	bool bStreamFile = false;
+	IntPtr FileHandle;
+	IO_STATUS_BLOCK IoStatusBlock = new IO_STATUS_BLOCK();
+	uint BufSize = 0x10000;   //initial buffer size of 65536 bytes
+	IntPtr pBuffer = Marshal.AllocHGlobal((int)BufSize);
+
+	FileHandle = Win32API.CreateFile(FileName, Win32API.GENERIC_READ | Win32API.GENERIC_WRITE,
+		FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
+
+	if (FileHandle.ToInt32() != Win32API.INVALID_HANDLE_VALUE)
+	{
+		NTSTATUS Status = Win32API.NtQueryInformationFile(FileHandle, ref IoStatusBlock, pBuffer, BufSize,
+			FILE_INFORMATION_CLASS.FileStreamInformation);
+
+		Win32API.CloseHandle(FileHandle);
+
+		if (Status == NTSTATUS.STATUS_SUCCESS)
+		{
+			int StructSize = Marshal.SizeOf(typeof(FILE_STREAM_INFORMATION));
+			FILE_STREAM_INFORMATION FileStreamInfo;
+			string StreamName;
+			IntPtr DataPtr = pBuffer;
+
+			do
+			{
+				FileStreamInfo = (FILE_STREAM_INFORMATION)Marshal.PtrToStructure(DataPtr, typeof(FILE_STREAM_INFORMATION));
+
+				if (FileStreamInfo.StreamNameLen == 0) break;
+
+				StreamName = Marshal.PtrToStringUni(DataPtr + StructSize - 2, (int)FileStreamInfo.StreamNameLen / 2);
+				if (CheckStreamName.Equals(StreamName) == true)
+				{
+					bStreamFile = true;
+					break;
+				}
+
+				DataPtr += (int)FileStreamInfo.NextEntryOffset;
+			} while (FileStreamInfo.NextEntryOffset != 0);
+		}
+	}
+
+	Marshal.FreeHGlobal(pBuffer);
+
+	return bStreamFile;
+}
