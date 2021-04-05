@@ -44,5 +44,8 @@
     <ClCompile Include="AccessControl.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="..\MiniComm\MiniComm.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
