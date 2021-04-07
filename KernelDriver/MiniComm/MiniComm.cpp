@@ -102,3 +102,15 @@ HRESULT SendMessageDriver(MINI_COMMAND Cmd, PBYTE InByte, ULONG InSize, PBYTE Ou
 
 	return hResult;
 }
+
+PCHAR Trim(PCHAR SourceStr)
+{
+	if (!SourceStr) return NULL;
+
+	while (*SourceStr) {
+		if (*SourceStr != '\n' && isspace((int)*SourceStr)) SourceStr++;
+		else break;
+	}
+
+	return SourceStr;
+}
