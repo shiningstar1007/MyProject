@@ -114,3 +114,50 @@ PCHAR Trim(PCHAR SourceStr)
 
 	return SourceStr;
 }
+
+PCHAR MyStrTok(PCHAR SourceStr, PCHAR SepChars, PCHAR* NextStr, BOOL UseQuota)
+{
+	PCHAR TargetChr = NULL, NextChr;
+	BOOL DelQuota = FALSE;
+
+	if (!UseQuota && strcmp(SepChars, SEP_NEWLN)) SourceStr = Trim(SourceStr);
+
+	if (!SourceStr || (!UseQuota && !*SourceStr)) {
+		if (NextStr) *NextStr = NULL;
+
+		return NULL;
+	}
+
+	if (SepChars) {
+		if (UseQuota && *SourceStr == CHR_QUOTA) {
+			TargetChr = ++SourceStr;
+			while (*TargetChr) {
+				NextChr = TargetChr + 1;
+				if (*TargetChr == CHR_QUOTA) {
+					if (*NextChr == CHR_QUOTA) TargetChr++;
+					else if (!*NextChr || *NextChr == *SepChars) {
+						*TargetChr++ = 0;
+						DelQuota = TRUE;
+						break;
+					}
+				}
+
+				TargetChr++;
+			}
+		}
+		else {
+			while (*SepChars) {
+				if (TargetChr = strchr(SourceStr, *SepChars++)) break;
+			}
+		}
+
+		if (TargetChr && *TargetChr) *TargetChr++ = 0;
+		else TargetChr = NULL;
+
+		if (UseQuota && DelQuota) QuotaDelete(SourceStr);
+	}
+
+	if (NextStr) *NextStr = TargetChr;
+
+	return SourceStr;
+}
