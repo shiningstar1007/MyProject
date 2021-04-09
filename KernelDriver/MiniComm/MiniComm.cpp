@@ -161,3 +161,39 @@ PCHAR MyStrTok(PCHAR SourceStr, PCHAR SepChars, PCHAR* NextStr, BOOL UseQuota)
 
 	return SourceStr;
 }
+
+PCHAR QuotaAdd(PCHAR SourceStr, PCHAR TargetStr)
+{
+	PCHAR SourceBuf = NULL, Source, Target;
+
+	if (!SourceStr || !*SourceStr) return SourceStr;
+
+	if (TargetStr) {
+		Target = TargetStr;
+		Source = SourceStr;
+	}
+	else {
+		ULONG SourceLen = (ULONG)strlen(SourceStr) + 1;
+
+		Target = TargetStr = SourceStr;
+		SourceBuf = (PCHAR)malloc(SourceLen);
+		if (SourceBuf) {
+			PsKeStrNCopy(SourceBuf, SourceStr, SourceLen);
+			Source = SourceBuf;
+		}
+		else return SourceStr;
+	}
+
+	*Target++ = CHR_QUOTA;
+	for (; *Source; Source++, Target++) {
+		if (*Source == CHR_QUOTA) *Target++ = *Source;
+
+		*Target = *Source;
+	}
+	*Target++ = CHR_QUOTA;
+	*Target = 0;
+
+	if (SourceBuf) free(SourceBuf);
+
+	return TargetStr;
+}
