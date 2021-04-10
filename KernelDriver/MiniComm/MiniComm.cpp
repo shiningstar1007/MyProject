@@ -178,7 +178,7 @@ PCHAR QuotaAdd(PCHAR SourceStr, PCHAR TargetStr)
 		Target = TargetStr = SourceStr;
 		SourceBuf = (PCHAR)malloc(SourceLen);
 		if (SourceBuf) {
-			PsKeStrNCopy(SourceBuf, SourceStr, SourceLen);
+			MyStrNCopy(SourceBuf, SourceStr, SourceLen);
 			Source = SourceBuf;
 		}
 		else return SourceStr;
@@ -196,4 +196,28 @@ PCHAR QuotaAdd(PCHAR SourceStr, PCHAR TargetStr)
 	if (SourceBuf) free(SourceBuf);
 
 	return TargetStr;
+}
+
+PCHAR QuotaDelete(PCHAR SourceStr)
+{
+	PCHAR SourceBuf, SourceChr, TargetStr = SourceStr;
+	ULONG SourceLen;
+
+	if (!SourceStr || !*SourceStr) return SourceStr;
+
+	SourceLen = (ULONG)strlen(SourceStr) + 1;
+	SourceBuf = (PCHAR)malloc(SourceLen);
+	if (SourceBuf) {
+		MyStrNCopy(SourceBuf, SourceStr, SourceLen);
+		for (SourceChr = SourceBuf; *SourceChr; SourceChr++, TargetStr++) {
+			if (*SourceChr == CHR_QUOTA && *(SourceChr + 1) == CHR_QUOTA) SourceChr++;
+
+			*TargetStr = *SourceChr;
+		}
+		*TargetStr = 0;
+
+		free(SourceBuf);
+	}
+
+	return SourceStr;
 }
