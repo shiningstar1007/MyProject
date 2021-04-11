@@ -221,3 +221,27 @@ PCHAR QuotaDelete(PCHAR SourceStr)
 
 	return SourceStr;
 }
+
+PCHAR QuotaDelete(PCHAR SourceStr)
+{
+	PCHAR SourceBuf, SourceChr, TargetStr = SourceStr;
+	ULONG SourceLen;
+
+	if (!SourceStr || !*SourceStr) return SourceStr;
+
+	SourceLen = (ULONG)strlen(SourceStr) + 1;
+	SourceBuf = (PCHAR)malloc(SourceLen);
+	if (SourceBuf) {
+		MyStrNCopy(SourceBuf, SourceStr, SourceLen);
+		for (SourceChr = SourceBuf; *SourceChr; SourceChr++, TargetStr++) {
+			if (*SourceChr == CHR_QUOTA && *(SourceChr + 1) == CHR_QUOTA) SourceChr++;
+
+			*TargetStr = *SourceChr;
+		}
+		*TargetStr = 0;
+
+		free(SourceBuf);
+	}
+
+	return SourceStr;
+}
