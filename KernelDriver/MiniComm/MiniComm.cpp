@@ -245,3 +245,17 @@ PCHAR QuotaDelete(PCHAR SourceStr)
 
 	return SourceStr;
 }
+
+ULONG MyStrNCopy(PCHAR DestBuf, CONST PCHAR SourceBuf, ULONG MaxLen)
+{
+	ULONG SourceLen;
+
+	if (!DestBuf || !SourceBuf) return 0;
+
+	SourceLen = (ULONG)strlen(SourceBuf);
+	if (MaxLen <= SourceLen) SourceLen = MaxLen;
+
+	StringCchCopyNA(DestBuf, MaxLen, SourceBuf, SourceLen);
+
+	return SourceLen;
+}
