@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <fltUser.h>
+#include <strsafe.h>
 
 #define WIN_MAJOR_MAX	    10    // Windows 10
 #define WIN_MAJOR_MIN	    5    // Windows 2000 or XP
@@ -256,6 +257,19 @@ ULONG MyStrNCopy(PCHAR DestBuf, CONST PCHAR SourceBuf, ULONG MaxLen)
 	if (MaxLen <= SourceLen) SourceLen = MaxLen;
 
 	StringCchCopyNA(DestBuf, MaxLen, SourceBuf, SourceLen);
+
+	return SourceLen;
+}
+
+ULONG MyStrNCopyW(PWCHAR DestBuf, CONST PWCHAR SourceBuf, ULONG SourceLen, ULONG MaxLen)
+{
+	if (!DestBuf || !SourceBuf) return 0;
+
+	if (SourceLen == -1) SourceLen = (ULONG)wcslen(SourceBuf);
+
+	if (MaxLen <= SourceLen) SourceLen = MaxLen;
+
+	StringCchCopyNW(DestBuf, MaxLen, SourceBuf, SourceLen);
 
 	return SourceLen;
 }
