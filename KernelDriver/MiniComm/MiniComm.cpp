@@ -273,3 +273,16 @@ ULONG MyStrNCopyW(PWCHAR DestBuf, CONST PWCHAR SourceBuf, ULONG SourceLen, ULONG
 
 	return SourceLen;
 }
+
+ULONG MySNPrintf(PCHAR DestBuf, ULONG MaxLen, CONST PCHAR FormatStr, ...)
+{
+	va_list ap;
+
+	if (!DestBuf || !FormatStr) return 0;
+
+	va_start(ap, FormatStr);
+	StringCchVPrintfA(DestBuf, MaxLen, FormatStr, ap);
+	va_end(ap);
+
+	return (ULONG)strlen(DestBuf);
+}
