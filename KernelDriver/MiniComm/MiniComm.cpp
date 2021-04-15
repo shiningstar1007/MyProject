@@ -286,3 +286,16 @@ ULONG MySNPrintf(PCHAR DestBuf, ULONG MaxLen, CONST PCHAR FormatStr, ...)
 
 	return (ULONG)strlen(DestBuf);
 }
+
+ULONG MySNPrintfW(PWCHAR DestBuf, ULONG MaxLen, CONST PWCHAR FormatStr, ...)
+{
+	va_list ArgList;
+
+	if (!DestBuf || !FormatStr) return 0;
+
+	va_start(ArgList, FormatStr);
+	StringCchVPrintfW(DestBuf, MaxLen, FormatStr, ArgList);
+	va_end(ArgList);
+
+	return (ULONG)wcslen(DestBuf);
+}
