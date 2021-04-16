@@ -299,3 +299,13 @@ ULONG MySNPrintfW(PWCHAR DestBuf, ULONG MaxLen, CONST PWCHAR FormatStr, ...)
 
 	return (ULONG)wcslen(DestBuf);
 }
+
+ULONG CopyLineBuf(PSTR_BUF StrBuf, PULONG Offset, PCHAR LineBuf, ULONG Len)
+{
+	if (*Offset + Len >= StrBuf->BufSize - 1) return -1;
+	else memcpy(StrBuf->Buffer + *Offset, LineBuf, Len + 1);
+
+	*Offset += Len;
+
+	return 0;
+}
