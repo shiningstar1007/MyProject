@@ -309,3 +309,46 @@ ULONG CopyLineBuf(PSTR_BUF StrBuf, PULONG Offset, PCHAR LineBuf, ULONG Len)
 
 	return 0;
 }
+
+PCHAR GetLocalAccount(PCHAR UserName)
+{
+	LPUSER_INFO_20 pBuf = NULL, pTempBuf;
+	LPUSER_INFO_24 pUserInfo = NULL;
+	DWORD dwPreMaxLen = (DWORD)-1, dwEntriesRead = 0;
+	DWORD dwTotalEntries = 0, dwResumeHandle = 0, i;
+	NET_API_STATUS nStatus;
+	WCHAR CompareName[MAX_KPATH];
+
+	if (!UserName || !*UserName) return NULL;
+
+	MultiByteToWideChar(CP_ACP, 0, UserName, -1, CompareName, MAX_KPATH);
+
+	nStatus = NetUserEnum(NULL, 20, 0, (LPBYTE*)&pBuf, dwPreMaxLen, &dwEntriesRead, &dwTotalEntries, &dwResumeHandle);
+	if ((nStatus == NERR_Success) || (nStatus == ERROR_MORE_DATA)) {
+		pTempBuf = pBuf;
+		if (pTempBuf != NULL) {
+			for (i = 0; i < dwEntriesRead; i++) {
+				if (!pTempBuf) break;
+
+				if ((pTempBuf->usri20_flags & UF_ACCOUNTDISABLE) != UF_ACCOUNTDISABLE) {
+					if (NetUserGetInfo(NULL, pTempBuf->usri20_name, 24, (LPBYTE*)&pUserInfo) == NERR_Success) {
+						if (pUserInfo->usri24_internet_identity) {
+							if (!_wcsicmp(CompareName, pUserInfo->usri24_internet_principal_name)) {
+								WideCharToMultiByte(CP_ACP, 0, pTempBuf->usri20_name, -1, UserName, MAX_KPATH, NULL, FALSE);
+							}
+						}
+						NetApiBufferFree(pUserInfo);
+					}
+				}
+				pTempBuf++;
+			}
+		}
+	}
+
+	if (pBuf != NULL) {
+		NetApiBufferFree(pBuf);
+		pBuf = NULL;
+	}
+
+	return UserName;
+}
