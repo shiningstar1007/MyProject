@@ -310,6 +310,27 @@ ULONG CopyLineBuf(PSTR_BUF StrBuf, PULONG Offset, PCHAR LineBuf, ULONG Len)
 	return 0;
 }
 
+ULONGLONG GetObjKey(TYPE_OBJECT ObjType, PCHAR ObjPath)
+{
+	HANDLE hFile;
+	BY_HANDLE_FILE_INFORMATION FileInfo;
+	ULONGLONG ObjKey = 0;
+
+	if (!ObjPath || !*ObjPath) return 0;
+
+	if (ObjType == OBJECT_FILE) {
+		hFile = CreateFileA(ObjPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (hFile != INVALID_HANDLE_VALUE) {
+			if (GetFileInformationByHandle(hFile, &FileInfo)) {
+				ObjKey = ((ULONGLONG)FileInfo.nFileIndexHigh << 32) | (ULONGLONG)FileInfo.nFileIndexLow;
+			}
+			if (hFile) CloseHandle(hFile);
+		}
+	}
+
+	return ObjKey;
+}
+
 PCHAR GetLocalAccount(PCHAR UserName)
 {
 	LPUSER_INFO_20 pBuf = NULL, pTempBuf;
@@ -352,3 +373,4 @@ PCHAR GetLocalAccount(PCHAR UserName)
 
 	return UserName;
 }
+
