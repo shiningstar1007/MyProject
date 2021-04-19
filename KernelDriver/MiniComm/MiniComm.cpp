@@ -374,3 +374,48 @@ PCHAR GetLocalAccount(PCHAR UserName)
 	return UserName;
 }
 
+ULONG GetGroupList(PKEPARAM KEParam)
+{
+	PLOCALGROUP_INFO_0 pGroups = NULL, pTmpGroup;
+	DWORD dwEntriesRead = 0, dwTotalEntries = 0, i;
+	NET_API_STATUS nStatus;
+	CHAR GroupName[MAX_KPATH];
+	ULONG Len = 0, OffSet, ErrCode;
+
+	do {
+		Len = OffSet = 0;
+
+		do {
+			nStatus = NetLocalGroupEnum(NULL, 0, (LPBYTE*)&pGroups, MAX_PREFERRED_LENGTH, &dwEntriesRead, &dwTotalEntries, NULL);
+			if ((nStatus == NERR_Success) || (nStatus == ERROR_MORE_DATA)) {
+				pTmpGroup = pGroups;
+				if (pTmpGroup != NULL) {
+					for (i = 0; i < dwEntriesRead; i++) {
+						if (!pTmpGroup) break;
+
+						Len = WideCharToMultiByte(CP_ACP, 0, pTmpGroup->lgrpi0_name, -1, GroupName, MAX_KPATH, NULL, FALSE);
+
+						if (OffSet > 0) CopyLineBuf(&KEParam->StrBuf, &OffSet, SEP_NEWLN, (ULONG)strlen(SEP_NEWLN));
+
+						ErrCode = CopyLineBuf(&KEParam->StrBuf, &OffSet, GroupName, (Len - 1));
+						if (ErrCode == -1) break;
+
+						pTmpGroup++;
+					}
+				}
+			}
+
+			if (pGroups != NULL) {
+				NetApiBufferFree(pGroups);
+				pGroups = NULL;
+			}
+		} while (ErrCode != -1 && nStatus == ERROR_MORE_DATA);
+
+	} while (ErrCode != -1);
+
+	if (pGroups != NULL) NetApiBufferFree(pGroups);
+
+	KEParam->StrBuf.BufSize = OffSet;
+
+	return 0;
+}
