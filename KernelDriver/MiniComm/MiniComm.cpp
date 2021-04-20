@@ -419,3 +419,25 @@ ULONG GetGroupList(PKEPARAM KEParam)
 
 	return 0;
 }
+
+BOOL SetStrBuffer(PGET_STR GetStr)
+{
+	ULONG BufSize;
+
+	if (!GetStr) return FALSE;
+
+	if (GetStr->BufSize == 0) BufSize = BUF_UNIT;
+	else if (GetStr->BufSize < BUF_UNIT) BufSize = GetStr->BufSize + BUF_UNIT;
+	else BufSize = GetStr->BufSize * 2;
+
+	GetStr->BufSize = 0;
+	if (GetStr->Buffer) free(GetStr->Buffer);
+
+	GetStr->Buffer = (PCHAR)malloc(BufSize);
+	if (!GetStr->Buffer) return FALSE;
+
+	GetStr->BufSize = BufSize;
+	memset(GetStr->Buffer, 0, GetStr->BufSize);
+
+	return TRUE;
+}
