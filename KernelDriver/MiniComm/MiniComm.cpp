@@ -441,3 +441,14 @@ BOOL SetStrBuffer(PGET_STR GetStr)
 
 	return TRUE;
 }
+
+VOID FreeStrBuffer(PGET_STR GetStr)
+{
+	if (!GetStr) return;
+
+	if (GetStr->Buffer) {
+		free(GetStr->Buffer);
+		GetStr->Buffer = NULL;
+	}
+	GetStr->BufSize = 0;
+}
