@@ -452,3 +452,28 @@ VOID FreeStrBuffer(PGET_STR GetStr)
 	}
 	GetStr->BufSize = 0;
 }
+
+NTSTATUS(WINAPI* _ZwQuerySystemInformation)(UINT, PVOID, ULONG, PULONG) = NULL;
+NTSTATUS(WINAPI* _ZwQueryInformationProcess)(HANDLE, UINT, PVOID, ULONG, PULONG) = NULL;
+
+HMODULE SetNAPIAddr()
+{
+	CHAR SysDllPath[MAX_KPATH];
+	HMODULE hNtDll = LoadLibrary(GetSystemFilePath(SysDllPath, "ntdll.dll"));
+
+	if (hNtDll) {
+		*(FARPROC*)&_ZwQuerySystemInformation = GetProcAddress(hNtDll, "ZwQuerySystemInformation");
+		if (!_ZwQuerySystemInformation) {
+			pWrite("GetProcAddress ZwQuerySystemInformation Error %u", GetLastError());
+			return FALSE;
+		}
+
+		*(FARPROC*)&_ZwQueryInformationProcess = GetProcAddress(hNtDll, "ZwQueryInformationProcess");
+		if (!_ZwQueryInformationProcess)
+			pWrite("GetProcAddress ZwQueryInformationProcess Error %u", GetLastError());
+	}
+	else pWrite("LoadLibrary Error %u", GetLastError());
+
+	return hNtDll;
+}
+
