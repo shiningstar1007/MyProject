@@ -477,3 +477,25 @@ HMODULE SetNAPIAddr()
 	return hNtDll;
 }
 
+PVOID GetProcessList()
+{
+	NTSTATUS Status;
+	ULONG cbBuffer = 0x8000;
+	PVOID ProcListBuf = NULL;
+
+	while (_ZwQuerySystemInformation) {
+		ProcListBuf = malloc(cbBuffer);
+		if (!ProcListBuf) return NULL;
+
+		Status = _ZwQuerySystemInformation(SystemProcessesAndThreadsInformation,
+			ProcListBuf, cbBuffer, NULL);
+		if (Status) {
+			free(ProcListBuf);
+			if (Status == STATUS_INFO_LENGTH_MISMATCH) cbBuffer *= 2;
+			else return NULL;
+		}
+		else break;
+	}
+
+	return ProcListBuf;
+}
