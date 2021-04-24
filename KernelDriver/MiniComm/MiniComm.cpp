@@ -499,3 +499,20 @@ PVOID GetProcessList()
 
 	return ProcListBuf;
 }
+
+ULONG GetParentProcessId(ULONG ProcessId)
+{
+	ULONG ParentId = ProcessId;
+	PROCESS_BASIC_INFORMATION ProcInfo = { 0 };
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);
+
+	if (!hProcess || !_ZwQueryInformationProcess) return ParentId;
+
+	if (_ZwQueryInformationProcess(hProcess, ProcessBasicInformation, &ProcInfo,
+		sizeof(PROCESS_BASIC_INFORMATION), NULL) == 0)
+		ParentId = (ULONG)ProcInfo.InheritedFromUniqueProcessId;
+
+	CloseHandle(hProcess);
+
+	return ParentId;
+}
