@@ -563,3 +563,16 @@ ULONG FindProcessPathEx(PCHAR ProcPath, PULONG SessionId, PCHAR CreateTime)
 
 	return ProcessId;
 }
+
+VOID GetSessionUser(ULONG SessionId, PCHAR UserName)
+{
+	ULONG RetSize = 0;
+	PCHAR pBuffer = NULL;
+
+	if (WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, SessionId, WTSUserName,
+		&pBuffer, &RetSize) && pBuffer) {
+		MyStrNCpy(UserName, pBuffer, MAX_USER_NAME);
+		WTSFreeMemory(pBuffer);
+	}
+	else *UserName = 0;
+}
