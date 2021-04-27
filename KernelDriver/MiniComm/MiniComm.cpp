@@ -576,3 +576,24 @@ VOID GetSessionUser(ULONG SessionId, PCHAR UserName)
 	}
 	else *UserName = 0;
 }
+
+VOID GetSessionIP(ULONG SessionId, PCHAR IPStr, PCHAR DefIP)
+{
+	ULONG RetSize = 0;
+	PWTS_CLIENT_ADDRESS pClientIP = NULL;
+
+	*IPStr = 0;
+
+	if (WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, SessionId, WTSClientAddress,
+		(PCHAR*)&pClientIP, &RetSize) && pClientIP) {
+		if (pClientIP->AddressFamily == AF_INET) {
+			MySNPrintf(IPStr, MAX_IP_LEN, "%u.%u.%u.%u", pClientIP->Address[2], pClientIP->Address[3],
+				pClientIP->Address[4], pClientIP->Address[5]);
+		}
+		WTSFreeMemory(pClientIP);
+	}
+	if (*IPStr) return;
+
+	if (DefIP && *DefIP) MyStrNCopy(IPStr, DefIP, MAX_IP_LEN);
+
+}
