@@ -610,3 +610,14 @@ VOID GetClientHostName(ULONG SessionId, PCHAR ClientHostName)
 	}
 	else *ClientHostName = 0;
 }
+
+ULONG GetDiskFreeMB(PCHAR DirPath, PULONG TotalMB)
+{
+	ULARGE_INTEGER FreeByte = { 0 }, TotalByte = { 0 };
+
+	GetDiskFreeSpaceEx(DirPath, NULL, &TotalByte, &FreeByte);
+
+	if (TotalMB) *TotalMB = (ULONG)(TotalByte.QuadPart / MB1);
+
+	return (ULONG)(FreeByte.QuadPart / MB1);
+}
