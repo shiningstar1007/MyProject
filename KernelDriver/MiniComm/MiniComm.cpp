@@ -621,3 +621,38 @@ ULONG GetDiskFreeMB(PCHAR DirPath, PULONG TotalMB)
 
 	return (ULONG)(FreeByte.QuadPart / MB1);
 }
+
+BOOLEAN(WINAPI* _WinStationQueryInformationW)(
+	HANDLE, ULONG, WINSTATIONINFOCLASS, PVOID, ULONG, PULONG) = NULL;
+
+time_t GetTSTimes(ULONG SessionId, PCHAR LogonTime, PCHAR ConnectTime, PCHAR ConnectNumOnly)
+{
+	WINSTATIONINFORMATIONW WinStation = { 0 };
+	ULONG RetLen = 0;
+	time_t LastInput = 0;
+	CHAR SysDllPath[MAX_KPATH];
+	HMODULE hWinSta = LoadLibrary(GetSystemFilePath(SysDllPath, "WINSTA.DLL"));
+
+	if (LogonTime) *LogonTime = 0;
+	if (ConnectTime) *ConnectTime = 0;
+	if (ConnectNumOnly) *ConnectNumOnly = 0;
+
+	if (!hWinSta) return 0;
+
+	*(FARPROC*)&_WinStationQueryInformationW = GetProcAddress(hWinSta,
+		"WinStationQueryInformationW");
+
+	if (_WinStationQueryInformationW && _WinStationQueryInformationW(NULL, SessionId,
+		WinStationInformation, &WinStation, sizeof(WinStation), &RetLen)) {
+		LastInput = FileTimeToSecond(&WinStation.LastInputTime);
+		if (LastInput > 0 && LogonTime)
+			FileTimeToStr(&WinStation.LogonTime, LogonTime, NULL);
+
+		if (ConnectTime || ConnectNumOnly)
+			FileTimeToStr(&WinStation.ConnectTime, ConnectTime, ConnectNumOnly);
+	}
+
+	FreeLibrary(hWinSta);
+
+	return LastInput;
+}
