@@ -622,6 +622,25 @@ ULONG GetDiskFreeMB(PCHAR DirPath, PULONG TotalMB)
 	return (ULONG)(FreeByte.QuadPart / MB1);
 }
 
+time_t FileTimeToSecond(PFILETIME FileTime)
+{
+	SYSTEMTIME SysTime;
+	FILETIME LocalTime;
+	struct tm DateTime;
+
+	FileTimeToLocalFileTime(FileTime, &LocalTime);
+	FileTimeToSystemTime(&LocalTime, &SysTime);
+
+	DateTime.tm_year = SysTime.wYear - 1900;
+	DateTime.tm_mon = SysTime.wMonth - 1;
+	DateTime.tm_mday = SysTime.wDay;
+	DateTime.tm_hour = SysTime.wHour;
+	DateTime.tm_min = SysTime.wMinute;
+	DateTime.tm_sec = SysTime.wSecond;
+
+	return mktime(&DateTime);
+}
+
 BOOLEAN(WINAPI* _WinStationQueryInformationW)(
 	HANDLE, ULONG, WINSTATIONINFOCLASS, PVOID, ULONG, PULONG) = NULL;
 
