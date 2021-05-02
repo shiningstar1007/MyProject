@@ -675,3 +675,43 @@ time_t GetTSTimes(ULONG SessionId, PCHAR LogonTime, PCHAR ConnectTime, PCHAR Con
 
 	return LastInput;
 }
+
+ULONG GetScvVerStr(PCHAR Buffer, PCHAR FilePath, ULONG MaxLen)
+{
+	PCHAR pValue = NULL, VerStr;
+	PBYTE pVerInfo = NULL;
+	ULONG Len = 0, VerSize, i, LangCnt;
+	UINT VerLen = 0;
+	CHAR InfoString[MAX_KPATH];
+
+	struct LANGANDCODEPAGE {
+		WORD wLanguage;
+		WORD wCodePage;
+	} *lpTranslate;
+
+	VerSize = GetFileVersionInfoSize(FilePath, &VerSize);
+	if (VerSize > 0) pVerInfo = (PBYTE)malloc(VerSize);
+
+	if (!pVerInfo) return 0;
+
+	if (GetFileVersionInfo(FilePath, 0, VerSize, pVerInfo)) {
+		if (VerQueryValue(pVerInfo, "\\VarFileInfo\\Translation", (PVOID*)&lpTranslate, &VerLen)) {
+			LangCnt = VerLen / sizeof(struct LANGANDCODEPAGE);
+			for (i = 0; i < LangCnt && Len == 0; i++) {
+				MySNPrintf(InfoString, MAX_NAME, "\\StringFileInfo\\%04x%04x\\ProductVersion",
+					lpTranslate[i].wLanguage, lpTranslate[i].wCodePage);
+				if (!VerQueryValue(pVerInfo, InfoString, (PVOID*)&pValue, &VerLen)) continue;
+
+				pValue[VerLen] = 0;
+				for (VerStr = strtok(pValue, " ,"); VerStr;) {
+					Len += MySNPrintf(Buffer + Len, MaxLen - Len, "%s", VerStr);
+					VerStr = strtok(NULL, " ,");
+					if (VerStr) Len += MySNPrintf(Buffer + Len, MaxLen - Len, ".");
+				}
+			}
+		}
+	}
+	free(pVerInfo);
+
+	return Len;
+}
