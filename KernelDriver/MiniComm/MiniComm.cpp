@@ -715,3 +715,29 @@ ULONG GetScvVerStr(PCHAR Buffer, PCHAR FilePath, ULONG MaxLen)
 
 	return Len;
 }
+
+ULONG GetOSVerFromFile(PCHAR SysFilePath, PULONG MinorVersion, PULONG BuildNumber)
+{
+	ULONG MajorVersion = 5;
+	CHAR OSVerStr[MAX_KPATH] = { 0 }, * Minor, * Build;
+
+	if (MinorVersion) *MinorVersion = 0;
+	if (BuildNumber) *BuildNumber = 0;
+
+	if (GetScvVerStr(OSVerStr, SysFilePath, MAX_KPATH)) {
+		MajorVersion = atoi(OSVerStr);
+
+		Minor = strchr(OSVerStr, '.');
+		if (Minor) Minor++;
+
+		if (MinorVersion && Minor) *MinorVersion = atoi(Minor);
+
+		if (BuildNumber) {
+			Build = strchr(Minor, '.');
+			if (Build) *BuildNumber = atoi(Build + 1);
+		}
+	}
+	else pWriteF("Failed to get Version String from %s", SysFilePath);
+
+	return MajorVersion;
+}
