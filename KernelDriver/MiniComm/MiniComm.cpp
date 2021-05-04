@@ -741,3 +741,21 @@ ULONG GetOSVerFromFile(PCHAR SysFilePath, PULONG MinorVersion, PULONG BuildNumbe
 
 	return MajorVersion;
 }
+
+BOOL ImpersonateUser(PCHAR UserName, PCHAR UserPwd)
+{
+	HANDLE hToken;
+	BOOL bImpersonated = FALSE;
+
+
+	if (LogonUserA(NULL, UserName, UserPwd, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &hToken)) {
+		bImpersonated = ImpersonateLoggedOnUser(hToken);
+		if (bImpersonated)
+			pWriteF("Impersonated as %s", UserName);
+
+		CloseHandle(hToken);
+	}
+	else pWriteF("LogonUser Failed %d", GetLastError());
+
+	return bImpersonated;
+}
