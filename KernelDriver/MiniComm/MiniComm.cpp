@@ -783,3 +783,17 @@ VOID GetProcessUserName(HANDLE hProcess, PCHAR UserName)
 
 	CloseHandle(hToken);
 }
+
+VOID KillProcess(PCHAR ProcPath)
+{
+	ULONG ProcessId;
+	HANDLE hProcess;
+
+	ProcessId = FindProcessPath(ProcPath, NULL);
+	hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);
+	if (hProcess) {
+		pWriteF("KillProcess Find and Open Success[%s]", ProcPath);
+		TerminateProcess(hProcess, 0);
+		CloseHandle(hProcess);
+	}
+}
