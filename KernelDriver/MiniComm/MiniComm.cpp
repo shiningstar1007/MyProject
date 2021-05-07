@@ -784,6 +784,42 @@ VOID GetProcessUserName(HANDLE hProcess, PCHAR UserName)
 	CloseHandle(hToken);
 }
 
+VOID KillProcesses(PCHAR InstallPath)
+{
+	CHAR ProcPath[MAX_PATH];
+	ULONG PathLen = (ULONG)strlen(InstallPath), CurPID = GetCurrentProcessId();
+	HANDLE hProcess;
+	HMODULE hNtDll = NULL;
+	PVOID ProcListBuf;
+	PSYSTEM_PROCESSES pProcess;
+
+	if (!_ZwQuerySystemInformation) hNtDll = SetNAPIAddr();
+
+	ProcListBuf = GetProcessList();
+	if (!ProcListBuf) return;
+
+	for (pProcess = (PSYSTEM_PROCESSES)ProcListBuf; pProcess;) {
+		if (CurPID != (ULONG)pProcess->ProcessId &&
+			GetProcessPath((ULONG)pProcess->ProcessId, ProcPath, FALSE) &&
+			!_strnicmp(InstallPath, ProcPath, PathLen)) {
+			pWriteF("KillProcesses Find[%s]", ProcPath);
+
+			hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, (ULONG)pProcess->ProcessId);
+			if (hProcess) {
+				pWriteF("KillProcesses Find and Open Success[%s]", ProcPath);
+				TerminateProcess(hProcess, 0);
+				CloseHandle(hProcess);
+			}
+		}
+
+		if (pProcess->NextEntryDelta == 0) break;
+		else pProcess = (PSYSTEM_PROCESSES)((LPBYTE)pProcess + pProcess->NextEntryDelta);
+	}
+
+	free(ProcListBuf);
+	if (hNtDll) FreeLibrary(hNtDll);
+}
+
 VOID KillProcess(PCHAR ProcPath)
 {
 	ULONG ProcessId;
@@ -795,5 +831,35 @@ VOID KillProcess(PCHAR ProcPath)
 		pWriteF("KillProcess Find and Open Success[%s]", ProcPath);
 		TerminateProcess(hProcess, 0);
 		CloseHandle(hProcess);
+	}
+}
+
+BOOL GetHostIPs(PAGT_CONF AgentConf, PHOST_IP HostIP)
+{
+	struct hostent* pHost = NULL;
+	struct in_addr SockAddr;
+	ULONG i;
+
+	if (AgentConf) {
+		gethostname(AgentConf->HostName, sizeof(AgentConf->HostName));
+		pHost = gethostbyname(AgentConf->HostName);
+	}
+	else if (HostIP) pHost = gethostbyname(HostIP->HostName);
+
+	if (pHost && pHost->h_addrtype == AF_INET) {
+		for (i = 0; pHost->h_addr_list[i] && i < MAX_HOST_IP; i++) {
+			memcpy(&SockAddr, pHost->h_addr_list[i], pHost->h_length);
+			if (AgentConf) MyStrNCopy(AgentConf->HostIPs[i], inet_ntoa(SockAddr), MAX_IP_LEN);
+			else HostIP->IPs[i] = ntohl(SockAddr.S_un.S_addr);
+		}
+		if (AgentConf) AgentConf->HostIPCnt = i;
+		else HostIP->IPCnt = i;
+
+		return TRUE;
+	}
+	else {
+		pWrite("Fail to Get HostIPs");
+
+		return FALSE;
 	}
 }
