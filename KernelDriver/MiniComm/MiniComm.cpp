@@ -834,26 +834,20 @@ VOID KillProcess(PCHAR ProcPath)
 	}
 }
 
-BOOL GetHostIPs(PAGT_CONF AgentConf, PHOST_IP HostIP)
+BOOL GetHostIPs(PHOST_IP HostIP)
 {
 	struct hostent* pHost = NULL;
 	struct in_addr SockAddr;
 	ULONG i;
 
-	if (AgentConf) {
-		gethostname(AgentConf->HostName, sizeof(AgentConf->HostName));
-		pHost = gethostbyname(AgentConf->HostName);
-	}
-	else if (HostIP) pHost = gethostbyname(HostIP->HostName);
+	pHost = gethostbyname(HostIP->HostName);
 
 	if (pHost && pHost->h_addrtype == AF_INET) {
 		for (i = 0; pHost->h_addr_list[i] && i < MAX_HOST_IP; i++) {
 			memcpy(&SockAddr, pHost->h_addr_list[i], pHost->h_length);
-			if (AgentConf) MyStrNCopy(AgentConf->HostIPs[i], inet_ntoa(SockAddr), MAX_IP_LEN);
-			else HostIP->IPs[i] = ntohl(SockAddr.S_un.S_addr);
+			HostIP->IPs[i] = ntohl(SockAddr.S_un.S_addr);
 		}
-		if (AgentConf) AgentConf->HostIPCnt = i;
-		else HostIP->IPCnt = i;
+		HostIP->IPCnt = i;
 
 		return TRUE;
 	}
@@ -862,4 +856,24 @@ BOOL GetHostIPs(PAGT_CONF AgentConf, PHOST_IP HostIP)
 
 		return FALSE;
 	}
+}
+
+BOOL CheckExistSession(ULONG SessionId)
+{
+	PWTS_SESSION_INFO pSessionInfo = NULL, TmpInfo;
+	ULONG i, SessionCnt = 0;
+	BOOL bRet = FALSE;
+
+	if (!WTSEnumerateSessions(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessionInfo, &SessionCnt))
+		return FALSE;
+
+	for (i = 0, TmpInfo = pSessionInfo; i < SessionCnt && TmpInfo && !bRet; i++, TmpInfo++) {
+		//if (TmpInfo->State != WTSActive) continue;
+
+		if (TmpInfo->SessionId == SessionId) bRet = TRUE;
+	}
+
+	if (pSessionInfo) WTSFreeMemory(pSessionInfo);
+
+	return bRet;
 }
