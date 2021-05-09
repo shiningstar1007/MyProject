@@ -877,3 +877,23 @@ BOOL CheckExistSession(ULONG SessionId)
 
 	return bRet;
 }
+
+BOOL CheckActiveSession(ULONG SessionId)
+{
+	PWTS_SESSION_INFO pSessionInfo = NULL, TmpInfo;
+	ULONG i, SessionCnt = 0;
+	BOOL bRet = FALSE;
+
+	if (!WTSEnumerateSessions(WTS_CURRENT_SERVER_HANDLE, 0, 1, &pSessionInfo, &SessionCnt))
+		return FALSE;
+
+	for (i = 0, TmpInfo = pSessionInfo; i < SessionCnt && TmpInfo && !bRet; i++, TmpInfo++) {
+		if (TmpInfo->State != WTSActive) continue;
+
+		if (TmpInfo->SessionId == SessionId) bRet = TRUE;
+	}
+
+	if (pSessionInfo) WTSFreeMemory(pSessionInfo);
+
+	return bRet;
+}
