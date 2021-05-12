@@ -931,3 +931,16 @@ VOID GetSessionIP(ULONG SessionId, PCHAR IPStr, PCHAR DefIP)
 	if (DefIP && *DefIP) MyStrNCopy(IPStr, DefIP, MAX_IP_LEN);
 
 }
+
+VOID GetClientHostName(ULONG SessionId, PCHAR ClientHostName)
+{
+	ULONG RetSize = 0;
+	PCHAR pBuffer = NULL;
+
+	if (WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, SessionId, WTSClientName,
+		&pBuffer, &RetSize) && pBuffer) {
+		MyStrNCopy(ClientHostName, pBuffer, MAX_HOST_LEN);
+		WTSFreeMemory(pBuffer);
+	}
+	else *ClientHostName = 0;
+}
