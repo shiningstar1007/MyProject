@@ -944,3 +944,39 @@ VOID GetClientHostName(ULONG SessionId, PCHAR ClientHostName)
 	}
 	else *ClientHostName = 0;
 }
+
+BOOL GetProcessPath(ULONG ProcessId, PCHAR ProcPath, BOOL bAddBit)
+{
+	HANDLE hProc;
+	CHAR FullPath[MAX_KPATH], * EnvName, * ProcName;
+	BOOL bIsWowProc = FALSE;
+
+	*ProcPath = 0;
+	if (ProcessId == 0) return FALSE;
+
+	hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, ProcessId);
+	if (!hProc) return FALSE;
+
+	if (GetModuleFileNameEx(hProc, NULL, FullPath, MAX_KPATH) > 0) {
+		if (!strncmp(FullPath, "\\??\\", 4)) EnvName = FullPath + 4;
+		else EnvName = FullPath;
+
+		if (*EnvName == '\\') { //\SystemRoot\smss.exe
+			ProcName = strchr(EnvName + 1, '\\');
+			if (ProcName) *ProcName++ = 0;
+
+			MySNPrintf(ProcPath, MAX_PATH, "%s\\%s", getenv(EnvName + 1), ProcName);
+		}
+		else MyStrNCpy(ProcPath, EnvName, MAX_PATH);
+
+		if (bAddBit) {
+#ifdef _WIN64
+			IsWow64Process(hProc, &bIsWowProc);
+#endif
+			if (bIsWowProc) MyStrNCat(ProcPath, " *32", MAX_PATH);
+		}
+	}
+	CloseHandle(hProc);
+
+	return (*ProcPath);
+}
