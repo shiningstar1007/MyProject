@@ -911,6 +911,21 @@ VOID GetSessionUser(ULONG SessionId, PCHAR UserName)
 	else *UserName = 0;
 }
 
+VOID GetSessionDomain(ULONG SessionId, PCHAR DomainName)
+{
+	ULONG RetSize = 0;
+	PCHAR pBuffer = NULL;
+
+	*DomainName = 0;
+	if (WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, SessionId, WTSDomainName,
+		&pBuffer, &RetSize) && pBuffer) {
+		if (RetSize > 1)
+			MySNPrintf(DomainName, MAX_PATH, "%s\\", pBuffer);
+
+		WTSFreeMemory(pBuffer);
+	}
+}
+
 VOID GetSessionIP(ULONG SessionId, PCHAR IPStr, PCHAR DefIP)
 {
 	ULONG RetSize = 0;
