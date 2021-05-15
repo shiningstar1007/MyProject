@@ -960,6 +960,48 @@ VOID GetClientHostName(ULONG SessionId, PCHAR ClientHostName)
 	else *ClientHostName = 0;
 }
 
+ULONG FindProcessPathEx(PCHAR ProcPath, PULONG SessionId, PCHAR CreateTime)
+{
+	HMODULE hNtDll = NULL;
+	CHAR TmpPath[MAX_KPATH];
+	PVOID ProcListBuf;
+	PSYSTEM_PROCESSES pProcess;
+	ULONG ProcessId = 0, TmpSessionId;
+
+	if (!_ZwQuerySystemInformation) hNtDll = SetNAPIAddr();
+
+	ProcListBuf = GetProcessList();
+	if (!ProcListBuf) return 0;
+
+	for (pProcess = (PSYSTEM_PROCESSES)ProcListBuf; pProcess;) {
+		if (GetProcessPath((ULONG)pProcess->ProcessId, TmpPath, FALSE) &&
+			!_stricmp(TmpPath, ProcPath)) {
+			if (SessionId) ProcessIdToSessionId((ULONG)pProcess->ProcessId, &TmpSessionId);
+
+			if (!SessionId || *SessionId == TmpSessionId) {
+				ProcessId = (ULONG)pProcess->ProcessId;
+
+				if (CreateTime) {
+					FILETIME FileTime;
+
+					FileTime.dwHighDateTime = pProcess->CreateTime.HighPart;
+					FileTime.dwLowDateTime = pProcess->CreateTime.LowPart;
+					FileTimeToStr(&FileTime, CreateTime, NULL);
+				}
+				break;
+			}
+		}
+
+		if (pProcess->NextEntryDelta == 0) break;
+		else pProcess = (PSYSTEM_PROCESSES)((LPBYTE)pProcess + pProcess->NextEntryDelta);
+	} //for (pProcess = (PSYSTEM_PROCESSES)ProcListBuf; pProcess;) {
+
+	free(ProcListBuf);
+	if (hNtDll) FreeLibrary(hNtDll);
+
+	return ProcessId;
+}
+
 BOOL GetProcessPath(ULONG ProcessId, PCHAR ProcPath, BOOL bAddBit)
 {
 	HANDLE hProc;
