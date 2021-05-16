@@ -104,6 +104,27 @@ HRESULT SendMessageDriver(MINI_COMMAND Cmd, PBYTE InByte, ULONG InSize, PBYTE Ou
 	return hResult;
 }
 
+PCHAR FileTimeToStr(PFILETIME FileTime, PCHAR TimeStr, PCHAR TimeNumOnly)
+{
+	SYSTEMTIME SysTime;
+	FILETIME LocalTime;
+
+	FileTimeToLocalFileTime(FileTime, &LocalTime);
+	FileTimeToSystemTime(&LocalTime, &SysTime);
+
+	if (TimeStr) {
+		MySNPrintf(TimeStr, 32, "\"%04u-%02u-%02u %02u:%02u:%02u\"", SysTime.wYear, SysTime.wMonth,
+			SysTime.wDay, SysTime.wHour, SysTime.wMinute, SysTime.wSecond);
+	}
+
+	if (TimeNumOnly) {
+		MySNPrintf(TimeNumOnly, 32, "%04u%02u%02u%02u%02u%02u", SysTime.wYear, SysTime.wMonth,
+			SysTime.wDay, SysTime.wHour, SysTime.wMinute, SysTime.wSecond);
+	}
+
+	return TimeStr;
+}
+
 PCHAR Trim(PCHAR SourceStr)
 {
 	if (!SourceStr) return NULL;
@@ -1024,12 +1045,10 @@ BOOL GetProcessPath(ULONG ProcessId, PCHAR ProcPath, BOOL bAddBit)
 
 			MySNPrintf(ProcPath, MAX_PATH, "%s\\%s", getenv(EnvName + 1), ProcName);
 		}
-		else MyStrNCpy(ProcPath, EnvName, MAX_PATH);
+		else MyStrNCopy(ProcPath, EnvName, MAX_PATH);
 
 		if (bAddBit) {
-#ifdef _WIN64
-			IsWow64Process(hProc, &bIsWowProc);
-#endif
+
 			if (bIsWowProc) MyStrNCat(ProcPath, " *32", MAX_PATH);
 		}
 	}
