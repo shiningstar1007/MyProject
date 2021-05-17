@@ -125,6 +125,18 @@ PCHAR FileTimeToStr(PFILETIME FileTime, PCHAR TimeStr, PCHAR TimeNumOnly)
 	return TimeStr;
 }
 
+PCHAR MyStrNCat(PCHAR DestBuf, PCHAR SourceBuf, ULONG MaxLen)
+{
+	ULONG DestLen;
+
+	if (!DestBuf || !SourceBuf) return "";
+
+	DestLen = (ULONG)strlen(DestBuf);
+	MyStrNCopy(DestBuf + DestLen, SourceBuf, MaxLen - DestLen);
+
+	return DestBuf;
+}
+
 PCHAR Trim(PCHAR SourceStr)
 {
 	if (!SourceStr) return NULL;
