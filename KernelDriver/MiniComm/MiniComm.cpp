@@ -137,6 +137,18 @@ PCHAR MyStrNCat(PCHAR DestBuf, PCHAR SourceBuf, ULONG MaxLen)
 	return DestBuf;
 }
 
+PWCHAR MyStrNCatW(PWCHAR DestBuf, PWCHAR SourceBuf, ULONG MaxLen)
+{
+	ULONG DestLen;
+
+	if (!DestBuf || !SourceBuf) return L"";
+
+	DestLen = (ULONG)wcslen(DestBuf);
+	MyStrNCopyW(DestBuf + DestLen, SourceBuf, -1, MaxLen - DestLen);
+
+	return DestBuf;
+}
+
 PCHAR Trim(PCHAR SourceStr)
 {
 	if (!SourceStr) return NULL;
@@ -256,30 +268,6 @@ PCHAR QuotaDelete(PCHAR SourceStr)
 	return SourceStr;
 }
 
-PCHAR QuotaDelete(PCHAR SourceStr)
-{
-	PCHAR SourceBuf, SourceChr, TargetStr = SourceStr;
-	ULONG SourceLen;
-
-	if (!SourceStr || !*SourceStr) return SourceStr;
-
-	SourceLen = (ULONG)strlen(SourceStr) + 1;
-	SourceBuf = (PCHAR)malloc(SourceLen);
-	if (SourceBuf) {
-		MyStrNCopy(SourceBuf, SourceStr, SourceLen);
-		for (SourceChr = SourceBuf; *SourceChr; SourceChr++, TargetStr++) {
-			if (*SourceChr == CHR_QUOTA && *(SourceChr + 1) == CHR_QUOTA) SourceChr++;
-
-			*TargetStr = *SourceChr;
-		}
-		*TargetStr = 0;
-
-		free(SourceBuf);
-	}
-
-	return SourceStr;
-}
-
 ULONG MyStrNCopy(PCHAR DestBuf, CONST PCHAR SourceBuf, ULONG MaxLen)
 {
 	ULONG SourceLen;
@@ -293,6 +281,7 @@ ULONG MyStrNCopy(PCHAR DestBuf, CONST PCHAR SourceBuf, ULONG MaxLen)
 
 	return SourceLen;
 }
+
 
 ULONG MyStrNCopyW(PWCHAR DestBuf, CONST PWCHAR SourceBuf, ULONG SourceLen, ULONG MaxLen)
 {
