@@ -104,6 +104,28 @@ HRESULT SendMessageDriver(MINI_COMMAND Cmd, PBYTE InByte, ULONG InSize, PBYTE Ou
 	return hResult;
 }
 
+BOOL SetStrBuffer(PSTR_BUF StrBuf)
+{
+	ULONG BufSize;
+
+	if (!StrBuf) return FALSE;
+
+	if (StrBuf->BufSize == 0) BufSize = BUF_UNIT;
+	else if (StrBuf->BufSize < BUF_UNIT) BufSize = StrBuf->BufSize + BUF_UNIT;
+	else BufSize = StrBuf->BufSize * 2;
+
+	StrBuf->BufSize = 0;
+	if (StrBuf->Buffer) free(StrBuf->Buffer);
+
+	StrBuf->Buffer = (PCHAR)malloc(BufSize);
+	if (!StrBuf->Buffer) return FALSE;
+
+	StrBuf->BufSize = BufSize;
+	memset(StrBuf->Buffer, 0, StrBuf->BufSize);
+
+	return TRUE;
+}
+
 PCHAR FileTimeToStr(PFILETIME FileTime, PCHAR TimeStr, PCHAR TimeNumOnly)
 {
 	SYSTEMTIME SysTime;
