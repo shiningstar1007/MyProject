@@ -126,6 +126,17 @@ BOOL SetStrBuffer(PSTR_BUF StrBuf)
 	return TRUE;
 }
 
+VOID FreeStrBuffer(PSTR_BUF StrBuf)
+{
+	if (!StrBuf) return;
+
+	if (StrBuf->Buffer) {
+		free(StrBuf->Buffer);
+		StrBuf->Buffer = NULL;
+	}
+	StrBuf->BufSize = 0;
+}
+
 PCHAR FileTimeToStr(PFILETIME FileTime, PCHAR TimeStr, PCHAR TimeNumOnly)
 {
 	SYSTEMTIME SysTime;
