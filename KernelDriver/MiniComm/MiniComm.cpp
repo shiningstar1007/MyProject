@@ -532,29 +532,6 @@ HMODULE SetNAPIAddr()
 	return hNtDll;
 }
 
-PVOID GetProcessList()
-{
-	NTSTATUS Status;
-	ULONG cbBuffer = 0x8000;
-	PVOID ProcListBuf = NULL;
-
-	while (_ZwQuerySystemInformation) {
-		ProcListBuf = malloc(cbBuffer);
-		if (!ProcListBuf) return NULL;
-
-		Status = _ZwQuerySystemInformation(SystemProcessesAndThreadsInformation,
-			ProcListBuf, cbBuffer, NULL);
-		if (Status) {
-			free(ProcListBuf);
-			if (Status == STATUS_INFO_LENGTH_MISMATCH) cbBuffer *= 2;
-			else return NULL;
-		}
-		else break;
-	}
-
-	return ProcListBuf;
-}
-
 ULONG GetParentProcessId(ULONG ProcessId)
 {
 	ULONG ParentId = ProcessId;
@@ -1112,4 +1089,33 @@ BOOL GetProcessPath(ULONG ProcessId, PCHAR ProcPath, BOOL bAddBit)
 	CloseHandle(hProc);
 
 	return (*ProcPath);
+}
+
+LPENUM_SERVICE_STATUS_PROCESS NTServiceList(PULONG SvcReturned)
+{
+	ULONG ErrCode = -1;
+	SC_HANDLE hSCM;
+	LPENUM_SERVICE_STATUS_PROCESS Services = NULL;
+	ULONG ByteNeeded = 0;
+
+	hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	if (!hSCM) return NULL;
+
+	EnumServicesStatusEx(hSCM, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
+		NULL, 0, &ByteNeeded, SvcReturned, NULL, NULL);
+	if (GetLastError() == ERROR_MORE_DATA && ByteNeeded > 0) {
+		Services = (LPENUM_SERVICE_STATUS_PROCESS)malloc(ByteNeeded);
+		if (Services) {
+			if (EnumServicesStatusEx(hSCM, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
+				(LPBYTE)Services, ByteNeeded, &ByteNeeded, SvcReturned, NULL, NULL))
+				ErrCode = 0;
+		}
+	}
+
+	CloseServiceHandle(hSCM);
+
+	if (ErrCode == 0) return Services;
+	else if (Services) free(Services);
+
+	return NULL;
 }
