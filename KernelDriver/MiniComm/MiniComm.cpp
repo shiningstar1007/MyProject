@@ -1091,6 +1091,31 @@ BOOL GetProcessPath(ULONG ProcessId, PCHAR ProcPath, BOOL bAddBit)
 	return (*ProcPath);
 }
 
+ULONG NTServiceGetStart(PCHAR SvcName)
+{
+	SC_HANDLE hSCM, hSrv;
+	CHAR Buffer[2048] = { 0 };
+	LPQUERY_SERVICE_CONFIG SvcConfig = (LPQUERY_SERVICE_CONFIG)Buffer;
+	ULONG BytesNeeded = 0, StartType = -1;
+
+	hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
+	if (!hSCM) return SERVICE_STOPPED;
+
+	hSrv = OpenService(hSCM, SvcName, SERVICE_QUERY_CONFIG);
+	if (!hSrv) {
+		CloseServiceHandle(hSCM);
+		return -1;
+	}
+
+	if (QueryServiceConfig(hSrv, SvcConfig, sizeof(Buffer), &BytesNeeded))
+		StartType = SvcConfig->dwStartType;
+
+	CloseServiceHandle(hSrv);
+	CloseServiceHandle(hSCM);
+
+	return StartType;
+}
+
 LPENUM_SERVICE_STATUS_PROCESS NTServiceList(PULONG SvcReturned)
 {
 	ULONG ErrCode = -1;
