@@ -1116,6 +1116,28 @@ ULONG NTServiceGetStart(PCHAR SvcName)
 	return StartType;
 }
 
+ULONG NTServiceStatus(PCHAR SvcName)
+{
+	SC_HANDLE hSCM, hSrv;
+	SERVICE_STATUS SvcStat = { 0 };
+
+	hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
+	if (!hSCM) return SERVICE_STOPPED;
+
+	hSrv = OpenService(hSCM, SvcName, SERVICE_QUERY_STATUS);
+	if (!hSrv) {
+		CloseServiceHandle(hSCM);
+		return SERVICE_STOPPED;
+	}
+
+	QueryServiceStatus(hSrv, &SvcStat);
+
+	CloseServiceHandle(hSrv);
+	CloseServiceHandle(hSCM);
+
+	return SvcStat.dwCurrentState;
+}
+
 LPENUM_SERVICE_STATUS_PROCESS NTServiceList(PULONG SvcReturned)
 {
 	ULONG ErrCode = -1;
