@@ -1116,6 +1116,48 @@ ULONG NTServiceGetStart(PCHAR SvcName)
 	return StartType;
 }
 
+BOOL NTServiceStart(PCHAR SvcName, BOOL bWaitDone, PCHAR Params)
+{
+	SC_HANDLE hSCM, hSrv;
+	SERVICE_STATUS SvcStat = { 0 };
+	BOOL Ret = FALSE;
+	ULONG WaitSec = 0;
+
+	hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	if (!hSCM) return FALSE;
+
+	hSrv = OpenService(hSCM, SvcName, SERVICE_ALL_ACCESS);
+	if (!hSrv) {
+		CloseServiceHandle(hSCM);
+		return FALSE;
+	}
+
+	QueryServiceStatus(hSrv, &SvcStat);
+	if (SvcStat.dwCurrentState == SERVICE_STOPPED) {
+		if (Params) {
+			PCHAR ArgVal[1];
+
+			ArgVal[0] = Params;
+			StartService(hSrv, 1, (LPCSTR*)ArgVal);
+		}
+		else StartService(hSrv, 0, NULL);
+
+		if (bWaitDone) {
+			for (; WaitSec < ONEMINUTE && SvcStat.dwCurrentState != SERVICE_RUNNING; WaitSec++) {
+				Sleep(1000);
+				QueryServiceStatus(hSrv, &SvcStat);
+				if (SvcStat.dwCurrentState == SERVICE_STOPPED) break;
+			}
+		}
+		else Sleep(500);
+	}
+
+	CloseServiceHandle(hSrv);
+	CloseServiceHandle(hSCM);
+
+	return TRUE;
+}
+
 BOOL NTServiceStop(PCHAR SvcName, DWORD dwControl, BOOL bWaitDone)
 {
 	SC_HANDLE hSCM, hSrv;
