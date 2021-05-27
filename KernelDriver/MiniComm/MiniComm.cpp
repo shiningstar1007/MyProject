@@ -1091,6 +1091,21 @@ BOOL GetProcessPath(ULONG ProcessId, PCHAR ProcPath, BOOL bAddBit)
 	return (*ProcPath);
 }
 
+BOOL NTServiceSetStart(PCHAR SvcName, ULONG StartType)
+{
+	HKEY hKey;
+	CHAR SvcRegPath[MAX_PATH];
+
+	MySNPrintf(SvcRegPath, MAX_PATH, "%s\\%s", REG_SERVICE, SvcName);
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, SvcRegPath, 0, KEY_SET_VALUE, &hKey) != ERROR_SUCCESS)
+		return FALSE;
+
+	RegSetValueEx(hKey, "Start", 0, REG_DWORD, (unsigned char*)&StartType, sizeof(DWORD));
+	RegCloseKey(hKey);
+
+	return TRUE;
+}
+
 ULONG NTServiceGetStart(PCHAR SvcName)
 {
 	SC_HANDLE hSCM, hSrv;
