@@ -1091,6 +1091,28 @@ BOOL GetProcessPath(ULONG ProcessId, PCHAR ProcPath, BOOL bAddBit)
 	return (*ProcPath);
 }
 
+BOOL NTServiceUninstall(PCHAR SvcName, DWORD dwControl)
+{
+	SC_HANDLE hSCM, hSrv;
+	SERVICE_STATUS SvcStat = { 0 };
+	BOOL Ret = TRUE;
+
+	NTServiceStop(SvcName, dwControl, TRUE);
+
+	hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	if (!hSCM) return FALSE;
+
+	hSrv = OpenService(hSCM, SvcName, SERVICE_ALL_ACCESS);
+	if (hSrv) {
+		Ret = DeleteService(hSrv);
+		CloseServiceHandle(hSrv);
+	}
+
+	CloseServiceHandle(hSCM);
+
+	return Ret;
+}
+
 BOOL NTServiceSetStart(PCHAR SvcName, ULONG StartType)
 {
 	HKEY hKey;
