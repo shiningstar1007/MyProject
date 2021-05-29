@@ -1091,6 +1091,68 @@ BOOL GetProcessPath(ULONG ProcessId, PCHAR ProcPath, BOOL bAddBit)
 	return (*ProcPath);
 }
 
+BOOL NTServiceInstall(PCHAR SvcName, PCHAR DispName, PCHAR SvcPath,
+	DWORD dwStartType, PCHAR Description, BOOL bAddAction, PCHAR Dependencies)
+{
+	SC_HANDLE hSCM, hSrv;
+	BOOL Ret = FALSE;
+	CHAR MsgStr[128];
+
+	hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	if (!hSCM) return FALSE;
+
+	hSrv = OpenService(hSCM, SvcName, SERVICE_ALL_ACCESS);
+	if (hSrv);//ServiceReInstall(SvcName, SvcPath, dwStartType);
+	else {
+		hSrv = CreateService(hSCM, SvcName, DispName, SERVICE_ALL_ACCESS,
+			SERVICE_WIN32_OWN_PROCESS, dwStartType, SERVICE_ERROR_NORMAL, SvcPath,
+			NULL, NULL, Dependencies, NULL, NULL);
+		if (hSrv) {
+			typedef BOOL(__stdcall* CSC2)(SC_HANDLE, DWORD, LPVOID);
+			CHAR SysDllPath[MAX_KPATH];
+			HINSTANCE hInstance = LoadLibrary(GetSystemFilePath(SysDllPath, "advapi32.dll"));
+
+			if (hInstance) {
+				CSC2 pProcAddr = (CSC2)GetProcAddress(hInstance, "ChangeServiceConfig2A");
+
+				if (pProcAddr) {
+					SERVICE_DESCRIPTION sdBuf;
+
+					sdBuf.lpDescription = Description;
+					(pProcAddr)(hSrv, SERVICE_CONFIG_DESCRIPTION, &sdBuf);
+
+					if (bAddAction) {
+						SERVICE_FAILURE_ACTIONS sfaBuf = { 0 };
+						SC_ACTION Action[3];
+
+						memset(Action, 0, sizeof(SC_ACTION) * 3);
+						Action[0].Type = SC_ACTION_RESTART;
+						Action[0].Delay = 1000 * 60;
+
+						sfaBuf.cActions = 3;
+						sfaBuf.lpsaActions = Action;
+						(pProcAddr)(hSrv, SERVICE_CONFIG_FAILURE_ACTIONS, &sfaBuf);
+					}
+				}
+
+				FreeLibrary(hInstance);
+			}
+		}
+	}
+	if (hSrv) {
+		Ret = TRUE;
+		CloseServiceHandle(hSrv);
+	}
+	else {
+		MySNPrintf(MsgStr, sizeof(MsgStr), "Failed to install %s", SvcName);
+		MessageBox(NULL, MsgStr, "Fail", MB_OK | MB_ICONERROR);
+	}
+
+	CloseServiceHandle(hSCM);
+
+	return Ret;
+}
+
 BOOL NTServiceUninstall(PCHAR SvcName, DWORD dwControl)
 {
 	SC_HANDLE hSCM, hSrv;
