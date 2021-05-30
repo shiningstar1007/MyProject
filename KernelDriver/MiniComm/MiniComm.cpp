@@ -1346,3 +1346,21 @@ LPENUM_SERVICE_STATUS_PROCESS NTServiceList(PULONG SvcReturned)
 
 	return NULL;
 }
+
+BOOL CheckUserName(PCHAR UserName)
+{
+	NET_API_STATUS nStatus;
+	PUSER_INFO_0 UserInfo0 = NULL;
+	WCHAR UserNameW[MAX_USER_NAME] = { 0 };
+
+	if (!UserName || !*UserName) return FALSE;
+
+	if (strlen(UserName) >= MAX_USER_NAME) return FALSE;
+
+	MultiByteToWideChar(CP_ACP, 0, UserName, (int)strlen(UserName) + 1, UserNameW,
+		MAX_USER_NAME - 1);
+	nStatus = NetUserGetInfo(NULL, UserNameW, 0, (LPBYTE*)&UserInfo0);
+	if (UserInfo0) NetApiBufferFree(UserInfo0);
+
+	return (nStatus == NERR_Success);
+}
