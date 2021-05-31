@@ -1364,3 +1364,21 @@ BOOL CheckUserName(PCHAR UserName)
 
 	return (nStatus == NERR_Success);
 }
+
+BOOL CheckGroupName(PCHAR GroupName)
+{
+	NET_API_STATUS nStatus;
+	PLOCALGROUP_INFO_1 GroupInfo1 = NULL;
+	WCHAR GroupNameW[MAX_USER_NAME] = { 0 };
+
+	if (!GroupName || !*GroupName) return FALSE;
+
+	if (strlen(GroupName) >= MAX_USER_NAME) return FALSE;
+
+	MultiByteToWideChar(CP_ACP, 0, GroupName, (int)strlen(GroupName) + 1, GroupNameW,
+		MAX_USER_NAME - 1);
+	nStatus = NetLocalGroupGetInfo(NULL, GroupNameW, 1, (LPBYTE*)&GroupInfo1);
+	if (GroupInfo1) NetApiBufferFree(GroupInfo1);
+
+	return (nStatus == NERR_Success);
+}
