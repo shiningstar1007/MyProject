@@ -1382,3 +1382,56 @@ BOOL CheckGroupName(PCHAR GroupName)
 
 	return (nStatus == NERR_Success);
 }
+
+BOOL CheckGroupMember(PWCHAR DomainNameW, PWCHAR UserNameW, PCHAR GroupStr, GROUP_TYPE GroupType)
+{
+	TOSERR ErrCode = ERR_AGT_SUCCESS;
+	CHAR GroupName[MAX_PATH * 2];
+	PGROUP_USERS_INFO_0 pGroups = NULL, TmpGroup;
+	ULONG PreMax = -1, EntriesRead = 0, TotalEntries = 0, GroupCnt, TmpLen;
+	NET_API_STATUS nStatus;
+
+	PCHAR Group, NextGroup, TmpStr;
+	BOOL bFound = FALSE;
+
+	TmpLen = (ULONG)strlen(GroupStr) + 1;
+	TmpStr = (PCHAR)malloc(TmpLen);
+	if (!TmpStr) return FALSE;
+
+	do {
+		if (GroupType == GRT_LOCAL) {
+			nStatus = NetUserGetLocalGroups(DomainNameW, UserNameW, 0,
+				LG_INCLUDE_INDIRECT, (LPBYTE*)&pGroups, PreMax, &EntriesRead, &TotalEntries);
+		}
+		else {
+			nStatus = NetUserGetGroups(DomainNameW, UserNameW, 0, (LPBYTE*)&pGroups, PreMax,
+				&EntriesRead, &TotalEntries);
+		}
+		if (nStatus == NERR_UserNotFound) ErrCode = ERR_USER_NOT_FOUND;
+		else if ((nStatus != NERR_Success) && (nStatus != ERROR_MORE_DATA)) ErrCode = nStatus;
+
+		MyStrNCopy(TmpStr, GroupStr, TmpLen);
+		NextGroup = TmpStr;
+		while (NextGroup && ErrCode == ERR_AGT_SUCCESS && !bFound) {
+			Group = MyStrTok(NextGroup, SEP_COMMA, &NextGroup, FALSE);
+			if (!Group) break;
+
+			for (GroupCnt = 0, TmpGroup = pGroups; GroupCnt < EntriesRead && TmpGroup; GroupCnt++, TmpGroup++) {
+				memset(GroupName, 0, sizeof(GroupName));
+				WideCharToMultiByte(CP_ACP, 0, TmpGroup->grui0_name, -1, GroupName, MAX_PATH - 1, NULL, FALSE);
+
+				if (!_stricmp(Group, GroupName)) {
+					bFound = TRUE;
+					break;
+				}
+			}
+		}
+
+		if (pGroups) {
+			NetApiBufferFree(pGroups);
+			pGroups = NULL;
+		}
+	} while (nStatus == ERROR_MORE_DATA && ErrCode == ERR_AGT_SUCCESS);
+
+	return bFound;
+}
