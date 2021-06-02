@@ -1435,3 +1435,27 @@ BOOL CheckGroupMember(PWCHAR DomainNameW, PWCHAR UserNameW, PCHAR GroupStr, GROU
 
 	return bFound;
 }
+
+VOID GetProcessUserName(HANDLE hProcess, PCHAR UserName)
+{
+	HANDLE hToken;
+	CHAR UserBuf[256];
+	DWORD dwRet = 0, dwName = 32;
+
+	if (!hProcess || !UserName) return;
+
+	UserName[0] = 0;
+
+	if (!OpenProcessToken(hProcess, TOKEN_QUERY, &hToken)) return;
+
+	if (GetTokenInformation(hToken, TokenUser, UserBuf, sizeof(UserBuf), &dwRet)) {
+		CHAR szDomain[256];
+		DWORD dwDomain = sizeof(szDomain);
+		SID_NAME_USE peUse;
+		PTOKEN_USER pUser = (PTOKEN_USER)UserBuf;
+
+		LookupAccountSid(NULL, pUser->User.Sid, UserName, &dwName, szDomain, &dwDomain, &peUse);
+	}
+
+	CloseHandle(hToken);
+}
