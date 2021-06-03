@@ -1459,3 +1459,36 @@ VOID GetProcessUserName(HANDLE hProcess, PCHAR UserName)
 
 	CloseHandle(hToken);
 }
+
+BOOL StartProcessSession(PCHAR Command, ULONG SessionId, BOOL bWait)
+{
+	HANDLE hToken;
+	STARTUPINFO StartInfo = { 0 };
+	PROCESS_INFORMATION ProcInfo = { 0 };
+	CHAR SysDllPath[MAX_KPATH];
+	HINSTANCE hWtsApi = LoadLibrary(GetSystemFilePath(SysDllPath, "WtsApi32.dll"));
+	BOOL bRetValue = FALSE;
+
+	if (!hWtsApi) return bRetValue;
+
+	*(FARPROC*)&_WTSQueryUserToken = GetProcAddress(hWtsApi, "WTSQueryUserToken");
+
+	if (_WTSQueryUserToken && _WTSQueryUserToken(SessionId, &hToken)) {
+		StartInfo.cb = sizeof(STARTUPINFO);
+		if (CreateProcessAsUser(hToken, NULL, AddQuots(Command), NULL, NULL, FALSE, 0, NULL, NULL,
+			&StartInfo, &ProcInfo)) {
+			if (bWait) WaitForInputIdle(ProcInfo.hProcess, 10000);
+
+			CloseHandle(ProcInfo.hProcess);
+			CloseHandle(ProcInfo.hThread);
+
+			bRetValue = TRUE;
+		}
+
+		CloseHandle(hToken);
+	}
+
+	FreeLibrary(hWtsApi);
+
+	return bRetValue;
+}
