@@ -1492,3 +1492,39 @@ BOOL StartProcessSession(PCHAR Command, ULONG SessionId, BOOL bWait)
 
 	return bRetValue;
 }
+
+DWORD WINAPI RestartProcess(LPVOID Param)
+{
+	PRESTART_PROC Restart = (PRESTART_PROC)Param;
+	CHAR ProcPath[MAX_KPATH] = { 0 }, AgentDir[MAX_KPATH];
+	ULONG ProcessId, i;
+	HANDLE hProcess;
+
+	if (!Restart) return 0;
+
+	//Kill Process
+	MyStrNCopy(ProcPath, Restart->FilePath, MAX_KPATH);
+
+	if (*ProcPath) {
+		ProcessId = FindProcessPathEx(ProcPath, &Restart->SessionId, NULL);
+		if (ProcessId) {
+			hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, ProcessId);
+			if (hProcess) {
+				if (TerminateProcess(hProcess, 0)) {
+					for (i = 0; i < CONN_TIMEOUT; i++) {
+						Sleep(1000);
+						if (!FindProcessPathEx(ProcPath, &Restart->SessionId, NULL)) break;
+					}
+				}
+
+				CloseHandle(hProcess);
+			}
+		}
+		//Create Process
+		StartProcessSession(ProcPath, Restart->SessionId, TRUE);
+	}
+
+	free(Restart);
+
+	return 0;
+}
