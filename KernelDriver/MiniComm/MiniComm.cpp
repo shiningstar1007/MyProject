@@ -1528,3 +1528,49 @@ DWORD WINAPI RestartProcess(LPVOID Param)
 
 	return 0;
 }
+
+BOOL GetSessionIPByHostName(ULONG SessionId, PCHAR IPStr)
+{
+	CHAR HostName[MAX_NAME] = { 0 };
+	WSADATA WSAData;
+
+	struct addrinfo* pAddrInfo = NULL, * pAddr = NULL;
+	struct addrinfo Hints;
+	struct sockaddr_in* pClientIP;
+	DWORD dwRetval;
+
+	GetClientHostName(SessionId, HostName);
+	if (!*HostName) return FALSE;
+
+	WSAStartup(MAKEWORD(2, 2), &WSAData);
+
+	ZeroMemory(&Hints, sizeof(Hints));
+	Hints.ai_family = AF_UNSPEC;
+	Hints.ai_socktype = SOCK_STREAM;
+	Hints.ai_protocol = IPPROTO_TCP;
+
+	dwRetval = getaddrinfo(HostName, "0", &Hints, &pAddrInfo);
+	if (dwRetval) {
+		pWriteF("getaddrinfo failed with error: %d", dwRetval);
+		WSACleanup();
+
+		return FALSE;
+	}
+
+	for (pAddr = pAddrInfo; pAddr != NULL; pAddr = pAddr->ai_next) {
+		switch (pAddr->ai_family) {
+		case AF_INET:
+			pClientIP = (struct sockaddr_in*)pAddr->ai_addr;
+			MySNPrintf(IPStr, MAX_IP_LEN, "%s", inet_ntoa(pClientIP->sin_addr));
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	freeaddrinfo(pAddrInfo);
+	WSACleanup();
+
+	return *IPStr ? TRUE : FALSE;
+}
