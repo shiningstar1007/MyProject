@@ -1574,3 +1574,78 @@ BOOL GetSessionIPByHostName(ULONG SessionId, PCHAR IPStr)
 
 	return *IPStr ? TRUE : FALSE;
 }
+
+BOOL GetSessionNetList(PCHAR NetListStr, ULONG MaxNetCnt)
+{
+	ULONG Len = 0;
+	PCHAR pTemp;
+	CHAR TmpName[300] = { 0, }, CmdLine[320] = { 0, }, LineBuf[1024] = { 0, };
+	STARTUPINFO StartInfo = { 0 };
+	PROCESS_INFORMATION ProcInfo = { 0 };
+	ULONG TickCount = GetTickCount(), nLimitTime = 8, WaitRet;
+	FILE* fp;
+	HKEY hKey;
+	ULONG DataLen, Port = 3389;
+	ULONG NetCnt = 0;
+
+	pTemp = getenv("TEMP");
+	if (pTemp) MySNPrintf(TmpName, sizeof(TmpName), "%s\\scvnetlist", pTemp);
+	else MySNPrintf(TmpName, sizeof(TmpName), "C:\\scvnetlist");
+
+	//netstat
+	if (RegOpenKey(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp", &hKey) == ERROR_SUCCESS) {
+		DataLen = sizeof(ULONG);
+		RegQueryValueEx(hKey, "PortNumber", NULL, NULL, (PBYTE)&Port, &DataLen);
+		RegCloseKey(hKey);
+	}
+
+	pWriteF("GetSessionNetList netstat[%s], port[%u]", TmpName, Port);
+	MySNPrintf(CmdLine, sizeof(CmdLine),
+		"cmd /c netstat -an | findstr %u | findstr ESTABLISHED > %s 2>&1", Port, TmpName);
+
+	ZeroMemory(&StartInfo, sizeof(StartInfo));
+	ZeroMemory(&ProcInfo, sizeof(ProcInfo));
+	StartInfo.cb = sizeof(StartInfo);
+	if (!CreateProcess(NULL, CmdLine, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL,
+		&StartInfo, &ProcInfo))
+		return FALSE;
+
+	CloseHandle(ProcInfo.hThread);
+	WaitRet = WaitForSingleObject(ProcInfo.hProcess, nLimitTime * 1000);
+	if (WaitRet != WAIT_OBJECT_0) {
+		TerminateProcess(ProcInfo.hProcess, 0);
+		DeleteFile(TmpName);
+		CloseHandle(ProcInfo.hProcess);
+		return FALSE;
+	}
+	CloseHandle(ProcInfo.hProcess);
+
+	fp = fopen(TmpName, "rt");
+	if (!fp) return FALSE;
+
+	while (!feof(fp)) {
+		memset(LineBuf, 0x00, sizeof(LineBuf));
+		fgets(LineBuf, sizeof(LineBuf), fp);
+
+		if (!strstr(LineBuf, "TCP ")) continue;
+
+		//TCP    192.168.152.11:3389    192.168.150.211:1201   ESTABLISHED
+		if (NetCnt >= MaxNetCnt) {
+			pWriteF("GetSessionNetList Overflow, MaxNetCnt[%d]", MaxNetCnt);
+			break;
+		}
+
+		if (Len > 0) Len += MySNPrintf(NetListStr + Len, (MAX_NET_LEN + 1) * MaxNetCnt - Len, ",");
+
+		Len += MySNPrintf(NetListStr + Len, (MAX_NET_LEN + 1) * MaxNetCnt - Len, "%s",
+			Trim(LineBuf, FALSE));
+		NetCnt++;
+	}
+
+	*(NetListStr + Len) = '\0';
+
+	fclose(fp);
+	DeleteFile(TmpName);
+
+	return (Len > 0);
+}
