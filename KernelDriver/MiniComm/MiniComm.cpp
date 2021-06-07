@@ -1649,3 +1649,32 @@ BOOL GetSessionNetList(PCHAR NetListStr, ULONG MaxNetCnt)
 
 	return (Len > 0);
 }
+
+BOOL AddToACL(PACL* pACL, const PCHAR AccountName, ULONG AccessOption)
+{
+	CHAR  SIdBuf[MAX_PATH] = { 0 };
+	DWORD SIdLen = MAX_PATH;
+	CHAR  Domain[MAX_PATH] = { 0 };
+	DWORD DomainLen = MAX_PATH;
+	SID_NAME_USE SNU;
+	PACL TmpACL = NULL;
+	EXPLICIT_ACCESS ExAcc = { 0 };
+
+	if (!LookupAccountName(NULL, AccountName, (PSID)SIdBuf, &SIdLen, Domain, &DomainLen, &SNU))
+		return FALSE;
+
+	ExAcc.grfAccessPermissions = AccessOption;
+	ExAcc.grfAccessMode = SET_ACCESS;
+	ExAcc.grfInheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
+	ExAcc.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+	ExAcc.Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
+	ExAcc.Trustee.ptstrName = (LPTSTR)(PSID)SIdBuf;
+
+	if (SetEntriesInAcl(1, &ExAcc, *pACL, &TmpACL) != ERROR_SUCCESS)
+		return FALSE;
+
+	LocalFree(*pACL);
+	*pACL = TmpACL;
+
+	return TRUE;
+}
