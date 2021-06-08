@@ -1678,3 +1678,30 @@ BOOL AddToACL(PACL* pACL, const PCHAR AccountName, ULONG AccessOption)
 
 	return TRUE;
 }
+
+BOOL ChangeFileSecurity(PCHAR FilePath)
+{
+	BOOL bRet = FALSE;
+	BYTE SDBuffer[4096] = { 0 };
+	ULONG SDLength = 4096;
+	PSECURITY_DESCRIPTOR SD = (PSECURITY_DESCRIPTOR)SDBuffer;
+	PACL pACL;
+	ULONG AccessOption = GENERIC_ALL | GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE;
+
+	if (!InitializeSecurityDescriptor(SD, SECURITY_DESCRIPTOR_REVISION)) return FALSE;
+
+	pACL = (PACL)LocalAlloc(LMEM_FIXED, sizeof(ACL));
+	if (!pACL) return FALSE;
+
+	if (InitializeAcl(pACL, MAX_PATH, ACL_REVISION)) {
+		AddToACL(&pACL, "Everyone", AccessOption);
+
+		if (SetSecurityDescriptorDacl(SD, TRUE, pACL, TRUE)) {
+			bRet = SetFileSecurity(FilePath, DACL_SECURITY_INFORMATION, SD);
+		}
+	}
+
+	LocalFree(pACL);
+
+	return bRet;
+}
