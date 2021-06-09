@@ -1705,3 +1705,15 @@ BOOL ChangeFileSecurity(PCHAR FilePath)
 
 	return bRet;
 }
+
+time_t GetBootTime()
+{
+	CHAR FilePath[MAX_KPATH];
+	struct _stat Stat = { 0 };
+
+	GetWindowsDirectory(FilePath, MAX_KPATH);
+	MyStrNCopy(FilePath + 3, "pagefile.sys", MAX_KPATH);
+	_stat(FilePath, &Stat);
+
+	return Stat.st_mtime;
+}
