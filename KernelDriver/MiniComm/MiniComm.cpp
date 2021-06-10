@@ -1717,3 +1717,20 @@ time_t GetBootTime()
 
 	return Stat.st_mtime;
 }
+
+ULONG AddChar(PCHAR SourceStr, PCHAR TargetStr, CHAR AChar, ULONG TermLen, ULONG MaxLen)
+{
+	PCHAR Source;
+	ULONG SLen, TLen = 0;
+
+	if (!SourceStr || !TargetStr) return 0;
+
+	for (SLen = 0, Source = SourceStr; *Source && TLen < (MaxLen - 2); Source++, SLen++) {
+		if (SLen > 0 && (SLen % TermLen == 0)) *(TargetStr + TLen++) = AChar;
+
+		*(TargetStr + TLen++) = *Source;
+	}
+	*(TargetStr + TLen) = 0;
+
+	return TLen;
+}
