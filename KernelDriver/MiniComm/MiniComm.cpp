@@ -1734,3 +1734,12 @@ ULONG AddChar(PCHAR SourceStr, PCHAR TargetStr, CHAR AChar, ULONG TermLen, ULONG
 
 	return TLen;
 }
+
+VOID ReplaceChar(PCHAR SourceStr, CHAR OldChar, CHAR NewChar)
+{
+	PCHAR Source;
+
+	for (Source = SourceStr; Source && *Source; Source++) {
+		if (*Source == OldChar) *Source = NewChar;
+	}
+}
