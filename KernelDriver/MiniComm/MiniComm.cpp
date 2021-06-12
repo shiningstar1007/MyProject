@@ -1743,3 +1743,19 @@ VOID ReplaceChar(PCHAR SourceStr, CHAR OldChar, CHAR NewChar)
 		if (*Source == OldChar) *Source = NewChar;
 	}
 }
+
+ULONG RemoveChar(PCHAR SourceStr, PCHAR TargetStr, CHAR RemChar, ULONG MaxLen)
+{
+	PCHAR Source;
+	ULONG Len = 0;
+
+	if (!SourceStr || !TargetStr) return 0;
+
+	for (Source = SourceStr; *Source && Len < (MaxLen - 1); Source++) {
+		if (*Source == RemChar) continue;
+		else *(TargetStr + Len++) = *Source;
+	}
+	*(TargetStr + Len) = 0;
+
+	return Len;
+}
