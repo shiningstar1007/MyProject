@@ -355,6 +355,15 @@ ULONG MySNPrintfW(PWCHAR DestBuf, ULONG MaxLen, CONST PWCHAR FormatStr, ...)
 	return (ULONG)wcslen(DestBuf);
 }
 
+ULONG MyMemCpy(PVOID BufTo, PVOID BufFrom, ULONG BufSize)
+{
+	if (!BufTo || !BufFrom) return 0;
+
+	memcpy(BufTo, BufFrom, BufSize);
+
+	return BufSize;
+}
+
 ULONG CopyLineBuf(PSTR_BUF StrBuf, PULONG Offset, PCHAR LineBuf, ULONG Len)
 {
 	if (*Offset + Len >= StrBuf->BufSize - 1) return -1;
@@ -603,7 +612,7 @@ VOID GetSessionUser(ULONG SessionId, PCHAR UserName)
 
 	if (WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, SessionId, WTSUserName,
 		&pBuffer, &RetSize) && pBuffer) {
-		MyStrNCpy(UserName, pBuffer, MAX_USER_NAME);
+		MyStrNCopy(UserName, pBuffer, MAX_USER_NAME);
 		WTSFreeMemory(pBuffer);
 	}
 	else *UserName = 0;
