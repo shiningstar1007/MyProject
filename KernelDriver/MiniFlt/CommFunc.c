@@ -29,6 +29,26 @@ PVOID MyFreeNonPagedPool(
 	return NULL;
 }
 
+VOID MySharedSpinLock(
+	_Inout_ MY_LOCK MyLock
+)
+{
+	KLOCK_QUEUE_HANDLE hLockQueue;
+
+	while (TRUE) {
+		KeAcquireInStackQueuedSpinLock(&MyLock->MySpinLock, &hLockQueue);
+
+		if (MyLock->NonSharedLock == 0) {
+			MyLock->SharedLock++;
+			KeReleaseInStackQueuedSpinLock(&hLockQueue);
+			break;
+		}
+		else {
+			KeReleaseInStackQueuedSpinLock(&hLockQueue);
+		}
+	}
+}
+
 static const int YearLengths[2] = { DAYSPERNORMALYEAR, DAYSPERLEAPYEAR };
 static const int MonthLengths[2][MONSPERYEAR] = {
 	{ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },

@@ -355,7 +355,7 @@ ULONG MySNPrintfW(PWCHAR DestBuf, ULONG MaxLen, CONST PWCHAR FormatStr, ...)
 	return (ULONG)wcslen(DestBuf);
 }
 
-ULONG MyMemCpy(PVOID BufTo, PVOID BufFrom, ULONG BufSize)
+ULONG MyMemCopy(PVOID BufTo, PVOID BufFrom, ULONG BufSize)
 {
 	if (!BufTo || !BufFrom) return 0;
 
