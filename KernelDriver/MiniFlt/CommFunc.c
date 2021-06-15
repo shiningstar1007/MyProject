@@ -29,8 +29,8 @@ PVOID MyFreeNonPagedPool(
 	return NULL;
 }
 
-VOID MySharedSpinLock(
-	_Inout_ MY_LOCK MyLock
+VOID MyAcquireSharedSpinLock(
+	_Inout_ PMY_LOCK MyLock
 )
 {
 	KLOCK_QUEUE_HANDLE hLockQueue;
@@ -40,6 +40,28 @@ VOID MySharedSpinLock(
 
 		if (MyLock->NonSharedLock == 0) {
 			MyLock->SharedLock++;
+			KeReleaseInStackQueuedSpinLock(&hLockQueue);
+			break;
+		}
+		else {
+			KeReleaseInStackQueuedSpinLock(&hLockQueue);
+		}
+	}
+}
+
+VOID MyReleaseSharedSpinLock(
+	_Inout_ PMY_LOCK MyLock
+)
+{
+	KLOCK_QUEUE_HANDLE hLockQueue;
+
+	while (TRUE) {
+		KeAcquireInStackQueuedSpinLock(&MyLock->MySpinLock, &hLockQueue);
+
+		if (MyLock->NonSharedLock == 0) {
+			if (MyLock->SharedLock > 0) {
+				MyLock->SharedLock--;
+			}
 			KeReleaseInStackQueuedSpinLock(&hLockQueue);
 			break;
 		}
