@@ -513,3 +513,15 @@ VOID ClearACLSubFromObj(
 		ClearData(&ACLObj->SubjectLink);
 	}
 }
+
+PACL_SUBJECT g_FirstByPass = NULL, g_LastByPass = NULL;
+PACL_SUBJECT SearchByPass(PACL_SUBJECT ByPass)
+{
+	PACL_SUBJECT CompareSub;
+
+	for (CompareSub = g_FirstByPass; CompareSub; CompareSub = CompareSub->NextSubjectLink) {
+		if (!_stricmp(CompareSub->SubjectName, ByPass->SubjectName)) break;
+	}
+
+	return CompareSub;
+}
