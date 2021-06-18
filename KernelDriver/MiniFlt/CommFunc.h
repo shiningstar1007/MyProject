@@ -169,6 +169,12 @@ typedef struct _COMMAND_DATA {
 	PUCHAR Data;
 } COMMAND_DATA, * PCOMMAND_DATA;
 
+typedef struct _MY_LOCK {
+	int SharedLock;
+	int NonSharedLock;
+	KSPIN_LOCK MySpinLock;
+} MY_LOCK, * PMY_LOCK;
+
 extern LONG g_NonPagedPoolCnt;
 PVOID MyAllocNonPagedPool(
 	_In_ ULONG BufSize,

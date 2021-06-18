@@ -29,6 +29,17 @@ PVOID MyFreeNonPagedPool(
 	return NULL;
 }
 
+MY_LOCK g_MiniLock = { 0 };
+MY_LOCK g_LogLock = { 0 };
+KSPIN_LOCK g_CtxSpinLock;
+
+VOID MyInitializeLock()
+{
+	KeInitializeSpinLock(&g_MiniLock.MySpinLock);
+	KeInitializeSpinLock(&g_LogLock.MySpinLock);
+	KeInitializeSpinLock(&g_CtxSpinLock);
+}
+
 VOID MyAcquireSharedSpinLock(
 	_Inout_ PMY_LOCK MyLock
 )
