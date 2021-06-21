@@ -525,3 +525,24 @@ PACL_SUBJECT SearchByPass(PACL_SUBJECT ByPass)
 
 	return CompareSub;
 }
+
+MINICODE ByPassAdd(PACL_SUBJECT ByPass)
+{
+	MINICODE ErrCode = ERROR_MINI_SUCCESS;
+	PACL_SUBJECT SubByPass;
+
+	SubByPass = SearchByPass(ByPass);
+	if (SubByPass != NULL) return ERROR_SUBJECT_EXIST;
+
+	SubByPass = MyAllocNonPagedPool(sizeof(ACL_SUBJECT), &g_ACLNonPagedPoolCnt);
+	if (SubByPass == NULL) return ERROR_NOT_ALLOC_BUF;
+	else memcpy(SubByPass, ByPass, sizeof(ACL_SUBJECT));
+
+	if (g_FirstByPass == NULL) g_FirstByPass = SubByPass;
+	else g_LastByPass->NextSubjectLink = SubByPass;
+
+	g_LastByPass = SubByPass;
+
+
+	return ErrCode;
+}
