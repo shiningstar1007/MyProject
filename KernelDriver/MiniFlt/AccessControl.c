@@ -543,6 +543,31 @@ MINICODE ByPassAdd(PACL_SUBJECT ByPass)
 
 	g_LastByPass = SubByPass;
 
+	return ErrCode;
+}
+
+MINICODE ByPassRemove(PACL_SUBJECT ByPass)
+{
+	MINICODE ErrCode = ERROR_MINI_SUCCESS;
+	PACL_SUBJECT SubByPass, PreByPass = NULL;
+
+	for (SubByPass = g_FirstByPass; SubByPass; SubByPass = SubByPass->NextSubjectLink) {
+		if (!_stricmp(SubByPass->SubjectName, ByPass->SubjectName)) {
+			if (g_FirstByPass == SubByPass) {
+				g_FirstByPass = SubByPass->NextSubjectLink;
+				if (g_LastByPass == SubByPass) {
+					g_LastByPass = SubByPass->NextSubjectLink;
+				}
+			}
+			else {
+				PreByPass->NextSubjectLink = SubByPass->NextSubjectLink;
+				if (g_LastByPass == SubByPass) {
+					g_LastByPass = PreByPass;
+				}
+			}
+		}
+		else PreByPass = SubByPass;
+	}
 
 	return ErrCode;
 }
