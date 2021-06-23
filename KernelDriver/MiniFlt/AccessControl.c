@@ -571,3 +571,15 @@ MINICODE ByPassRemove(PACL_SUBJECT ByPass)
 
 	return ErrCode;
 }
+
+MINICODE ByPassList()
+{
+	MINICODE ErrCode = ERROR_MINI_SUCCESS;
+	PACL_SUBJECT ByPass;
+
+	for (ByPass = g_FirstByPass; ByPass; ByPass = ByPass->NextSubjectLink) {
+		DbgPrint("ByPass[%s]", ByPass->SubjectName);
+	}
+
+	return ErrCode;
+}
