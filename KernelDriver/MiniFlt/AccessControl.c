@@ -583,3 +583,16 @@ MINICODE ByPassList()
 
 	return ErrCode;
 }
+
+VOID ByPassClear()
+{
+	PACL_SUBJECT ByPass, NextByPass;
+
+	for (ByPass = g_FirstSubject; ByPass; ByPass = NextByPass) {
+		NextByPass = ByPass->NextSubjectLink;
+
+		MyFreeNonPagedPool(ByPass, &g_ACLNonPagedPoolCnt);
+	}
+
+	g_FirstByPass = g_LastByPass = NULL;
+}
