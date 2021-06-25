@@ -1768,3 +1768,13 @@ ULONG RemoveChar(PCHAR SourceStr, PCHAR TargetStr, CHAR RemChar, ULONG MaxLen)
 
 	return Len;
 }
+
+VOID SetSecAttr(PSECURITY_ATTRIBUTES pSecAttr, PSECURITY_DESCRIPTOR pSecDesc)
+{
+	InitializeSecurityDescriptor(pSecDesc, SECURITY_DESCRIPTOR_REVISION);
+	SetSecurityDescriptorDacl(pSecDesc, TRUE, NULL, FALSE);
+
+	pSecAttr->nLength = sizeof(SECURITY_ATTRIBUTES);
+	pSecAttr->lpSecurityDescriptor = pSecDesc;
+	pSecAttr->bInheritHandle = TRUE;
+}
