@@ -1778,3 +1778,25 @@ VOID SetSecAttr(PSECURITY_ATTRIBUTES pSecAttr, PSECURITY_DESCRIPTOR pSecDesc)
 	pSecAttr->lpSecurityDescriptor = pSecDesc;
 	pSecAttr->bInheritHandle = TRUE;
 }
+
+BOOL AdjustPrivForProc(PCHAR PrivName, BOOL bEnable)
+{
+	HANDLE hToken;
+	TOKEN_PRIVILEGES TokenPriv;
+	BOOL Ret = FALSE;
+
+	if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
+		return FALSE;
+
+	LookupPrivilegeValue(NULL, PrivName, &TokenPriv.Privileges[0].Luid);
+	TokenPriv.PrivilegeCount = 1;
+	if (bEnable) TokenPriv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+	else TokenPriv.Privileges[0].Attributes = SE_PRIVILEGE_REMOVED;
+
+	Ret = AdjustTokenPrivileges(hToken, FALSE, &TokenPriv, 0, NULL, 0);
+
+	CloseHandle(hToken);
+
+	if (TokenPriv.Privileges[0].Attributes == 0) return FALSE;
+	else return Ret;
+}
