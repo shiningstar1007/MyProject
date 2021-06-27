@@ -395,6 +395,21 @@ ULONGLONG GetObjKey(TYPE_OBJECT ObjType, PCHAR ObjPath)
 	return ObjKey;
 }
 
+BOOL GetUserSId(PCHAR UserName, PUSERSID UserSId)
+{
+	CHAR Domain[256] = { 0 };
+	DWORD cbSId = sizeof(USERSID), cbDomain = sizeof(Domain);
+	SID_NAME_USE peUse;
+	BOOL bRet;
+
+	if (!UserName || !*UserName || !UserSId) return FALSE;
+
+	memset(UserSId, 0, sizeof(USERSID));
+	bRet = LookupAccountNameA(NULL, UserName, UserSId, &cbSId, Domain, &cbDomain, &peUse);
+
+	return bRet;
+}
+
 PCHAR GetLocalAccount(PCHAR UserName)
 {
 	LPUSER_INFO_20 pBuf = NULL, pTempBuf;
