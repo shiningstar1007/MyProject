@@ -1815,3 +1815,14 @@ BOOL AdjustPrivForProc(PCHAR PrivName, BOOL bEnable)
 	if (TokenPriv.Privileges[0].Attributes == 0) return FALSE;
 	else return Ret;
 }
+
+BOOL MiniThreadCreate(PMINI_THREAD MiniThread, PVOID Parameter)
+{
+	if (MiniThread->ThreadHandle == TRUE) return TRUE;
+
+	MiniThread->Parameter = Parameter;
+	MiniThread->ThreadHandle = CreateThread(NULL, 0, MiniThread->StartAddress, (PVOID)MiniThread, 0,
+		&MiniThread->ThreadId);
+
+	return (MiniThread->ThreadHandle != NULL);
+}
