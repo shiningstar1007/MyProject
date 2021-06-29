@@ -1826,3 +1826,11 @@ BOOL MiniThreadCreate(PMINI_THREAD MiniThread, PVOID Parameter)
 
 	return (MiniThread->ThreadHandle != NULL);
 }
+
+VOID MiniThreadTerminate(PMINI_THREAD MiniThread, BOOL bWaitThread)
+{
+	if (!MiniThread->ThreadHandle) return;
+
+	MiniThread->Terminated = TRUE;
+	if (bWaitThread == TRUE) WaitForSingleObject(MiniThread->ThreadHandle, INFINITE);
+}
