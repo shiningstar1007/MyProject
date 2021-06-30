@@ -1834,3 +1834,32 @@ VOID MiniThreadTerminate(PMINI_THREAD MiniThread, BOOL bWaitThread)
 	MiniThread->Terminated = TRUE;
 	if (bWaitThread == TRUE) WaitForSingleObject(MiniThread->ThreadHandle, INFINITE);
 }
+
+ULONG hexstr2num(PCHAR hexa)
+{
+	char* p = NULL;
+	char	digit = 0;
+	int		len = 0, i, j;
+	ULONG sq16, result;
+
+	if (!hexa || !*hexa) return 0;
+
+	if (hexa[0] == '0' && (hexa[1] == 'x' || hexa[1] == 'X')) p = hexa + 2;
+	else p = hexa;
+
+	len = (int)strlen(p);
+	result = 0;
+	for (i = 0; i < len; i++, p++) {
+		sq16 = 1;
+		for (j = 0; j < len - i - 1; j++)
+			sq16 = sq16 * 16;
+
+		if (*p >= 'a' && *p <= 'f') digit = *p - 'a' + 10;
+		else if (*p >= 'A' && *p <= 'F') digit = *p - 'A' + 10;
+		else digit = *p - '0';
+
+		result += (sq16 * digit);
+	}
+
+	return result;
+}
