@@ -127,6 +127,30 @@ FLT_REGISTRATION FilterRegistration = {
     NULL, NULL, NULL                                //  Unused naming support callbacks
 };
 
+NTSTATUS StartProcessNotifyRoutine()
+{
+	NTSTATUS Status;
+
+	Status = PsSetCreateProcessNotifyRoutineEx(CreateProcessNotifyRoutine, FALSE);
+	if (!NT_SUCCESS(Status)) {
+		DbgPrint("Failed to process callback register [status=0x%X]", Status);
+	}
+	else DbgPrint("PsSetCreateProcessNotifyRoutineEx success");
+
+	return Status;
+}
+
+VOID StopProcessNotifyRoutine()
+{
+	NTSTATUS Status;
+
+	Status = PsSetCreateProcessNotifyRoutineEx(CreateProcessNotifyRoutine, TRUE);
+	if (!NT_SUCCESS(Status)) {
+		DbgPrint("Failed to process callback unregister [status=0x%X]", Status);
+	}
+	else DbgPrint("PsSetCreateProcessNotifyRoutineEx success");
+}
+
 NTSTATUS InitializeData(
 	_In_ PUNICODE_STRING RegistryPath
 )
