@@ -127,6 +127,25 @@ FLT_REGISTRATION FilterRegistration = {
     NULL, NULL, NULL                                //  Unused naming support callbacks
 };
 
+VOID CreateProcessNotifyRoutine(
+	_Inout_ PEPROCESS Process,
+	_In_ HANDLE ProcessId,
+	_Inout_opt_ PPS_CREATE_NOTIFY_INFO CreateInfo)
+{
+	UNICODE_STRING ProcPath;
+
+	if (CreateInfo == NULL) {
+		DbgPrint("Process exiting [PID=%u]", ProcessId);
+	}
+	else {
+		RtlInitUnicodeString(&ProcPath, L"\\??\\C:\\Windows\\System32\\notepad.exe");
+		if (RtlCompareUnicodeString(CreateInfo->ImageFileName, &ProcPath, TRUE) == 0) {
+			CreateInfo->CreationStatus = STATUS_ACCESS_DENIED;
+			DbgPrint("Process start failed [path=%S]", ProcPath.Buffer);
+		}
+	}
+}
+
 NTSTATUS StartProcessNotifyRoutine()
 {
 	NTSTATUS Status;
