@@ -127,6 +127,19 @@ FLT_REGISTRATION FilterRegistration = {
     NULL, NULL, NULL                                //  Unused naming support callbacks
 };
 
+NTSTATUS StartThreadNotifyRoutine()
+{
+	NTSTATUS Status;
+
+	Status = PsSetCreateThreadNotifyRoutine(CreateThreadNotifyRoutine);
+	if (!NT_SUCCESS(Status)) {
+		DbgPrint("Failed to thread callback register [status=0x%X]", Status);
+	}
+	else DbgPrint("PsSetCreateThreadNotifyRoutine success");
+
+	return Status;
+}
+
 VOID CreateProcessNotifyRoutine(
 	_Inout_ PEPROCESS Process,
 	_In_ HANDLE ProcessId,
