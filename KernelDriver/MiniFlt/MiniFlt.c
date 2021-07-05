@@ -140,6 +140,17 @@ NTSTATUS StartThreadNotifyRoutine()
 	return Status;
 }
 
+VOID StopThreadNotifyRoutine()
+{
+	NTSTATUS Status;
+
+	Status = PsRemoveCreateThreadNotifyRoutine(CreateThreadNotifyRoutine);
+	if (!NT_SUCCESS(Status)) {
+		DbgPrint("Failed to thread callback unregister [status=0x%X]", Status);
+	}
+	else DbgPrint("PsRemoveCreateThreadNotifyRoutine success");
+}
+
 VOID CreateProcessNotifyRoutine(
 	_Inout_ PEPROCESS Process,
 	_In_ HANDLE ProcessId,
