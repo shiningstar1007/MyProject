@@ -127,6 +127,19 @@ FLT_REGISTRATION FilterRegistration = {
     NULL, NULL, NULL                                //  Unused naming support callbacks
 };
 
+NTSTATUS StartLoadImageNotifyRoutine()
+{
+	NTSTATUS Status;
+
+	Status = PsSetLoadImageNotifyRoutine(CreateLoadImageNotifyRoutine);
+	if (!NT_SUCCESS(Status)) {
+		DbgPrint("Failed to loadimage callback register [status=0x%X]", Status);
+	}
+	else DbgPrint("PsSetLoadImageNotifyRoutine success");
+
+	return Status;
+}
+
 NTSTATUS StartThreadNotifyRoutine()
 {
 	NTSTATUS Status;
