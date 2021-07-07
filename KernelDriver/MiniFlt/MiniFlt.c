@@ -140,6 +140,18 @@ NTSTATUS StartLoadImageNotifyRoutine()
 	return Status;
 }
 
+VOID StopLoadImageNotifyRoutine()
+{
+	NTSTATUS Status;
+
+	Status = PsRemoveLoadImageNotifyRoutine(CreateLoadImageNotifyRoutine);
+	if (!NT_SUCCESS(Status)) {
+		DbgPrint("Failed to loadimage callback unregister [status=0x%X]", Status);
+	}
+	else DbgPrint("PsRemoveLoadImageNotifyRoutine success");
+}
+
+
 NTSTATUS StartThreadNotifyRoutine()
 {
 	NTSTATUS Status;
