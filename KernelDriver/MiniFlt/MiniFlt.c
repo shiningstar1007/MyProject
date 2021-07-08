@@ -127,6 +127,22 @@ FLT_REGISTRATION FilterRegistration = {
     NULL, NULL, NULL                                //  Unused naming support callbacks
 };
 
+VOID CreateLoadImageNotifyRoutine(
+	PUNICODE_STRING FullImageName,
+	HANDLE ProcessId,
+	PIMAGE_INFO ImageInfo
+)
+{
+	if (ImageInfo->SystemModeImage == 0)
+	{
+		DbgPrint("Load Image Name : \n\t[%.4X] %wZ\n", ProcessId, FullImageName);
+	}
+	else
+	{
+		DbgPrint("Load Driver Name : \n\t[%.4X] %wZ\n", ProcessId, FullImageName);
+	}
+}
+
 NTSTATUS StartLoadImageNotifyRoutine()
 {
 	NTSTATUS Status;
@@ -150,7 +166,6 @@ VOID StopLoadImageNotifyRoutine()
 	}
 	else DbgPrint("PsRemoveLoadImageNotifyRoutine success");
 }
-
 
 NTSTATUS StartThreadNotifyRoutine()
 {
