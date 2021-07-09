@@ -127,6 +127,33 @@ FLT_REGISTRATION FilterRegistration = {
     NULL, NULL, NULL                                //  Unused naming support callbacks
 };
 
+VOID TerminateProcess(IN HANDLE pid)
+{
+	HANDLE hProcess = NULL;
+	OBJECT_ATTRIBUTES obAttr = { 0, };
+	CLIENT_ID cid = { 0, };
+
+	obAttr.Length = sizeof(obAttr);
+	obAttr.Attributes = OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE;
+	cid.UniqueProcess = pid;
+
+	if (ZwOpenProcess(&hProcess, PROCESS_ALL_ACCESS, &obAttr, &cid) == STATUS_SUCCESS)	// Get process handle
+	{
+		if (ZwTerminateProcess(hProcess, STATUS_ACCESS_DENIED) == STATUS_SUCCESS)	// Terminate process
+		{
+			DbgPrint("[INFO] Success terminate process\n");
+		}
+		else
+		{
+			DbgPrint("[ERROR] Failed terminate process\n");
+		}
+	}
+	else
+	{
+		DbgPrint("[ERROR] Failed open process\n");
+	}
+}
+
 VOID CreateLoadImageNotifyRoutine(
 	PUNICODE_STRING FullImageName,
 	HANDLE ProcessId,
