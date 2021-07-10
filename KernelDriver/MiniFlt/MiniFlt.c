@@ -162,11 +162,11 @@ VOID CreateLoadImageNotifyRoutine(
 {
 	if (ImageInfo->SystemModeImage == 0)
 	{
-		DbgPrint("Load Image Name : \n\t[%.4X] %wZ\n", ProcessId, FullImageName);
+		DbgPrint("Load Image Name : [%.4X] %wZ\n", ProcessId, FullImageName);
 	}
 	else
 	{
-		DbgPrint("Load Driver Name : \n\t[%.4X] %wZ\n", ProcessId, FullImageName);
+		DbgPrint("Load Driver Name : [%.4X] %wZ\n", ProcessId, FullImageName);
 	}
 }
 
@@ -192,6 +192,23 @@ VOID StopLoadImageNotifyRoutine()
 		DbgPrint("Failed to loadimage callback unregister [status=0x%X]", Status);
 	}
 	else DbgPrint("PsRemoveLoadImageNotifyRoutine success");
+}
+
+VOID CreateThreadNotifyRoutine(
+	HANDLE ProcessId,
+	HANDLE ThreadId,
+	BOOLEAN Create
+)
+{
+	if (Create == TRUE)
+	{
+		DbgPrint("CreateThread : ProcId[%.4X] ThreadId[%.4X]", ProcessId, ThreadId);
+	}
+	else
+	{
+		DbgPrint("TerminateThread : ProcId[%.4X] ThreadId[%.4X]", ProcessId, ThreadId);
+	}
+
 }
 
 NTSTATUS StartThreadNotifyRoutine()
