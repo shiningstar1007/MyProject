@@ -8,6 +8,7 @@ using System.IO;
 using System.Security.AccessControl;
 using System.Runtime.ConstrainedExecution;
 using System.Security;
+using System.Text.RegularExpressions;
 
 namespace MyCSharp.Service
 {
@@ -200,6 +201,13 @@ namespace MyCSharp.Service
             }
 
             return bUse;
+        }
+
+        public static bool CheckIPType(string path)
+        {
+            Regex regex = new Regex(@"^\\\\(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])");
+
+            return regex.IsMatch(path);
         }
     }
 
