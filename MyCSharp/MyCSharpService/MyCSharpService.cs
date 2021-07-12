@@ -9,6 +9,7 @@ using System.Security.AccessControl;
 using System.Runtime.ConstrainedExecution;
 using System.Security;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace MyCSharp.Service
 {
@@ -208,6 +209,21 @@ namespace MyCSharp.Service
             Regex regex = new Regex(@"^\\\\(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])");
 
             return regex.IsMatch(path);
+        }
+
+        public static bool CheckLocalDrive(string path)
+        {
+            var drvs = DriveInfo.GetDrives().Where(e => e.IsReady && (e.DriveType == DriveType.Fixed));
+
+            foreach (DriveInfo drv in drvs)
+            {
+                if (char.ToLower(drv.Name[0]) == char.ToLower(path[0]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 
