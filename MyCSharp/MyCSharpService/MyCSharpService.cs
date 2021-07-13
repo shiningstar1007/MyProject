@@ -225,6 +225,34 @@ namespace MyCSharp.Service
 
             return false;
         }
+
+        public static string executeCMD(string textCMD)
+        {
+            ProcessStartInfo pri = new ProcessStartInfo();
+            Process pro = new Process();
+
+            pri.FileName = @"cmd.exe";
+            pri.CreateNoWindow = false;
+            pri.UseShellExecute = false;
+
+            pri.RedirectStandardInput = true;
+            pri.RedirectStandardOutput = true;
+            pri.RedirectStandardError = true;
+
+            pro.StartInfo = pri;
+            pro.Start();
+
+            pro.StandardInput.Write(textCMD + Environment.NewLine);
+            pro.StandardInput.Close();
+
+            System.IO.StreamReader sr = pro.StandardError;
+
+            string resultValue = sr.ReadToEnd();
+            pro.WaitForExit();
+            pro.Close();
+
+            return resultValue == "" ? "" : resultValue;
+        }
     }
 
     public class ACL_Subject
