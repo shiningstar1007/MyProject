@@ -10,6 +10,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Security;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.Diagnostics;
 
 namespace MyCSharp.Service
 {
@@ -252,6 +253,21 @@ namespace MyCSharp.Service
             pro.Close();
 
             return resultValue == "" ? "" : resultValue;
+        }
+
+        public bool checkDiskSize(string fileName, long fileSize)
+        {
+            var drvs = DriveInfo.GetDrives().Where(e => e.IsReady && (e.DriveType == DriveType.Fixed));
+
+            foreach (DriveInfo drv in drvs)
+            {
+                if (char.ToLower(drv.Name[0]) == char.ToLower(fileName[0]))
+                {
+                    if (fileSize >= drv.AvailableFreeSpace) return false;
+                }
+            }
+
+            return true;
         }
     }
 
