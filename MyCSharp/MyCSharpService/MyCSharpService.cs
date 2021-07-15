@@ -269,6 +269,28 @@ namespace MyCSharp.Service
 
             return true;
         }
+
+        public int ConnectRemoteServerStart(string server, string netUserId, string netPwd, string funcName)
+        {
+            int index, retValue = 0;
+            string tempName = server.Substring(2);
+            string[] hostName = tempName.Split(new char[] { '\\' });
+
+            string Msg = executeCMD(string.Format("net use {0} /user:{1}\\{2} {3} /PERSISTENT:YES", server, hostName[0], netUserId, netPwd));
+
+            if (string.IsNullOrEmpty(Msg) == false)
+            {
+                index = Msg.IndexOf("86");
+                if (index != -1) retValue = 86; //account error
+                else
+                {
+                    index = Msg.IndexOf("1326");
+                    if (index != -1) retValue = 86; //account error
+                    else retValue = 53; //network error
+                }
+            }
+            return retValue;
+        }
     }
 
     public class ACL_Subject
