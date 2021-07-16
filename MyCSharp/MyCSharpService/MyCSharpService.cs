@@ -270,7 +270,7 @@ namespace MyCSharp.Service
             return true;
         }
 
-        public int ConnectRemoteServerStart(string server, string netUserId, string netPwd, string funcName)
+        public int ConnectRemoteServerStart(string server, string netUserId, string netPwd)
         {
             int index, retValue = 0;
             string tempName = server.Substring(2);
@@ -290,6 +290,11 @@ namespace MyCSharp.Service
                 }
             }
             return retValue;
+        }
+
+        public void CloseRemoteServerEnd(string server)
+        {
+            executeCMD(string.Format("net use /delete {0}", server));
         }
     }
 
