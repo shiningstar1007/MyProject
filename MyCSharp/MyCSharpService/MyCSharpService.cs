@@ -185,6 +185,25 @@ namespace MyCSharp.Service
             return bStreamFile;
         }
 
+        public static bool CheckTargetFile(string FileName, string StreamName)
+        {
+            bool bCheckFile = false;
+            IntPtr FileHandle;
+
+            string streamName = FileName + ":" + StreamName;
+            FileHandle = Win32API.CreateFile(streamName, Win32API.GENERIC_READ | Win32API.GENERIC_WRITE,
+                FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
+
+            if (FileHandle.ToInt32() != Win32API.INVALID_HANDLE_VALUE) // skip file target
+            {
+                bCheckFile = true;
+
+                Win32API.CloseHandle(FileHandle);
+            }
+
+            return bCheckFile;
+        }
+
         public bool CheckUseFile(string fileName)
         {
             bool bUse = false;
