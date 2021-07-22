@@ -170,6 +170,23 @@ PCHAR MyStrNCat(PCHAR DestBuf, PCHAR SourceBuf, ULONG MaxLen)
 	return DestBuf;
 }
 
+PCHAR MyStrNCatEx(PCHAR DestBuf, PCHAR SourceBuf, ULONG MaxLen, ULONG CopyLen)
+{
+	ULONG DestLen;
+
+	if (!DestBuf || !SourceBuf) return "";
+
+	if (CopyLen == -1) return MyStrNCat(DestBuf, SourceBuf, MaxLen);
+
+	DestLen = (ULONG)strlen(DestBuf);
+	if (DestLen + CopyLen >= MaxLen) CopyLen = MaxLen - DestLen - 1;
+
+	MyStrNCopy(DestBuf + DestLen, SourceBuf, CopyLen);
+	DestBuf[DestLen + CopyLen] = 0;
+
+	return DestBuf;
+}
+
 PWCHAR MyStrNCatW(PWCHAR DestBuf, PWCHAR SourceBuf, ULONG MaxLen)
 {
 	ULONG DestLen;
