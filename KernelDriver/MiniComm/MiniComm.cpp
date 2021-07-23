@@ -199,6 +199,17 @@ PWCHAR MyStrNCatW(PWCHAR DestBuf, PWCHAR SourceBuf, ULONG MaxLen)
 	return DestBuf;
 }
 
+BOOL CheckChars(PCHAR ValueStr, PCHAR InvalidChars)
+{
+	PCHAR AChar;
+
+	for (AChar = ValueStr; AChar && *AChar; AChar++) {
+		if (strchr(InvalidChars, *AChar)) return FALSE;
+	}
+
+	return TRUE;
+}
+
 PCHAR Trim(PCHAR SourceStr)
 {
 	if (!SourceStr) return NULL;
