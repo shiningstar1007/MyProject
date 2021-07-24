@@ -1916,3 +1916,35 @@ VOID GenRandStr(PCHAR RandStr, ULONG StrLen)
 	}
 	RandStr[i] = 0;
 }
+
+BOOL FileMapSrvInitialize(PFILE_MAP FileMap, PHANDLE hReadEvent, PHANDLE hWriteEvent)
+{
+	SECURITY_ATTRIBUTES SecAttr;
+	SECURITY_DESCRIPTOR SecDesc;
+	CHAR EventName[64];
+
+	SetSecAttr(&SecAttr, &SecDesc);
+	FileMap->hFileMap = CreateFileMapping(INVALID_HANDLE_VALUE, &SecAttr, PAGE_READWRITE,
+		0, MAX_CMD_BUF, FileMap->FileMapName);
+	if (FileMap->hFileMap == NULL) return FALSE;
+
+	FileMap->hMutex = CreateMutex(&SecAttr, FALSE, FileMap->MutexName);
+	if (FileMap->hMutex == NULL) return FALSE;
+
+	FileMap->hWaitEvent = CreateEventA(&SecAttr, FALSE, FALSE, FileMap->EvtWaitName);
+	if (FileMap->hWaitEvent == NULL) return FALSE;
+	else if (GetLastError() == ERROR_ALREADY_EXISTS) ResetEvent(FileMap->hWaitEvent);
+
+	if (hWriteEvent != NULL) {
+		MySNPrintf(EventName, sizeof(EventName), "%s%u", FileMap->ReadEventName, 0);
+		*hReadEvent = CreateEventA(&SecAttr, FALSE, FALSE, EventName);
+
+		MySNPrintf(EventName, sizeof(EventName), "%s%u", FileMap->WriteEventName, 0);
+		*hWriteEvent = CreateEventA(&SecAttr, FALSE, FALSE, EventName);
+	}
+	else *hReadEvent = CreateEventA(&SecAttr, FALSE, FALSE, FileMap->ReadEventName);
+
+	if (*hReadEvent == NULL) return FALSE;
+
+	return MiniThreadCreate(FileMap->MiniThread, NULL);
+}
