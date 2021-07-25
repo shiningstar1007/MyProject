@@ -3,5 +3,8 @@
 
 #include <iostream>
 #include <conio.h>
-#include <windows.h>
 #include <string.h>
+
+#include <Windows.h>
+#include <fltUser.h>
+#include <strsafe.h>

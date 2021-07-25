@@ -1,6 +1,6 @@
-#include <Windows.h>
-#include <fltUser.h>
-#include <strsafe.h>
+#include "MiniComm.h"
+
+#pragma comment(lib, "netapi32.lib")
 
 #define WIN_MAJOR_MAX	    10    // Windows 10
 #define WIN_MAJOR_MIN	    5    // Windows 2000 or XP
@@ -1946,5 +1946,22 @@ BOOL FileMapSrvInitialize(PFILE_MAP FileMap, PHANDLE hReadEvent, PHANDLE hWriteE
 
 	if (*hReadEvent == NULL) return FALSE;
 
-	return MiniThreadCreate(FileMap->MiniThread, NULL);
+	return MiniThreadCreate(FileMap->hMiniThread, NULL);
+}
+
+VOID FileMapSrvFinalize(PFILE_MAP FileMap, HANDLE hReadEvent, HANDLE hWriteEvent)
+{
+	if (hReadEvent != NULL) {
+		if (FileMap->hMiniThread->Handle != NULL) {
+			hMiniThread->Terminated = TRUE;
+			SetEvent(hReadEvent);
+			WaitForSingleObject(FileMap->hMiniThread->Handle, INFINITE);
+		}
+		CloseHandle(hReadEvent);
+	}
+	if (hWriteEvent) CloseHandle(hWriteEvent);
+
+	if (FileMap->hWaitEvent != NULL) CloseHandle(FileMap->hWaitEvent);
+	if (FileMap->hFileMap != NULL) CloseHandle(FileMap->hFileMap);
+	if (FileMap->hMutex != NULL) CloseHandle(FileMap->hMutex);
 }

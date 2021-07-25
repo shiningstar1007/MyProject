@@ -16,4 +16,3 @@ typedef struct _COMMAND_MESSAGE {
 	ULONG Reserved;  // Alignment on IA64
 	UCHAR Data[];
 } COMMAND_MESSAGE, * PCOMMAND_MESSAGE;
-
