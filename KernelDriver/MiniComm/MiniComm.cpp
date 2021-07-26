@@ -1931,7 +1931,7 @@ BOOL FileMapSrvInitialize(PFILE_MAP FileMap, PHANDLE hReadEvent, PHANDLE hWriteE
 	FileMap->hMutex = CreateMutex(&SecAttr, FALSE, FileMap->MutexName);
 	if (FileMap->hMutex == NULL) return FALSE;
 
-	FileMap->hWaitEvent = CreateEventA(&SecAttr, FALSE, FALSE, FileMap->EvtWaitName);
+	FileMap->hWaitEvent = CreateEventA(&SecAttr, FALSE, FALSE, FileMap->WaitEventName);
 	if (FileMap->hWaitEvent == NULL) return FALSE;
 	else if (GetLastError() == ERROR_ALREADY_EXISTS) ResetEvent(FileMap->hWaitEvent);
 
@@ -1946,22 +1946,43 @@ BOOL FileMapSrvInitialize(PFILE_MAP FileMap, PHANDLE hReadEvent, PHANDLE hWriteE
 
 	if (*hReadEvent == NULL) return FALSE;
 
-	return MiniThreadCreate(FileMap->hMiniThread, NULL);
+	return MiniThreadCreate(&FileMap->FileMapThread, NULL);
 }
 
 VOID FileMapSrvFinalize(PFILE_MAP FileMap, HANDLE hReadEvent, HANDLE hWriteEvent)
 {
 	if (hReadEvent != NULL) {
-		if (FileMap->hMiniThread->Handle != NULL) {
-			hMiniThread->Terminated = TRUE;
+		if (FileMap->FileMapThread.Handle != NULL) {
+			FileMap->FileMapThread.Terminated = TRUE;
 			SetEvent(hReadEvent);
-			WaitForSingleObject(FileMap->hMiniThread->Handle, INFINITE);
+			WaitForSingleObject(FileMap->FileMapThread.Handle, INFINITE);
 		}
 		CloseHandle(hReadEvent);
 	}
 	if (hWriteEvent) CloseHandle(hWriteEvent);
 
-	if (FileMap->hWaitEvent != NULL) CloseHandle(FileMap->hWaitEvent);
-	if (FileMap->hFileMap != NULL) CloseHandle(FileMap->hFileMap);
-	if (FileMap->hMutex != NULL) CloseHandle(FileMap->hMutex);
+	if (FileMap->hWaitEvent != INVALID_HANDLE_VALUE) CloseHandle(FileMap->hWaitEvent);
+	if (FileMap->hFileMap != INVALID_HANDLE_VALUE) CloseHandle(FileMap->hFileMap);
+	if (FileMap->hMutex != INVALID_HANDLE_VALUE) CloseHandle(FileMap->hMutex);
+}
+
+BOOL FileMapClntInitialize(PFILE_MAP FileMap, BOOL bIncludeMutex, PFILE_MAP FileMapBase)
+{
+	if (FileMapBase != NULL) {
+		memcpy(FileMap, FileMapBase, sizeof(FILE_MAP));
+		FileMap->hMutex = FileMap->hFileMap = FileMap->hWaitEvent = NULL;
+	}
+
+	FileMap->hFileMap = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, FileMap->FileMapName);
+	if (FileMap->hFileMap == INVALID_HANDLE_VALUE) return FALSE;
+
+	if (bIncludeMutex) {
+		FileMap->hMutex = OpenMutexA(SYNCHRONIZE, FALSE, FileMap->MutexName);
+		if (FileMap->hMutex == INVALID_HANDLE_VALUE) return FALSE;
+	}
+
+	FileMap->hWaitEvent = OpenEventA(SYNCHRONIZE | EVENT_MODIFY_STATE, FALSE, FileMap->WaitEventName);
+	if (FileMap->hWaitEvent == INVALID_HANDLE_VALUE) return FALSE;
+
+	return TRUE;
 }

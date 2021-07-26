@@ -24,4 +24,17 @@ typedef struct _MINI_THREAD {
 	PVOID Param;
 } MINI_THREAD, * PMINI_THREAD;
 
+typedef struct _FILE_MAP {
+	HANDLE hMutex;
+	HANDLE hFileMap;
+	HANDLE hWaitEvent;
+	CHAR MutexName[32];
+	CHAR ReadEventName[32];
+	CHAR WriteEventName[32];
+	CHAR WaitEventName[32];
+	CHAR FileMapName[32];
+
+	MINI_THREAD FileMapThread;
+} FILE_MAP, * PFILE_MAP;
+
 #endif
