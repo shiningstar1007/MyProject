@@ -1986,3 +1986,14 @@ BOOL FileMapClntInitialize(PFILE_MAP FileMap, BOOL bIncludeMutex, PFILE_MAP File
 
 	return TRUE;
 }
+
+VOID FileMapClntFinalize(PFILE_MAP FileMap)
+{
+	if (FileMap->hFileMap != INVALID_HANDLE_VALUE) CloseHandle(FileMap->hFileMap);
+
+	if (FileMap->hMutex != INVALID_HANDLE_VALUE) CloseHandle(FileMap->hMutex);
+
+	if (FileMap->hWaitEvent != INVALID_HANDLE_VALUE) CloseHandle(FileMap->hWaitEvent);
+
+	FileMap->hFileMap = FileMap->hMutex = FileMap->hWaitEvent = NULL;
+}
