@@ -1997,3 +1997,57 @@ VOID FileMapClntFinalize(PFILE_MAP FileMap)
 
 	FileMap->hFileMap = FileMap->hMutex = FileMap->hWaitEvent = NULL;
 }
+
+MINI_CODE FileMapWrite(PFILE_MAP FileMap, PCHAR Command, PCHAR ParamStr)
+{
+	HANDLE hReadEvent;
+	ULONG RetWait, Len;
+	PBYTE pBuffer;
+	CHAR key[16], CmdBuf[MAX_CMD_BUF] = { 0 };
+	USHORT EncSize;
+
+	if (!Command || !ParamStr || !FileMap->hWaitEvent) return 0;
+
+	hReadEvent = OpenEventA(SYNCHRONIZE | EVENT_MODIFY_STATE, FALSE, FileMap->ReadEventName);
+	if (hReadEvent == INVALID_HANDLE_VALUE) return 0;
+
+	RetWait = WaitForSingleObject(FileMap->hMutex, MAX_WAITSEC * 2);
+	if (RetWait == WAIT_TIMEOUT) {
+		return 0;
+	}
+	else if (RetWait == WAIT_ABANDONED) {
+	}
+
+	__try {
+		RetWait = WAIT_FAILED;
+
+		pBuffer = (PBYTE)MapViewOfFile(FileMap->hFileMap, FILE_MAP_WRITE, 0, 0, MAX_CMD_BUF);
+		if (pBuffer == NULL) {
+			__leave;
+		}
+
+		Len = MySNPrintf(CmdBuf, MAX_CMD_BUF - MAP_HEADLEN, "%s %s", Command, ParamStr);
+		memcpy(pBuffer, CmdBuf, Len);
+
+		UnmapViewOfFile(pBuffer);
+
+		SetEvent(hReadEvent);
+		RetWait = WaitForSingleObject(FileMap->hWaitEvent, MAX_WAITSEC);
+		if (FileMap == &g_FileMapAgent && RetWait == WAIT_OBJECT_0) {
+			pBuffer = (PBYTE)MapViewOfFile(FileMap->hFileMap, FILE_MAP_READ, 0, 0, MAX_CMD_BUF);
+			if (pBuffer) {
+				memset(CmdBuf, 0, MAX_CMD_BUF);
+
+				MyStrNCopy(ParamStr, CmdBuf, 1024);
+				UnmapViewOfFile(pBuffer);
+			}
+		}
+	}
+	__finally {
+		ReleaseMutex(FileMap->hMutex);
+	}
+
+	CloseHandle(hReadEvent);
+
+	return 0;
+}

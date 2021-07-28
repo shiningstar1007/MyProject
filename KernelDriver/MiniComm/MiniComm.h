@@ -16,6 +16,8 @@
 #include <Aclapi.h>
 #include <Dsgetdc.h>
 
+typedef ULONG MINI_CODE;
+
 typedef struct _MINI_THREAD {
 	HANDLE Handle;
 	BOOL Terminated;
