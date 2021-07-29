@@ -2051,3 +2051,47 @@ MINI_CODE FileMapWrite(PFILE_MAP FileMap, PCHAR Command, PCHAR ParamStr)
 
 	return 0;
 }
+
+SOCKET ConnectServer(PCHAR IPString, USHORT Port, LONG TimeOutSec, BOOL bBlockMode)
+{
+	struct sockaddr_in Addr = { 0 };
+	timeval TimeOut;
+	fd_set SendSet;
+	ULONG BlockMode = 1;
+	INT iRet;
+	SOCKET Socket;
+
+	if (IPString == NULL) return INVALID_SOCKET;
+
+	Socket = socket(AF_INET, SOCK_STREAM, 0);
+	if (Socket == INVALID_SOCKET) return Socket;
+
+	Addr.sin_family = AF_INET;
+	Addr.sin_addr.s_addr = inet_addr(IPString);
+	Addr.sin_port = htons(Port);
+
+	if (!ioctlsocket(Socket, FIONBIO, &BlockMode)) {
+		connect(Socket, (struct sockaddr*)&Addr, sizeof(struct sockaddr_in));
+
+		FD_ZERO(&SendSet);
+		FD_SET(Socket, &SendSet);
+
+		TimeOut.tv_sec = TimeOutSec;
+		TimeOut.tv_usec = 0;
+
+		iRet = select(1, NULL, &SendSet, NULL, &TimeOut);
+		if (iRet > 0) {
+			if (bBlockMode == TRUE) {
+				BlockMode = 0;
+				ioctlsocket(Socket, FIONBIO, &BlockMode);
+			}
+
+			return Socket;
+		}
+		else {
+			closesocket(Socket);
+		}
+	}
+
+	return INVALID_SOCKET;
+}
