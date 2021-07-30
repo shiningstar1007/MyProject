@@ -2095,3 +2095,14 @@ SOCKET ConnectServer(PCHAR IPString, USHORT Port, LONG TimeOutSec, BOOL bBlockMo
 
 	return INVALID_SOCKET;
 }
+
+BOOL CheckListenPort(PCHAR IPString, USHORT Port, LONG Timeout)
+{
+	SOCKET Socket = ConnectServer(IPString, Port, FALSE, 1);
+
+	if (Socket == INVALID_SOCKET) return FALSE;
+
+	closesocket(Socket);
+
+	return TRUE;
+}
