@@ -2106,3 +2106,21 @@ BOOL CheckListenPort(PCHAR IPString, USHORT Port, LONG Timeout)
 
 	return TRUE;
 }
+
+BOOL WaitSelect(SOCKET Socket, BOOL bWrite, ULONG TimeOut)
+{
+	INT iRet;
+	fd_set FdSet;
+	timeval TimeVal;
+
+	TimeVal.tv_usec = 0;
+	TimeVal.tv_sec = TimeOut;
+
+	FD_ZERO(&FdSet);
+	FD_SET(Socket, &FdSet);
+
+	if (bWrite) iRet = select(1, NULL, &FdSet, NULL, &TimeVal);
+	else iRet = select(1, &FdSet, NULL, NULL, &TimeVal);
+
+	return (iRet > 0);
+}
