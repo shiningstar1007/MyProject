@@ -2124,3 +2124,26 @@ BOOL WaitSelect(SOCKET Socket, BOOL bWrite, ULONG TimeOut)
 
 	return (iRet > 0);
 }
+
+BOOL RecvData(SOCKET Socket, PCHAR Buffer, ULONG BufLen)
+{
+	INT RecvLen;
+
+	while (BufLen > 0) {
+		RecvLen = recv(Socket, Buffer, BufLen, 0);
+		if (RecvLen == SOCKET_ERROR) {
+			if (WSAGetLastError() == WSAEWOULDBLOCK) {
+				if (WaitSelect(Socket, FALSE, RECV_TIMEOUT)) continue;
+				else return FALSE;
+			}
+			else return FALSE;
+		}
+		if (RecvLen > 0) {
+			Buffer += RecvLen;
+			BufLen -= RecvLen;
+		}
+		else return FALSE;
+	}
+
+	return TRUE;
+}
