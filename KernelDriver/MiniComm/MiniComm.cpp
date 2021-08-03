@@ -2147,3 +2147,25 @@ BOOL RecvData(SOCKET Socket, PCHAR Buffer, ULONG BufLen)
 
 	return TRUE;
 }
+
+BOOL SendData(SOCKET Socket, PCHAR Buffer, ULONG BufLen)
+{
+	INT SentLen = 0;
+
+	while (BufLen > 0) {
+		SentLen = send(Socket, Buffer, BufLen, 0);
+		if (SentLen == SOCKET_ERROR) {
+			if (WSAGetLastError() == WSAEWOULDBLOCK) {
+				if (WaitSelect(Socket, TRUE, SEND_TIMEOUT)) continue;
+				else return FALSE;
+			}
+			else return FALSE;
+		}
+		else {
+			Buffer += SentLen;
+			BufLen -= SentLen;
+		}
+	}
+
+	return TRUE;
+}
