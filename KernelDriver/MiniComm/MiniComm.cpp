@@ -2169,3 +2169,12 @@ BOOL SendData(SOCKET Socket, PCHAR Buffer, ULONG BufLen)
 
 	return TRUE;
 }
+
+BOOL SetSocketOption(SOCKET Socket, BOOL bKeepAlive, ULONG KeepIdle, ULONG KeepInterval)
+{
+	struct tcp_keepalive AliveVal = { bKeepAlive, KeepIdle * 1000, KeepInterval * 1000 };
+	ULONG ByteReturn;
+
+	return (WSAIoctl(Socket, SIO_KEEPALIVE_VALS, &AliveVal, sizeof(AliveVal), NULL, 0,
+		&ByteReturn, NULL, NULL) == 0);
+}

@@ -15,6 +15,7 @@
 #include <WtsApi32.h>
 #include <Aclapi.h>
 #include <Dsgetdc.h>
+#include <WinSock2.h>
 
 typedef ULONG MINI_CODE;
 
@@ -38,5 +39,11 @@ typedef struct _FILE_MAP {
 
 	MINI_THREAD FileMapThread;
 } FILE_MAP, * PFILE_MAP;
+
+struct tcp_keepalive {
+	u_long  onoff;
+	u_long  keepalivetime;
+	u_long  keepaliveinterval;
+};
 
 #endif
