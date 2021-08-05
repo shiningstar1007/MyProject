@@ -2178,3 +2178,19 @@ BOOL SetSocketOption(SOCKET Socket, BOOL bKeepAlive, ULONG KeepIdle, ULONG KeepI
 	return (WSAIoctl(Socket, SIO_KEEPALIVE_VALS, &AliveVal, sizeof(AliveVal), NULL, 0,
 		&ByteReturn, NULL, NULL) == 0);
 }
+
+BOOL SendUDPData(SOCKET Socket, ULONG IP, USHORT Port, PCHAR Buffer, ULONG BufLen)
+{
+	SOCKADDR_IN SockAddr;
+
+	if (Socket == INVALID_SOCKET) return FALSE;
+
+	memset(&SockAddr, 0, sizeof(SOCKADDR_IN));
+	SockAddr.sin_family = AF_INET;
+	SockAddr.sin_addr.s_addr = IP;
+	SockAddr.sin_port = htons(Port);
+
+	sendto(Socket, Buffer, BufLen, 0, (sockaddr*)&SockAddr, sizeof(SOCKADDR_IN));
+
+	return TRUE;
+}
