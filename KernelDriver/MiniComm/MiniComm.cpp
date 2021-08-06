@@ -2194,3 +2194,22 @@ BOOL SendUDPData(SOCKET Socket, ULONG IP, USHORT Port, PCHAR Buffer, ULONG BufLe
 
 	return TRUE;
 }
+
+BOOL WaitNetEvent(SOCKET Socket, WSAEVENT ClntEvent, ULONG NetEvent, ULONG TimeOut)
+{
+	ULONG dwRet;
+	WSANETWORKEVENTS NetEvents;
+
+	TimeOut *= 1000;
+
+	while (TRUE) {
+		dwRet = WSAWaitForMultipleEvents(1, &ClntEvent, FALSE, TimeOut, FALSE);
+
+		if (dwRet != WSA_WAIT_EVENT_0) return FALSE;
+
+		if (WSAEnumNetworkEvents(Socket, ClntEvent, &NetEvents) == SOCKET_ERROR) return FALSE;
+
+		if (NetEvents.lNetworkEvents & FD_CLOSE) return FALSE;
+		else if (NetEvents.lNetworkEvents & NetEvent) return TRUE;
+	}
+}
