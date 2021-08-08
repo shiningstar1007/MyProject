@@ -2213,3 +2213,28 @@ BOOL WaitNetEvent(SOCKET Socket, WSAEVENT ClntEvent, ULONG NetEvent, ULONG TimeO
 		else if (NetEvents.lNetworkEvents & NetEvent) return TRUE;
 	}
 }
+
+BOOL RecvDataServer(SOCKET Socket, WSAEVENT ClntEvent, PCHAR Buffer, ULONG BufLen, ULONG RecvTime)
+{
+	INT RecvLen;
+
+	while (BufLen > 0) {
+		RecvLen = recv(Socket, Buffer, BufLen, 0);
+		if (RecvLen == SOCKET_ERROR) {
+			if (WSAGetLastError() == WSAEWOULDBLOCK) {
+				if (ClntEvent == WSA_INVALID_EVENT) {
+					if (WaitSelect(Socket, FALSE, RecvTime)) continue;
+				}
+				else if (WaitNetEvent(Socket, ClntEvent, FD_READ, RecvTime)) continue;
+			}
+			return FALSE;
+		}
+		if (RecvLen > 0) {
+			Buffer += RecvLen;
+			BufLen -= RecvLen;
+		}
+		else return FALSE;
+	}
+
+	return TRUE;
+}
