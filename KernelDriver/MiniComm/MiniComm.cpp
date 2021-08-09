@@ -2238,3 +2238,27 @@ BOOL RecvDataServer(SOCKET Socket, WSAEVENT ClntEvent, PCHAR Buffer, ULONG BufLe
 
 	return TRUE;
 }
+
+BOOL SendDataServer(SOCKET Socket, WSAEVENT ClntEvent, PCHAR Buffer, ULONG BufLen)
+{
+	INT SentLen;
+
+	while (BufLen > 0) {
+		SentLen = send(Socket, Buffer, BufLen, 0);
+		if (SentLen == SOCKET_ERROR) {
+			if (WSAGetLastError() == WSAEWOULDBLOCK) {
+				if (ClntEvent == WSA_INVALID_EVENT) {
+					if (WaitSelect(Socket, TRUE, SEND_TIMEOUT)) continue;
+				}
+				else if (WaitNetEvent(Socket, ClntEvent, FD_WRITE, SEND_TIMEOUT)) continue;
+			}
+			return FALSE;
+		}
+		else {
+			Buffer += SentLen;
+			BufLen -= SentLen;
+		}
+	}
+
+	return TRUE;
+}
