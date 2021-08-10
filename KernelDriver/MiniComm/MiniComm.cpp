@@ -1,4 +1,4 @@
-#include "MiniComm.h"
+"MiniComm.h"
 
 #pragma comment(lib, "netapi32.lib")
 
@@ -2261,4 +2261,17 @@ BOOL SendDataServer(SOCKET Socket, WSAEVENT ClntEvent, PCHAR Buffer, ULONG BufLe
 	}
 
 	return TRUE;
+}
+
+VOID CloseServerSocket(WSAEVENT* ServerEvent, SOCKET* ServerSock)
+{
+	if (*ServerEvent != WSA_INVALID_EVENT) {
+		WSACloseEvent(*ServerEvent);
+		*ServerEvent = WSA_INVALID_EVENT;
+	}
+
+	if (*ServerSock != INVALID_SOCKET) {
+		closesocket(*ServerSock);
+		*ServerSock = INVALID_SOCKET;
+	}
 }
