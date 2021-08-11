@@ -1,4 +1,4 @@
-"MiniComm.h"
+#include "MiniComm.h"
 
 #pragma comment(lib, "netapi32.lib")
 
@@ -2274,4 +2274,31 @@ VOID CloseServerSocket(WSAEVENT* ServerEvent, SOCKET* ServerSock)
 		closesocket(*ServerSock);
 		*ServerSock = INVALID_SOCKET;
 	}
+}
+
+BOOL NTDriverStart(PCHAR DriverName)
+{
+	SC_HANDLE hSCM, hSrv;
+	BOOL Ret;
+
+	hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	if (!hSCM) return FALSE;
+
+	hSrv = OpenServiceA(hSCM, DriverName, SERVICE_ALL_ACCESS);
+	if (!hSrv) {
+		CloseServiceHandle(hSCM);
+		return FALSE;
+	}
+
+	Ret = StartService(hSrv, 0, NULL);
+	if (!Ret) {
+		ULONG LastErr = GetLastError();
+
+		if (LastErr == ERROR_SERVICE_ALREADY_RUNNING) Ret = TRUE;
+	}
+
+	CloseServiceHandle(hSrv);
+	CloseServiceHandle(hSCM);
+
+	return Ret;
 }
