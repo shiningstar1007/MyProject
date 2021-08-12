@@ -2278,26 +2278,49 @@ VOID CloseServerSocket(WSAEVENT* ServerEvent, SOCKET* ServerSock)
 
 BOOL NTDriverStart(PCHAR DriverName)
 {
-	SC_HANDLE hSCM, hSrv;
+	SC_HANDLE hSCM, hService;
 	BOOL Ret;
 
 	hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
 	if (!hSCM) return FALSE;
 
-	hSrv = OpenServiceA(hSCM, DriverName, SERVICE_ALL_ACCESS);
-	if (!hSrv) {
+	hService = OpenServiceA(hSCM, DriverName, SERVICE_ALL_ACCESS);
+	if (!hService) {
 		CloseServiceHandle(hSCM);
 		return FALSE;
 	}
 
-	Ret = StartService(hSrv, 0, NULL);
+	Ret = StartService(hService, 0, NULL);
 	if (!Ret) {
 		ULONG LastErr = GetLastError();
 
 		if (LastErr == ERROR_SERVICE_ALREADY_RUNNING) Ret = TRUE;
 	}
 
-	CloseServiceHandle(hSrv);
+	CloseServiceHandle(hService);
+	CloseServiceHandle(hSCM);
+
+	return Ret;
+}
+
+BOOL NTDriverStop(PCHAR DriverName)
+{
+	SC_HANDLE hSCM, hService;
+	BOOL Ret;
+	SERVICE_STATUS SvcStat = { 0 };
+
+	hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	if (!hSCM) return FALSE;
+
+	hService = OpenService(hSCM, DriverName, SERVICE_ALL_ACCESS);
+	if (!hService) {
+		CloseServiceHandle(hSCM);
+		return FALSE;
+	}
+
+	Ret = ControlService(hService, SERVICE_CONTROL_STOP, &SvcStat);
+
+	CloseServiceHandle(hService);
 	CloseServiceHandle(hSCM);
 
 	return Ret;
