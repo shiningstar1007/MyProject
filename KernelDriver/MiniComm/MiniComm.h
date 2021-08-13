@@ -17,7 +17,9 @@
 #include <Dsgetdc.h>
 #include <WinSock2.h>
 
-typedef ULONG MINI_CODE;
+#include "ErrorCode.h"
+
+typedef ULONG MINICODE;
 
 typedef struct _MINI_THREAD {
 	HANDLE Handle;

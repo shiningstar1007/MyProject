@@ -8,3 +8,5 @@
 #include <Windows.h>
 #include <fltUser.h>
 #include <strsafe.h>
+
+#include "ErrorCode.h"

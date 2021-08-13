@@ -1437,7 +1437,7 @@ BOOL CheckGroupName(PCHAR GroupName)
 
 BOOL CheckGroupMember(PWCHAR DomainNameW, PWCHAR UserNameW, PCHAR GroupStr, GROUP_TYPE GroupType)
 {
-	TOSERR ErrCode = ERR_AGT_SUCCESS;
+	MINICODE ErrCode;
 	CHAR GroupName[MAX_PATH * 2];
 	PGROUP_USERS_INFO_0 pGroups = NULL, TmpGroup;
 	ULONG PreMax = -1, EntriesRead = 0, TotalEntries = 0, GroupCnt, TmpLen;
@@ -1464,7 +1464,7 @@ BOOL CheckGroupMember(PWCHAR DomainNameW, PWCHAR UserNameW, PCHAR GroupStr, GROU
 
 		MyStrNCopy(TmpStr, GroupStr, TmpLen);
 		NextGroup = TmpStr;
-		while (NextGroup && ErrCode == ERR_AGT_SUCCESS && !bFound) {
+		while (NextGroup && ErrCode == ERR_MINI_SUCCESS && !bFound) {
 			Group = MyStrTok(NextGroup, SEP_COMMA, &NextGroup, FALSE);
 			if (!Group) break;
 
@@ -1483,7 +1483,7 @@ BOOL CheckGroupMember(PWCHAR DomainNameW, PWCHAR UserNameW, PCHAR GroupStr, GROU
 			NetApiBufferFree(pGroups);
 			pGroups = NULL;
 		}
-	} while (nStatus == ERROR_MORE_DATA && ErrCode == ERR_AGT_SUCCESS);
+	} while (nStatus == ERROR_MORE_DATA && ErrCode == ERR_MINI_SUCCESS);
 
 	return bFound;
 }
@@ -1998,7 +1998,7 @@ VOID FileMapClntFinalize(PFILE_MAP FileMap)
 	FileMap->hFileMap = FileMap->hMutex = FileMap->hWaitEvent = NULL;
 }
 
-MINI_CODE FileMapWrite(PFILE_MAP FileMap, PCHAR Command, PCHAR ParamStr)
+MINICODE FileMapWrite(PFILE_MAP FileMap, PCHAR Command, PCHAR ParamStr)
 {
 	HANDLE hReadEvent;
 	ULONG RetWait, Len;
@@ -2324,4 +2324,18 @@ BOOL NTDriverStop(PCHAR DriverName)
 	CloseServiceHandle(hSCM);
 
 	return Ret;
+}
+
+VOID GetEventUser(EVENTLOGRECORD* EvtRecord, PCHAR UserName, PCHAR DomainName)
+{
+	DWORD UserLen = MAX_USER_NAME, DomainLen = 256;
+	SID_NAME_USE Use;
+	PSID SId;
+
+	*UserName = *DomainName = 0;
+
+	if (EvtRecord->UserSidLength <= 0) return;
+
+	SId = (PSID)((LPBYTE)EvtRecord + EvtRecord->UserSidOffset);
+	LookupAccountSid(NULL, SId, UserName, &UserLen, DomainName, &DomainLen, &Use);
 }
