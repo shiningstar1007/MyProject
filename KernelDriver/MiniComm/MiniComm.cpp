@@ -2339,3 +2339,22 @@ VOID GetEventUser(EVENTLOGRECORD* EvtRecord, PCHAR UserName, PCHAR DomainName)
 	SId = (PSID)((LPBYTE)EvtRecord + EvtRecord->UserSidOffset);
 	LookupAccountSid(NULL, SId, UserName, &UserLen, DomainName, &DomainLen, &Use);
 }
+
+BOOL ReadEventSourceInfo(PCHAR Source, PCHAR EventFile, PCHAR LogName)
+{
+	HKEY hKey;
+	DWORD dwBytesReturned = MAX_KPATH;
+	CHAR KeyPath[MAX_KPATH];
+
+	*EventFile = 0;
+
+	if (!Source) return FALSE;
+
+	MySNPrintf(KeyPath, MAX_KPATH, "System\\CurrentControlSet\\Services\\EventLog\\%s\\%s", LogName, Source);
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, KeyPath, 0, KEY_ALL_ACCESS, &hKey) != ERROR_SUCCESS) return FALSE;
+
+	RegQueryValueExA(hKey, "EventMessageFile", NULL, NULL, (LPBYTE)EventFile, &dwBytesReturned);
+	RegCloseKey(hKey);
+
+	return TRUE;
+}

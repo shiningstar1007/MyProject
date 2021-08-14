@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\MiniComm\ErrorCode.h" />
     <ClInclude Include="..\MiniComm\MiniComm.h" />
     <ClInclude Include="AccessControl.h" />
     <ClInclude Include="framework.h" />
