@@ -2358,3 +2358,20 @@ BOOL ReadEventSourceInfo(PCHAR Source, PCHAR EventFile, PCHAR LogName)
 
 	return TRUE;
 }
+
+PCHAR GetEventMessage(HMODULE hDll, DWORD dwEventIndex, DWORD dwLanguageID, PCHAR* Params)
+{
+	ULONG Flags = FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ALLOCATE_BUFFER;
+	PCHAR MsgBuf = NULL;
+
+	if (Params) Flags |= FORMAT_MESSAGE_ARGUMENT_ARRAY;
+
+	__try {
+		FormatMessage(Flags, hDll, dwEventIndex, dwLanguageID, (LPTSTR)&MsgBuf, 0, Params);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER) {
+		return NULL;
+	}
+
+	return MsgBuf;
+}
