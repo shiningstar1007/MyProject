@@ -2375,3 +2375,39 @@ PCHAR GetEventMessage(HMODULE hDll, DWORD dwEventIndex, DWORD dwLanguageID, PCHA
 
 	return MsgBuf;
 }
+
+SERVER_TYPE GetServerType(PWCHAR DomainDNSW)
+{
+	PWSTR lpNameBuffer;
+	NETSETUP_JOIN_STATUS BufferType;
+	BOOL bDomain = FALSE;
+	NET_API_STATUS nStatus;
+	DWORD dwLevel = 101;
+	LPSERVER_INFO_101 pBuf = NULL;
+	LPWSTR lpDcName = NULL;
+
+	nStatus = NetGetJoinInformation(NULL, &lpNameBuffer, &BufferType);
+	if (nStatus == NERR_Success) {
+		if (BufferType == NetSetupDomainName) {
+			bDomain = TRUE;
+			MyStrNCopyW(DomainDNSW, lpNameBuffer, -1, 256);
+		}
+		NetApiBufferFree(lpNameBuffer);
+	}
+
+	if (bDomain) {
+		nStatus = NetServerGetInfo(NULL, dwLevel, (LPBYTE*)&pBuf);
+		if (nStatus == NERR_Success) {
+			if (pBuf->sv101_type & SV_TYPE_DOMAIN_CTRL)
+				return PRIMARY_DOMAIN_CONTROLLER; // AD PDC
+			else if (pBuf->sv101_type & SV_TYPE_DOMAIN_BAKCTRL)
+				return BACKUP_DOMAIN_CONTROLLER; // AD BDC
+
+			NetApiBufferFree(pBuf);
+		}
+
+		return DOMAIN_MEMBER; // AD Member
+	}
+
+	return NONE_AD;
+}
