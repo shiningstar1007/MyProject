@@ -2411,3 +2411,13 @@ SERVER_TYPE GetServerType(PWCHAR DomainDNSW)
 
 	return NONE_AD;
 }
+
+ULONGLONG GetFileIdByHandle(HANDLE hFile)
+{
+	BY_HANDLE_FILE_INFORMATION FileInfo;
+
+	if (GetFileInformationByHandle(hFile, &FileInfo))
+		return ((ULONGLONG)FileInfo.nFileIndexHigh << 32) | (ULONGLONG)FileInfo.nFileIndexLow;
+	else return 0;
+}
+
