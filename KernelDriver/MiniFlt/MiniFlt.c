@@ -418,6 +418,13 @@ MiniFltInstanceSetup(
 	else if (FlagOn(Flags, FLTFL_INSTANCE_SETUP_MANUAL_ATTACHMENT))
 		Flag = "FLTFL_INSTANCE_SETUP_MANUAL_ATTACHMENT";
 
+	if (VolumeDeviceType == FILE_DEVICE_CD_ROM_FILE_SYSTEM) {
+		DbgPrint("%s_DO_NOT_ATTACH Filesystem:%s Flag:%s Volume:%p Instance:%p\n",
+			DeviceType, FileSystem, Flag, FltObjects->Volume, FltObjects->Instance);
+
+		return STATUS_FLT_DO_NOT_ATTACH;
+	}
+
 	if (*FileSystem) {
 		DbgPrint("DeviceType:%s Filesystem:%s Flag:%s Volume:%p Instance:%p\n",
 			DeviceType, FileSystem, Flag, FltObjects->Volume, FltObjects->Instance);
