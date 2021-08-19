@@ -2421,3 +2421,20 @@ ULONGLONG GetFileIdByHandle(HANDLE hFile)
 	else return 0;
 }
 
+BOOL CheckProcessExt(PCHAR ProcExt)
+{
+	HKEY hKey;
+	CHAR Buffer[MAX_NAME] = { 0 };
+	ULONG RegSize = MAX_NAME;
+
+	if (RegOpenKeyExA(HKEY_CLASSES_ROOT, ProcExt, 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
+		return FALSE;
+
+	RegQueryValueExA(hKey, "", NULL, NULL, (LPBYTE)Buffer, &RegSize);
+	RegCloseKey(hKey);
+
+	if (*Buffer && !_stricmp(Buffer, "exefile")) return TRUE;
+
+	return FALSE;
+}
+
