@@ -1197,7 +1197,6 @@ BOOL NTServiceInstall(PCHAR SvcName, PCHAR DispName, PCHAR SvcPath,
 	}
 	else {
 		MySNPrintf(MsgStr, sizeof(MsgStr), "Failed to install %s", SvcName);
-		MessageBox(NULL, MsgStr, "Fail", MB_OK | MB_ICONERROR);
 	}
 
 	CloseServiceHandle(hSCM);
@@ -2419,6 +2418,24 @@ ULONGLONG GetFileIdByHandle(HANDLE hFile)
 	if (GetFileInformationByHandle(hFile, &FileInfo))
 		return ((ULONGLONG)FileInfo.nFileIndexHigh << 32) | (ULONGLONG)FileInfo.nFileIndexLow;
 	else return 0;
+}
+
+ULONGLONG GetFileIdByPath(PCHAR FilePath)
+{
+	HANDLE hFile;
+	ULONGLONG FileID;
+
+	if (strlen(FilePath) > MAX_KPATH - 4) return 0;
+
+	hFile = CreateFile(FilePath, GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ |
+		FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) return 0;
+
+	FileID = GetFileIdByHandle(hFile);
+
+	CloseHandle(hFile);
+
+	return FileID;
 }
 
 BOOL CheckProcessExt(PCHAR ProcExt)
