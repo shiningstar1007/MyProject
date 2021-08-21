@@ -2427,7 +2427,7 @@ ULONGLONG GetFileIdByPath(PCHAR FilePath)
 
 	if (strlen(FilePath) > MAX_KPATH - 4) return 0;
 
-	hFile = CreateFile(FilePath, GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ |
+	hFile = CreateFileA(FilePath, GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ |
 		FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) return 0;
 
@@ -2455,3 +2455,14 @@ BOOL CheckProcessExt(PCHAR ProcExt)
 	return FALSE;
 }
 
+DWORD SetUserPasswordW(PWCHAR DomainNameW, PWCHAR UserNameW, PWCHAR PasswordW)
+{
+	DWORD ErrCode;
+	USER_INFO_1003 UserInfo1003;
+
+	UserInfo1003.usri1003_password = PasswordW;
+
+	ErrCode = NetUserSetInfo(DomainNameW, UserNameW, 1003, (LPBYTE)&UserInfo1003, NULL);
+	
+	return ErrCode;
+}
