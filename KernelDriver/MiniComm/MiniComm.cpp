@@ -2466,3 +2466,12 @@ DWORD SetUserPasswordW(PWCHAR DomainNameW, PWCHAR UserNameW, PWCHAR PasswordW)
 	
 	return ErrCode;
 }
+
+DWORD SetRemoteUserPasswordW(PWCHAR DomainNameW, PWCHAR UserNameW, PWCHAR OldPasswordW, PWCHAR PasswordW)
+{
+	DWORD ErrCode;
+
+	ErrCode = NetUserChangePassword(DomainNameW, UserNameW, OldPasswordW, PasswordW);
+	
+	return ErrCode;
+}
