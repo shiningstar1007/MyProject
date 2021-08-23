@@ -2475,3 +2475,28 @@ DWORD SetRemoteUserPasswordW(PWCHAR DomainNameW, PWCHAR UserNameW, PWCHAR OldPas
 	
 	return ErrCode;
 }
+
+VOID GenRandStr(PCHAR RandStr, ULONG StrLen)
+{
+	ULONG i, Special;
+	BOOL bSpecial = FALSE, bLower = FALSE, bUpper = FALSE, bDigit = FALSE;
+
+	if (StrLen < 4) return;
+
+	srand((unsigned)time(NULL));
+
+	RandStr[0] = (rand() % 26) + 'A';
+	RandStr[1] = (rand() % 26) + 'a';
+	RandStr[2] = (rand() % 10) + '0';
+
+	Special = rand() % 4;
+	if (Special == 0) RandStr[3] = (rand() % 16) + ' ';
+	else if (Special == 1) RandStr[3] = (rand() % 7) + ':';
+	else if (Special == 2) RandStr[3] = (rand() % 6) + '[';
+	else RandStr[3] = (rand() % 4) + '{';
+
+	for (i = 4; i < StrLen; i++) {
+		RandStr[i] = (rand() % 95) + ' ';
+	}
+	RandStr[i] = 0;
+}
