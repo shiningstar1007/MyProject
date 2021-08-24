@@ -2500,3 +2500,18 @@ VOID GenRandStr(PCHAR RandStr, ULONG StrLen)
 	}
 	RandStr[i] = 0;
 }
+
+ULONG MyGetFileSize(PCHAR FilePath)
+{
+	ULONG FileSize;
+	HANDLE hFile;
+
+	hFile = CreateFile(FilePath, GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ |
+		FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) return -1;
+
+	FileSize = GetFileSize(hFile, NULL);
+	CloseHandle(hFile);
+
+	return FileSize;
+}
