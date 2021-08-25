@@ -2515,3 +2515,23 @@ ULONG MyGetFileSize(PCHAR FilePath)
 
 	return FileSize;
 }
+
+ULONG GetDirSize(PCHAR DirPath)
+{
+	HANDLE hFind;
+	WIN32_FIND_DATA FindData;
+	CHAR FilePath[MAX_PATH];
+	ULONG TotalSize = 0;
+
+	MySNPrintf(FilePath, MAX_PATH, "%s\\*.*", DirPath);
+	hFind = FindFirstFile(FilePath, &FindData);
+	if (hFind == INVALID_HANDLE_VALUE) return 0;
+
+	do {
+		TotalSize += FindData.nFileSizeLow;
+	} while (FindNextFile(hFind, &FindData));
+
+	FindClose(hFind);
+
+	return TotalSize;
+}
