@@ -2262,6 +2262,23 @@ BOOL SendDataServer(SOCKET Socket, WSAEVENT ClntEvent, PCHAR Buffer, ULONG BufLe
 	return TRUE;
 }
 
+BOOL GetHeader(SOCKET Socket, PCHAR HeadBuf)
+{
+	CHAR AChar;
+	ULONG HeadLen = 0;
+
+	while (TRUE) {
+		if (!RecvData(Socket, &AChar, 1)) return FALSE;
+
+		HeadBuf[HeadLen] = AChar;
+		if (!AChar) break;
+		else if (HeadLen >= MAX_HEAD_SIZE - 1) return FALSE;
+		else HeadLen++;
+	}
+
+	return TRUE;
+}
+
 VOID CloseServerSocket(WSAEVENT* ServerEvent, SOCKET* ServerSock)
 {
 	if (*ServerEvent != WSA_INVALID_EVENT) {
