@@ -2552,3 +2552,13 @@ ULONG GetDirSize(PCHAR DirPath)
 
 	return TotalSize;
 }
+
+PLINK_DATA FindLink(PVOID LinkData, PLINK_SET LinkSet)
+{
+	PLINK_DATA Data = LinkSet->FirstLink;
+
+	for (; Data; Data = Data->NextLink)
+		if (Data->LinkData == LinkData) return Data;
+
+	return NULL;
+}
