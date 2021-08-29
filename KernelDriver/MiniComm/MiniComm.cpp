@@ -2562,3 +2562,26 @@ PLINK_DATA FindLink(PVOID LinkData, PLINK_SET LinkSet)
 
 	return NULL;
 }
+
+PLINK_DATA AddLink(PVOID LinkData, PLINK_SET LinkSet)
+{
+	PLINK_DATA Data = FindLink(LinkData, LinkSet);
+
+	if (Data) return Data;
+
+	Data = (PLINK_DATA)malloc(sizeof(LINK_DATA));
+	if (Data == NULL) return NULL;
+
+	memset(Data, 0, sizeof(LINK_DATA));
+	Data->LinkData = LinkData;
+
+	if (LinkSet->FirstLink && LinkSet->LastLink) {
+		LinkSet->LastLink->NextLink = Data;
+		LinkSet->LastLink = Data;
+	}
+	else LinkSet->FirstLink = LinkSet->LastLink = Data;
+
+	LinkSet->LinkCnt++;
+
+	return Data;
+}
