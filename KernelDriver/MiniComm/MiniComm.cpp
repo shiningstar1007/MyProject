@@ -2585,3 +2585,27 @@ PLINK_DATA AddLink(PVOID LinkData, PLINK_SET LinkSet)
 
 	return Data;
 }
+
+VOID DelLink(PVOID LinkData, PLINK_SET LinkSet)
+{
+	PLINK_DATA Data, PreLink;
+
+	for (Data = LinkSet->FirstLink; Data; Data = Data->NextLink) {
+		if (Data->LinkData == LinkData) {
+			if (Data == LinkSet->FirstLink) {
+				LinkSet->FirstLink = Data->NextLink;
+				if (Data == LinkSet->LastLink) LinkSet->LastLink = Data->NextLink;
+			}
+			else {
+				PreLink->NextLink = Data->NextLink;
+				if (Data == LinkSet->LastLink) LinkSet->LastLink = PreLink;
+			}
+			if (Data->AnyBuf) free(Data->AnyBuf);
+
+			free(Data);
+			LinkSet->LinkCnt--;
+			break;
+		}
+		PreLink = Data;
+	}
+}
