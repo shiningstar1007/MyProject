@@ -2609,3 +2609,16 @@ VOID DelLink(PVOID LinkData, PLINK_SET LinkSet)
 		PreLink = Data;
 	}
 }
+
+VOID ClearLink(PLINK_SET LinkSet)
+{
+	PLINK_DATA Data, NextLink;
+
+	for (Data = LinkSet->FirstLink; Data; Data = NextLink) {
+		NextLink = Data->NextLink;
+
+		free(Data);
+	}
+	LinkSet->FirstLink = LinkSet->LastLink = NULL;
+	LinkSet->LinkCnt = 0;
+}
