@@ -2622,3 +2622,44 @@ VOID ClearLink(PLINK_SET LinkSet)
 	LinkSet->FirstLink = LinkSet->LastLink = NULL;
 	LinkSet->LinkCnt = 0;
 }
+
+BOOL CheckMacAddress(PCHAR MACAddr)
+{
+	ULONG i, j, Len, Count = 0, IFSize = 0;
+	CHAR MACAddrs[MAX_NIC][20] = { 0 };
+	PMIB_IFTABLE pIFInfo = NULL;
+	PMIB_IFROW pInterface;
+
+	if (GetIfTable(NULL, &IFSize, TRUE) == ERROR_INSUFFICIENT_BUFFER)
+		pIFInfo = (PMIB_IFTABLE)malloc(IFSize);
+	if (!pIFInfo) return FALSE;
+
+	pIFInfo->dwNumEntries = 0;
+	GetIfTable(pIFInfo, &IFSize, TRUE);
+	for (i = 0; i < pIFInfo->dwNumEntries; i++) {
+		pInterface = (PMIB_IFROW)&pIFInfo->table[i];
+		if (pInterface->dwPhysAddrLen != 6) continue;
+
+		//MAC
+		for (j = 0, Len = 0; j < pInterface->dwPhysAddrLen; j++) {
+			Len += MySNPrintf(MACAddrs[Count] + Len, sizeof(MACAddrs[0]) - Len, "%.2X",
+				pInterface->bPhysAddr[j]);
+		}
+		if (strcmp(MACAddrs[Count], "000000000000")) {
+			for (j = 0; j < Count; j++) {
+				if (!_stricmp(MACAddrs[j], MACAddrs[Count])) break;
+			}
+			if (j == Count) pWriteF("Cnt:%u", ++Count);
+		}
+
+		if (Count >= MAX_NIC) break;
+	}
+
+	free(pIFInfo);
+
+	for (i = 0; i < Count; i++) {
+		if (!_stricmp(MACAddrs[i], MACAddr)) return TRUE;
+	}
+
+	return FALSE;
+}
