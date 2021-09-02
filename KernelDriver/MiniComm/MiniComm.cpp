@@ -2663,3 +2663,47 @@ BOOL CheckMacAddress(PCHAR MACAddr)
 
 	return FALSE;
 }
+
+BOOL CheckMacAddress2(PCHAR MACAddr)
+{
+	ULONG i, j, Len, Count = 0, AddrSize = 0;
+	CHAR MACAddrs[MAX_NIC][20] = { 0 };
+	PMIB_IPADDRTABLE pAddrInfo = NULL;
+	PMIB_IPADDRROW pAddr;
+	PMIB_IFTABLE pIFInfo = NULL;
+
+	if (GetIpAddrTable(NULL, &AddrSize, FALSE) == ERROR_INSUFFICIENT_BUFFER)
+		pAddrInfo = (PMIB_IPADDRTABLE)malloc(AddrSize);
+	if (!pAddrInfo) return FALSE;
+
+	pAddrInfo->dwNumEntries = 0;
+	//GetIpAddrTable(pAddrInfo, &AddrSize, FALSE);
+	for (i = 0, pAddr = pAddrInfo->table; i < pAddrInfo->dwNumEntries && pAddr; i++, pAddr++) {
+		Interface.dwIndex = pAddr->dwIndex;
+		AddrSize = GetIfEntry(&Interface);
+		if (AddrSize != NO_ERROR) {
+			pWriteF("Index:%u  Err:%u", pAddr->dwIndex, AddrSize);
+			continue;
+		}
+		else if (Interface.dwType == MIB_IF_TYPE_LOOPBACK) {
+			continue;
+		}
+
+		//MAC
+		for (j = 0, Len = 0; j < Interface.dwPhysAddrLen; j++) {
+			Len += MySNPrintf(MACAddrs[Count] + Len, sizeof(MACAddrs[0]) - Len, "%.2X",
+				Interface.bPhysAddr[j]);
+		}
+		if (strcmp(MACAddrs[Count], "000000000000")) Count++;
+
+		if (Count >= MAX_NIC) break;
+	}
+
+	free(pAddrInfo);
+
+	for (i = 0; i < Count; i++) {
+		if (!_stricmp(MACAddrs[i], MACAddr)) return TRUE;
+	}
+
+	return FALSE;
+}
