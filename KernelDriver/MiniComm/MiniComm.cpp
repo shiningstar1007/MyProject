@@ -2707,3 +2707,30 @@ BOOL CheckMacAddress2(PCHAR MACAddr)
 
 	return FALSE;
 }
+
+BOOL SetRegRootKey(PCHAR RegStr, PCHAR RegPath, ULONG MaxSize)
+{
+	ULONG i, Len;
+	CHAR RootName[32] = { 0 }, * SubName;
+
+	if (!RegStr || !*RegStr || !RegPath) return FALSE;
+
+	SubName = strchr(RegStr, '\\');
+	if (SubName) {
+		strncpy(RootName, RegStr, SubName - RegStr);
+		SubName++;
+	}
+	else MyStrNCpy(RootName, RegStr, sizeof(RootName));
+
+	for (i = 0; i < g_RootKeyCnt; i++) {
+		if (!_stricmp(RootName, g_RegRootKey[i].RootName) ||
+			!_stricmp(RootName, g_RegRootKey[i].RootShort)) {
+			Len = MySNPrintf(RegPath, MaxSize, "%s", g_RegRootKey[i].RootName);
+			if (SubName && *SubName) SetRegLinkKey(SubName, RegPath + Len, MaxSize - Len);
+
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
