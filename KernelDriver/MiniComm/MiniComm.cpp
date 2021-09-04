@@ -2734,3 +2734,27 @@ BOOL SetRegRootKey(PCHAR RegStr, PCHAR RegPath, ULONG MaxSize)
 
 	return FALSE;
 }
+
+VOID SetRegLinkKey(PCHAR SubName, PCHAR RegPath, ULONG MaxSize)
+{
+	ULONG Len, OriLen;
+	CHAR TmpPath[MAX_KPATH];
+
+	OriLen = (ULONG)strlen(g_ControlSet.OriName);
+	if (!_strnicmp(g_ControlSet.OriName, SubName, OriLen)) {
+		Len = MySNPrintf(TmpPath, MAX_KPATH, "%s", g_ControlSet.LinkName);
+		MyStrNCpy(TmpPath + Len, SubName + OriLen, MAX_KPATH - Len);
+	}
+	else MyStrNCpy(TmpPath, SubName, MAX_KPATH);
+
+	Len = MySNPrintf(RegPath, MaxSize, "\\");
+
+	OriLen = (ULONG)strlen(g_CHPCurrent.OriName);
+	if (!_strnicmp(g_CHPCurrent.OriName, TmpPath, OriLen)) {
+		Len += MySNPrintf(RegPath + Len, MaxSize - Len, "%s", g_CHPCurrent.LinkName);
+		MyStrNCpy(RegPath + Len, TmpPath + OriLen, MaxSize - Len);
+	}
+	else MyStrNCpy(RegPath + Len, TmpPath, MaxSize);
+
+	if (RegPath[strlen(RegPath) - 1] == '\\') RegPath[strlen(RegPath) - 1] = 0;
+}
