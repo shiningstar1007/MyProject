@@ -2708,6 +2708,16 @@ BOOL CheckMacAddress2(PCHAR MACAddr)
 	return FALSE;
 }
 
+REG_ROOTKEY g_RegRootKey[] = {
+	{HKEY_LOCAL_MACHINE, "HKEY_LOCAL_MACHINE", "HKLM", "MACHINE"},
+	{HKEY_USERS, "HKEY_USERS", "HKUS", "USER"},
+};
+ULONG g_RootKeyCnt = sizeof(g_RegRootKey) / sizeof(REG_ROOTKEY);
+
+REG_LINKKEY g_ControlSet = { "SYSTEM\\ControlSet001", "SYSTEM\\CurrentControlSet" };
+REG_LINKKEY g_CHPCurrent = { "SYSTEM\\CurrentControlSet\\Hardware Profiles\\0001",
+	"SYSTEM\\CurrentControlSet\\Hardware Profiles\\Current" };
+
 BOOL SetRegRootKey(PCHAR RegStr, PCHAR RegPath, ULONG MaxSize)
 {
 	ULONG i, Len;
@@ -2743,18 +2753,31 @@ VOID SetRegLinkKey(PCHAR SubName, PCHAR RegPath, ULONG MaxSize)
 	OriLen = (ULONG)strlen(g_ControlSet.OriName);
 	if (!_strnicmp(g_ControlSet.OriName, SubName, OriLen)) {
 		Len = MySNPrintf(TmpPath, MAX_KPATH, "%s", g_ControlSet.LinkName);
-		MyStrNCpy(TmpPath + Len, SubName + OriLen, MAX_KPATH - Len);
+		MyStrNCopy(TmpPath + Len, SubName + OriLen, MAX_KPATH - Len);
 	}
-	else MyStrNCpy(TmpPath, SubName, MAX_KPATH);
+	else MyStrNCopy(TmpPath, SubName, MAX_KPATH);
 
 	Len = MySNPrintf(RegPath, MaxSize, "\\");
 
 	OriLen = (ULONG)strlen(g_CHPCurrent.OriName);
 	if (!_strnicmp(g_CHPCurrent.OriName, TmpPath, OriLen)) {
 		Len += MySNPrintf(RegPath + Len, MaxSize - Len, "%s", g_CHPCurrent.LinkName);
-		MyStrNCpy(RegPath + Len, TmpPath + OriLen, MaxSize - Len);
+		MyStrNCopy(RegPath + Len, TmpPath + OriLen, MaxSize - Len);
 	}
-	else MyStrNCpy(RegPath + Len, TmpPath, MaxSize);
+	else MyStrNCopy(RegPath + Len, TmpPath, MaxSize);
 
 	if (RegPath[strlen(RegPath) - 1] == '\\') RegPath[strlen(RegPath) - 1] = 0;
+}
+
+HKEY RootStrToKey(PCHAR RootStr)
+{
+	ULONG i;
+
+	for (i = 0; i < g_RootKeyCnt; i++) {
+		if (!_stricmp(RootStr, g_RegRootKey[i].RootName) ||
+			!_stricmp(RootStr, g_RegRootKey[i].RootShort))
+			return g_RegRootKey[i].hRootKey;
+	}
+
+	return NULL;
 }
