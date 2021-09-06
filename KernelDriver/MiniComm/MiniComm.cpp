@@ -2781,3 +2781,20 @@ HKEY RootStrToKey(PCHAR RootStr)
 
 	return NULL;
 }
+
+VOID pWrite(PCHAR fmt, ...)
+{
+	va_list ap;
+	PCHAR Buffer = (PCHAR)malloc(4096);
+
+	if (Buffer != NULL) memset(Buffer, 0, 4096);
+	else return;
+
+	va_start(ap, fmt);
+	vsnprintf(Buffer, 4095, fmt, ap);
+	va_end(ap);
+
+	OutputDebugStringA(Buffer);
+
+	free(Buffer);
+}
