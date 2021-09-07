@@ -2798,3 +2798,46 @@ VOID pWrite(PCHAR fmt, ...)
 
 	free(Buffer);
 }
+
+VOID pWriteF(PCHAR fmt, ...)
+{
+	va_list ap;
+	FILE* fp;
+	ULONG ProcessId;
+	PCHAR Buffer;
+
+	Buffer = (PCHAR)malloc(MAX_CMD_BUF);
+	if (Buffer) memset(Buffer, 0, MAX_CMD_BUF);
+	else return;
+
+	ProcessId = GetCurrentProcessId();
+
+	if (!strcmp(fmt, "time")) {
+		SYSTEMTIME SysTime;
+
+		GetLocalTime(&SysTime);
+		MySNPrintf(Buffer, MAX_CMD_BUF, "%02u-%02u %02u:%02u:%02u.%03u ", SysTime.wMonth,
+			SysTime.wDay, SysTime.wHour, SysTime.wMinute, SysTime.wSecond, SysTime.wMilliseconds);
+	}
+	else {
+		va_start(ap, fmt);
+		_vsnprintf(Buffer, MAX_CMD_BUF - 1, fmt, ap);
+		va_end(ap);
+	}
+
+
+	OutputDebugString(Buffer);
+
+	fp = fopen("C:\\MINIDbg.log", "at");
+	if (fp) {
+		SYSTEMTIME SysTime;
+
+		GetLocalTime(&SysTime);
+
+		fprintf(fp, "%02u-%02u %02u:%02u:%02u.%03u [%u] %s\n", SysTime.wMonth, SysTime.wDay,
+			SysTime.wHour, SysTime.wMinute, SysTime.wSecond, SysTime.wMilliseconds, ProcessId, Buffer);
+		fclose(fp);
+	}
+
+	free(Buffer);
+}
