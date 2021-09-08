@@ -2841,3 +2841,26 @@ VOID pWriteF(PCHAR fmt, ...)
 
 	free(Buffer);
 }
+
+VOID DumpDataBuf(PCHAR DataBuf, ULONG DataLen)
+{
+	ULONG Len, Index;
+	PCHAR DumpBuf;
+
+	DumpBuf = (PCHAR)malloc(MAX_KPATH);
+	if (!DumpBuf) return;
+
+	for (Index = 0; Index < DataLen;) {
+		memset(DumpBuf, 0, MAX_KPATH);
+		for (Len = 0; Len < MAX_KPATH - 3 && Index < DataLen; Index++) {
+			if (Len > 0) Len += MySNPrintf(DumpBuf + Len, MAX_KPATH - Len, " ");
+
+			if (isprint(DataBuf[Index] & 0xFF))
+				Len += MySNPrintf(DumpBuf + Len, MAX_KPATH - Len, "%c", DataBuf[Index] & 0xFF);
+			else Len += MySNPrintf(DumpBuf + Len, MAX_KPATH - Len, "%02x", DataBuf[Index] & 0xFF);
+		}
+		pWrite("%s", DumpBuf);
+	}
+
+	free(DumpBuf);
+}
