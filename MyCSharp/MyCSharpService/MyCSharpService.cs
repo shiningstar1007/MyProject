@@ -332,6 +332,21 @@ namespace MyCSharp.Service
 
             return bSetProperties;
         }
+
+        public bool CheckDiskSize(string fileName, long fileSize)
+        {
+            var drvs = DriveInfo.GetDrives().Where(e => e.IsReady && (e.DriveType == DriveType.Fixed));
+
+            foreach (DriveInfo drv in drvs)
+            {
+                if (char.ToLower(drv.Name[0]) == char.ToLower(fileName[0]))
+                {
+                    if (fileSize >= drv.AvailableFreeSpace) return false;
+                }
+            }
+
+            return true;
+        }
     }
 
     public class ACL_Subject
