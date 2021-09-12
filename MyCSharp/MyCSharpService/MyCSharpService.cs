@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Sockets;
 
 namespace MyCSharp.Service
 {
@@ -372,6 +373,25 @@ namespace MyCSharp.Service
             }
 
             return hostName;
+        }
+
+        public static string GetIPInfo()
+        {
+            string IPString = "";
+
+            try
+            {
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+                IPAddress ipAddress = ipHostInfo.AddressList.FirstOrDefault(
+                                        a => a.AddressFamily == AddressFamily.InterNetwork);
+
+                IPString = ipAddress != null ? ipAddress.ToString() : "";
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return IPString;
         }
     }
 
