@@ -13,6 +13,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Management;
 
 namespace MyCSharp.Service
 {
@@ -392,6 +393,24 @@ namespace MyCSharp.Service
             }
 
             return IPString;
+        }
+
+        public static List<string> GetProcessInfo()
+        {
+            ManagementClass management = new ManagementClass("Win32_Process");
+            ManagementObjectCollection mCollection = management.GetInstances();
+
+            List<string> processList = new List<string>();
+
+            foreach (ManagementObject ps in mCollection)
+            {
+                if ((string)ps["ExecutablePath"] != null)
+                {
+                    processList.Add((string)ps["ExecutablePath"]);
+                }
+            }
+
+            return processList;
         }
     }
 
