@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Management;
+using System.Security.Principal;
 
 namespace MyCSharp.Service
 {
@@ -426,6 +427,27 @@ namespace MyCSharp.Service
             }
 
             return false;
+        }
+
+        public static bool CreateDir(string dirPath)
+        {
+            if (Directory.Exists(dirPath))
+            {
+                return false;
+            }
+
+            Directory.CreateDirectory(dirPath);
+
+            DirectoryInfo dInfo = new DirectoryInfo(dirPath);
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+            dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null),
+                                                            FileSystemRights.FullControl,
+                                                            InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
+                                                            PropagationFlags.NoPropagateInherit,
+                                                            AccessControlType.Allow));
+            dInfo.SetAccessControl(dSecurity);
+
+            return true;
         }
     }
 
