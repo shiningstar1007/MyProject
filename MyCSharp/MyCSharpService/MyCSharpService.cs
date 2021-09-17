@@ -404,7 +404,6 @@ namespace MyCSharp.Service
 
             return string.Empty;
         }
-
         public static string GetIPInfo()
         {
             string IPString = "";
@@ -478,7 +477,18 @@ namespace MyCSharp.Service
             return true;
         }
 
-        
+        public string MyReadFile(string fileName, int length)
+        {
+            byte[] buffer = new byte[length];
+
+            using (FileStream fs = new FileStream(fileName, FileMode.Open, FileSystemRights.Read, FileShare.Read, 8, FileOptions.Asynchronous))
+            {
+                fs.Read(buffer, 0, length);
+            }
+
+            return Encoding.Default.GetString(buffer);
+        }
+
     }
 
     public class ACL_Subject
