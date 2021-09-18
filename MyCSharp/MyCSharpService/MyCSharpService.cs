@@ -489,6 +489,33 @@ namespace MyCSharp.Service
             return Encoding.Default.GetString(buffer);
         }
 
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        private struct NETRESOURCE
+        {
+            public uint dwScope;
+            public uint dwType;
+            public uint dwDisplayType;
+            public uint dwUsage;
+            public string lpLocalName;
+            public string lpRemoteName;
+            public string lpComment;
+            public string lpProvider;
+        }
+        const int RESOURCETYPE_DISK = 0x00000001;
+        const int CONNECT_TEMPORARY = 0x00000004;
+        const int ERROR_NO_ADMIN_INFO = 13120;
+        const int ERROR_NO_SUCH_LOGON_SESSION = 1312;
+        const int ERROR_SESSION_CREDENTIAL_CONFLICT = 1219;
+
+        // API 함수 선언
+        [DllImport("mpr.dll", CharSet = CharSet.Auto)]
+        private static extern int WNetAddConnection2(ref NETRESOURCE netResource,
+           string password, string username, uint flags);
+
+        // API 함수 선언 (공유해제)
+        [DllImport("mpr.dll", EntryPoint = "WNetCancelConnection2", CharSet = CharSet.Auto)]
+        private static extern int WNetCancelConnection2(string lpName, int dwFlags, int fForce);
+
     }
 
     public class ACL_Subject
