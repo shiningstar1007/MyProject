@@ -507,6 +507,10 @@ namespace MyCSharp.Service
         const int ERROR_NO_SUCH_LOGON_SESSION = 1312;
         const int ERROR_SESSION_CREDENTIAL_CONFLICT = 1219;
 
+        private const int RESOURCETYPE_ANY = 0x0;
+        private const int CONNECT_INTERACTIVE = 0x00000008;
+        private const int CONNECT_PROMPT = 0x00000010;
+
         // API 함수 선언
         [DllImport("mpr.dll", CharSet = CharSet.Auto)]
         private static extern int WNetAddConnection2(ref NETRESOURCE netResource,
@@ -515,6 +519,19 @@ namespace MyCSharp.Service
         // API 함수 선언 (공유해제)
         [DllImport("mpr.dll", EntryPoint = "WNetCancelConnection2", CharSet = CharSet.Auto)]
         private static extern int WNetCancelConnection2(string lpName, int dwFlags, int fForce);
+
+        public static int TryNetWorkConnect(string serverName, string userName, string userPwd)
+        {
+            NETRESOURCE netResource = new NETRESOURCE();
+            netResource.dwType = RESOURCETYPE_DISK;
+            netResource.lpRemoteName = serverName;
+            netResource.lpProvider = "";
+
+            int returnCode = WNetAddConnection2(ref netResource, userPwd, userName, 0);
+
+
+            return returnCode;
+        }
 
     }
 
