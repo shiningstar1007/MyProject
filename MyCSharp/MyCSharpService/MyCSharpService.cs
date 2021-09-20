@@ -510,6 +510,7 @@ namespace MyCSharp.Service
         private const int RESOURCETYPE_ANY = 0x0;
         private const int CONNECT_INTERACTIVE = 0x00000008;
         private const int CONNECT_PROMPT = 0x00000010;
+        private const int CONNECT_UPDATE_PROFILE = 0x00000001;
 
         // API 함수 선언
         [DllImport("mpr.dll", CharSet = CharSet.Auto)]
@@ -520,7 +521,7 @@ namespace MyCSharp.Service
         [DllImport("mpr.dll", EntryPoint = "WNetCancelConnection2", CharSet = CharSet.Auto)]
         private static extern int WNetCancelConnection2(string lpName, int dwFlags, int fForce);
 
-        public static int TryNetWorkConnect(string serverName, string userName, string userPwd)
+        public static int NetWorkDriveConnect(string serverName, string userName, string userPwd)
         {
             NETRESOURCE netResource = new NETRESOURCE();
             netResource.dwType = RESOURCETYPE_DISK;
@@ -529,6 +530,13 @@ namespace MyCSharp.Service
 
             int returnCode = WNetAddConnection2(ref netResource, userPwd, userName, 0);
 
+
+            return returnCode;
+        }
+
+        public static int NetWorkDriveDisConnect(string serverName)
+        {
+            int returnCode = WNetCancelConnection2(serverName, CONNECT_UPDATE_PROFILE, 1);
 
             return returnCode;
         }
