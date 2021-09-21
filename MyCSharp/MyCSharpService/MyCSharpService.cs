@@ -15,6 +15,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Management;
 using System.Security.Principal;
+using Microsoft.Win32;
 
 namespace MyCSharp.Service
 {
@@ -487,6 +488,17 @@ namespace MyCSharp.Service
             }
 
             return Encoding.Default.GetString(buffer);
+        }
+
+        public void SetRegistryKeyValue(string regPath, string keyName, string data)
+        {
+            if (data != null)
+            {
+                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(regPath, true))
+                {
+                    regKey.SetValue(keyName, data, RegistryValueKind.String);
+                }
+            }
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
