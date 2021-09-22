@@ -490,13 +490,24 @@ namespace MyCSharp.Service
             return Encoding.Default.GetString(buffer);
         }
 
-        public void SetRegistryKeyValue(string regPath, string keyName, string data)
+        public void SetRegistryKeyValueString(string regPath, string keyName, object data)
         {
             if (data != null)
             {
                 using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(regPath, true))
                 {
-                    regKey.SetValue(keyName, data, RegistryValueKind.String);
+                    regKey.SetValue(keyName, (string)data, RegistryValueKind.String);
+                }
+            }
+        }
+
+        public void SetRegistryKeyValueDWORD(string regPath, string keyName, object data)
+        {
+            if (data != null)
+            {
+                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(regPath, true))
+                {
+                    regKey.SetValue(keyName, (int)data, RegistryValueKind.DWord);
                 }
             }
         }
