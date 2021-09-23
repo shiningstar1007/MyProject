@@ -490,6 +490,14 @@ namespace MyCSharp.Service
             return Encoding.Default.GetString(buffer);
         }
 
+        public void CreateRegistrySubKeyValueString(string subKeyName, string keyName, object data)
+        {
+            using (RegistryKey regKey = Registry.LocalMachine.CreateSubKey(subKeyName))
+            {
+                regKey.SetValue(keyName, (string)data, RegistryValueKind.String);
+            }
+        }
+
         public void SetRegistryKeyValueString(string regPath, string keyName, object data)
         {
             if (data != null)
