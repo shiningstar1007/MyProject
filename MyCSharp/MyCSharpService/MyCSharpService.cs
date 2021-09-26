@@ -482,12 +482,23 @@ namespace MyCSharp.Service
         {
             byte[] buffer = new byte[length];
 
-            using (FileStream fs = new FileStream(fileName, FileMode.Open, FileSystemRights.Read, FileShare.Read, 8, FileOptions.Asynchronous))
+            using (FileStream fs = new FileStream(fileName, FileMode.Open, FileSystemRights.Read, FileShare.Read, (length - 1), FileOptions.Asynchronous))
             {
                 fs.Read(buffer, 0, length);
             }
 
             return Encoding.Default.GetString(buffer);
+        }
+
+        public void MyWriteFile(string fileName, string data, int length)
+        {
+            using (FileStream fs = new FileStream(fileName, FileMode.Append))
+            {
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    sw.Write(data);
+                }
+            }
         }
 
         public void CreateRegistrySubKeyValueString(string subKeyName, string keyName, object data)
@@ -503,14 +514,16 @@ namespace MyCSharp.Service
             using (RegistryKey regKey = Registry.LocalMachine.CreateSubKey(subKeyName))
             {
             }
-
-            if (regType == RegistryValueKind.DWord)
+            if (data != null)
             {
-                SetRegistryKeyValueDWORD(subKeyName, keyName, data);
-            }
-            else if (regType == RegistryValueKind.Binary)
-            {
-                SetRegistryKeyValueBinary(subKeyName, keyName, data);
+                if (regType == RegistryValueKind.DWord)
+                {
+                    SetRegistryKeyValueDWORD(subKeyName, keyName, data);
+                }
+                else if (regType == RegistryValueKind.Binary)
+                {
+                    SetRegistryKeyValueBinary(subKeyName, keyName, data);
+                }
             }
         }
 
