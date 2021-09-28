@@ -33,5 +33,15 @@ namespace MyCSharpService
 
             return SUB_TYPE.SUB_UNKNOWN;
         }
+
+        public String SubTypeToStr(SUB_TYPE SubType)
+        {
+            if (SubType == SUB_TYPE.SUB_USER) return SUB_TYPE_STR.SUB_USER_STR;
+            else if (SubType == SUB_TYPE.SUB_PROC) return SUB_TYPE_STR.SUB_PROC_STR;
+            else if (SubType == SUB_TYPE.SUB_SHARE) return SUB_TYPE_STR.SUB_SHARE_STR;
+            else if (SubType == SUB_TYPE.SUB_GROUP) return SUB_TYPE_STR.SUB_GROUP_STR;
+
+            return "";
+        }
     }
 }

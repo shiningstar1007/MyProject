@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommFunc.cs" />
     <Compile Include="MyCSharpService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
