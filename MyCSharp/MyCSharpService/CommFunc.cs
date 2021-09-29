@@ -43,5 +43,13 @@ namespace MyCSharpService
 
             return "";
         }
+
+        public OBJ_TYPE StrToObjType(String ObjTypeStr)
+        {
+            if (ObjTypeStr == OBJ_TYPE_STR.OBJ_FILE_STR) return OBJ_TYPE.OBJ_FILE;
+            else if (ObjTypeStr == OBJ_TYPE_STR.OBJ_DIR_STR) return OBJ_TYPE.OBJ_DIR;
+
+            return OBJ_TYPE.OBJ_UNKNOWN;
+        }
     }
 }
