@@ -44,12 +44,33 @@ namespace MyCSharpService
             return "";
         }
 
+        public enum OBJ_TYPE : int
+        {
+            OBJ_FILE = 0,
+            OBJ_DIR,
+            OBJ_UNKNOWN
+        }
+
+        public static class OBJ_TYPE_STR
+        {
+            public const String OBJ_FILE_STR = "file";
+            public const String OBJ_DIR_STR = "dir";
+        }
+
         public OBJ_TYPE StrToObjType(String ObjTypeStr)
         {
             if (ObjTypeStr == OBJ_TYPE_STR.OBJ_FILE_STR) return OBJ_TYPE.OBJ_FILE;
             else if (ObjTypeStr == OBJ_TYPE_STR.OBJ_DIR_STR) return OBJ_TYPE.OBJ_DIR;
 
             return OBJ_TYPE.OBJ_UNKNOWN;
+        }
+
+        public String ObjTypeToStr(OBJ_TYPE ObjType)
+        {
+            if (ObjType == OBJ_TYPE.OBJ_FILE) return OBJ_TYPE_STR.OBJ_FILE_STR;
+            else if (ObjType == OBJ_TYPE.OBJ_DIR) return OBJ_TYPE_STR.OBJ_DIR_STR;
+
+            return "";
         }
     }
 }
