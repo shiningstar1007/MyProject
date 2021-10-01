@@ -72,5 +72,12 @@ namespace MyCSharpService
 
             return "";
         }
+        public EFFECT_MODE StrToEffectMode(String EffectModeStr)
+        {
+            if (EffectModeStr == EFFECT_MODE_STR.EFT_ALLOW_STR) return EFFECT_MODE.EFT_ALLOW;
+            else if (EffectModeStr == EFFECT_MODE_STR.EFT_DENY_STR) return EFFECT_MODE.EFT_DENY;
+
+            return EFFECT_MODE.EFT_UNKNOWN;
+        }
     }
 }
