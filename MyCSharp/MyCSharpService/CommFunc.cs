@@ -72,12 +72,35 @@ namespace MyCSharpService
 
             return "";
         }
+
+        public enum EFFECT_MODE
+        {
+            EFT_DENY = 0,
+            EFT_ALLOW,
+            EFT_UNKNOWN
+        }
+
+        public static class EFFECT_MODE_STR
+        {
+            public const String EFT_ALLOW_STR = "allow";
+            public const String EFT_DENY_STR = "deny";
+            public const String EFT_UNKNOWN_STR = "unknown";
+        }
+
         public EFFECT_MODE StrToEffectMode(String EffectModeStr)
         {
             if (EffectModeStr == EFFECT_MODE_STR.EFT_ALLOW_STR) return EFFECT_MODE.EFT_ALLOW;
             else if (EffectModeStr == EFFECT_MODE_STR.EFT_DENY_STR) return EFFECT_MODE.EFT_DENY;
 
             return EFFECT_MODE.EFT_UNKNOWN;
+        }
+
+        public String EffectModeToStr(EFFECT_MODE EffectMode)
+        {
+            if (EffectMode == EFFECT_MODE.EFT_ALLOW) return EFFECT_MODE_STR.EFT_ALLOW_STR;
+            else if (EffectMode == EFFECT_MODE.EFT_DENY) return EFFECT_MODE_STR.EFT_DENY_STR;
+
+            return "";
         }
     }
 }
