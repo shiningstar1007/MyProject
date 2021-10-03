@@ -102,5 +102,13 @@ namespace MyCSharpService
 
             return "";
         }
+
+        public LOGGING_TYPE StrToLoggingType(String LoggingTypeStr)
+        {
+            if (LoggingTypeStr == LOGGING_TYPE_STR.LOG_ALLOW_STR) return LOGGING_TYPE.LOG_ALLOW;
+            else if (LoggingTypeStr == LOGGING_TYPE_STR.LOG_DENY_STR) return LOGGING_TYPE.LOG_DENY;
+
+            return LOGGING_TYPE.LOG_ALL;
+        }
     }
 }
