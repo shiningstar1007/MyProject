@@ -103,12 +103,34 @@ namespace MyCSharpService
             return "";
         }
 
+        public enum LOGGING_TYPE : int
+        {
+            LOG_DENY = 0,
+            LOG_ALLOW,
+            LOG_ALL
+        }
+
+        public static class LOGGING_TYPE_STR
+        {
+            public const String LOG_ALLOW_STR = "allow";
+            public const String LOG_DENY_STR = "deny";
+            public const String LOG_ALL_STR = "all";
+        }
+
         public LOGGING_TYPE StrToLoggingType(String LoggingTypeStr)
         {
             if (LoggingTypeStr == LOGGING_TYPE_STR.LOG_ALLOW_STR) return LOGGING_TYPE.LOG_ALLOW;
             else if (LoggingTypeStr == LOGGING_TYPE_STR.LOG_DENY_STR) return LOGGING_TYPE.LOG_DENY;
 
             return LOGGING_TYPE.LOG_ALL;
+        }
+
+        public String LoggingTypeToStr(LOGGING_TYPE LoggingType)
+        {
+            if (LoggingType == LOGGING_TYPE.LOG_ALLOW) return LOGGING_TYPE_STR.LOG_ALLOW_STR;
+            else if (LoggingType == LOGGING_TYPE.LOG_DENY) return LOGGING_TYPE_STR.LOG_DENY_STR;
+
+            return LOGGING_TYPE_STR.LOG_ALL_STR;
         }
     }
 }
