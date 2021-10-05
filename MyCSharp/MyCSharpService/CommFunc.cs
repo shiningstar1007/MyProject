@@ -132,5 +132,14 @@ namespace MyCSharpService
 
             return LOGGING_TYPE_STR.LOG_ALL_STR;
         }
+
+        public SHARED_PERM StrToSharedPerm(String SharedPermStr)
+        {
+            if (SharedPermStr == SHARED_PERM_STR.SDP_DECRYPT_STR) return SHARED_PERM.SDP_DECRYPT;
+            else if (SharedPermStr == SHARED_PERM_STR.SDP_ENCRYPT_STR) return SHARED_PERM.SDP_ENCRYPT;
+            else if (SharedPermStr == SHARED_PERM_STR.SDP_DENY_STR) return SHARED_PERM.SDP_DENY;
+
+            return SHARED_PERM.SDP_UNKNOWN;
+        }
     }
 }
