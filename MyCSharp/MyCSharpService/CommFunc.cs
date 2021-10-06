@@ -141,5 +141,14 @@ namespace MyCSharpService
 
             return SHARED_PERM.SDP_UNKNOWN;
         }
+
+        public String SharedPermToStr(SHARED_PERM SharedPerm)
+        {
+            if (SharedPerm == SHARED_PERM.SDP_DECRYPT) return SHARED_PERM_STR.SDP_DECRYPT_STR;
+            else if (SharedPerm == SHARED_PERM.SDP_ENCRYPT) return SHARED_PERM_STR.SDP_ENCRYPT_STR;
+            else if (SharedPerm == SHARED_PERM.SDP_DENY) return SHARED_PERM_STR.SDP_DENY_STR;
+
+            return "";
+        }
     }
 }
