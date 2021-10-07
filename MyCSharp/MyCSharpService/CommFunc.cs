@@ -133,6 +133,22 @@ namespace MyCSharpService
             return LOGGING_TYPE_STR.LOG_ALL_STR;
         }
 
+        public enum SHARED_PERM : int
+        {
+            SDP_DECRYPT = 0,
+            SDP_ENCRYPT,
+            SDP_DENY,
+            SDP_UNKNOWN
+        }
+
+        public static class SHARED_PERM_STR
+        {
+            public const String SDP_DECRYPT_STR = "decrypt";
+            public const String SDP_ENCRYPT_STR = "encrypt";
+            public const String SDP_DENY_STR = "deny";
+            public const String SDP_UNKNOWN_STR = "unknown";
+        }
+
         public SHARED_PERM StrToSharedPerm(String SharedPermStr)
         {
             if (SharedPermStr == SHARED_PERM_STR.SDP_DECRYPT_STR) return SHARED_PERM.SDP_DECRYPT;
