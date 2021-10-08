@@ -166,5 +166,12 @@ namespace MyCSharpService
 
             return "";
         }
+
+        public ONOFF_MODE StrToOnOffMode(String OnOffModeStr)
+        {
+            if (OnOffModeStr == ONOFF_MODE_STR.OFM_ON_STR) return ONOFF_MODE.OFM_ON;
+
+            return ONOFF_MODE.OFM_OFF;
+        }
     }
 }
