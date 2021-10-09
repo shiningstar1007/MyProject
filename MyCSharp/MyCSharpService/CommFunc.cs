@@ -173,5 +173,12 @@ namespace MyCSharpService
 
             return ONOFF_MODE.OFM_OFF;
         }
+
+        public String OnOffModeToStr(ONOFF_MODE OnOffMode)
+        {
+            if (OnOffMode == ONOFF_MODE.OFM_ON) return ONOFF_MODE_STR.OFM_ON_STR;
+
+            return ONOFF_MODE_STR.OFM_OFF_STR;
+        }
     }
 }
