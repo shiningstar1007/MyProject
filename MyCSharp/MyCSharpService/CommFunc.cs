@@ -180,5 +180,28 @@ namespace MyCSharpService
 
             return ONOFF_MODE_STR.OFM_OFF_STR;
         }
+
+        public ACL_ACTION StrToAction(String ActionStr)
+        {
+            String[] ActionBuf;
+            ACL_ACTION Action = 0;
+
+            if (ActionStr == ACL_ACTION_STR.ACT_ALL_STR) return ACL_ACTION.ACT_ALL;
+
+            ActionBuf = ActionStr.Split(new char[] { ',' });
+
+            foreach (var data in ActionBuf)
+            {
+                if (data == ACL_ACTION_STR.ACT_READ_STR) Action |= ACL_ACTION.ACT_READ;
+                else if (data == ACL_ACTION_STR.ACT_WRITE_STR) Action |= ACL_ACTION.ACT_WRITE;
+                else if (data == ACL_ACTION_STR.ACT_TRAVERSE_STR) Action |= ACL_ACTION.ACT_TRAVERSE;
+                else if (data == ACL_ACTION_STR.ACT_EXECUTE_STR) Action |= ACL_ACTION.ACT_EXECUTE;
+                else if (data == ACL_ACTION_STR.ACT_DELETE_STR) Action |= ACL_ACTION.ACT_DELETE;
+                else if (data == ACL_ACTION_STR.ACT_CREATE_STR) Action |= ACL_ACTION.ACT_CREATE;
+                else if (data == ACL_ACTION_STR.ACT_DEC_STR) Action |= ACL_ACTION.ACT_DEC;
+            }
+
+            return Action;
+        }
     }
 }
