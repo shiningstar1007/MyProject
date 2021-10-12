@@ -167,6 +167,18 @@ namespace MyCSharpService
             return "";
         }
 
+        public enum ONOFF_MODE : int
+        {
+            OFM_ON = 0,
+            OFM_OFF,
+        }
+
+        public static class ONOFF_MODE_STR
+        {
+            public const String OFM_ON_STR = "on";
+            public const String OFM_OFF_STR = "off";
+        }
+
         public ONOFF_MODE StrToOnOffMode(String OnOffModeStr)
         {
             if (OnOffModeStr == ONOFF_MODE_STR.OFM_ON_STR) return ONOFF_MODE.OFM_ON;
