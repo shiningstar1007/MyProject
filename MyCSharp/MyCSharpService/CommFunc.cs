@@ -193,6 +193,30 @@ namespace MyCSharpService
             return ONOFF_MODE_STR.OFM_OFF_STR;
         }
 
+        public enum ACL_ACTION : ulong
+        {
+            ACT_READ = 0x00000001,
+            ACT_WRITE = 0x00000002,
+            ACT_TRAVERSE = 0x00000004,
+            ACT_EXECUTE = 0x00000008,
+            ACT_DELETE = 0x00000010,
+            ACT_CREATE = 0x00000020,
+            ACT_DEC = 0x00000040,
+            ACT_ALL = 0xFFFFFFFF
+        }
+
+        public static class ACL_ACTION_STR
+        {
+            public const String ACT_READ_STR = "read";
+            public const String ACT_WRITE_STR = "write";
+            public const String ACT_TRAVERSE_STR = "traverse";
+            public const String ACT_EXECUTE_STR = "execute";
+            public const String ACT_DELETE_STR = "delete";
+            public const String ACT_CREATE_STR = "create";
+            public const String ACT_DEC_STR = "dec";
+            public const String ACT_ALL_STR = "all";
+        }
+
         public ACL_ACTION StrToAction(String ActionStr)
         {
             String[] ActionBuf;
