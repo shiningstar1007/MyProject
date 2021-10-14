@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace MyCSharpService
 {
+
+    public RUN_MODE StrToRunMode(String RunModeStr)
+    {
+        if (RunModeStr == RUN_MODE_STR.RUN_TEST_STR) return RUN_MODE.RUN_TEST;
+        else if (RunModeStr == RUN_MODE_STR.RUN_DISABLE_STR) return RUN_MODE.RUN_DISABLE;
+
+        return RUN_MODE.RUN_NORMAL;
+    }
     public enum SUB_TYPE
     {
         SUB_USER = 0,
