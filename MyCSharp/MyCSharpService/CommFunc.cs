@@ -14,6 +14,14 @@ namespace MyCSharpService
 
         return RUN_MODE.RUN_NORMAL;
     }
+
+    public String RunModeToStr(RUN_MODE RunMode)
+    {
+        if (RunMode == RUN_MODE.RUN_TEST) return RUN_MODE_STR.RUN_TEST_STR;
+        else if (RunMode == RUN_MODE.RUN_DISABLE) return RUN_MODE_STR.RUN_DISABLE_STR;
+
+        return RUN_MODE_STR.RUN_NORMAL_STR;
+    }
     public enum SUB_TYPE
     {
         SUB_USER = 0,
