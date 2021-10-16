@@ -6,40 +6,54 @@ using System.Threading.Tasks;
 
 namespace MyCSharpService
 {
-
-    public RUN_MODE StrToRunMode(String RunModeStr)
-    {
-        if (RunModeStr == RUN_MODE_STR.RUN_TEST_STR) return RUN_MODE.RUN_TEST;
-        else if (RunModeStr == RUN_MODE_STR.RUN_DISABLE_STR) return RUN_MODE.RUN_DISABLE;
-
-        return RUN_MODE.RUN_NORMAL;
-    }
-
-    public String RunModeToStr(RUN_MODE RunMode)
-    {
-        if (RunMode == RUN_MODE.RUN_TEST) return RUN_MODE_STR.RUN_TEST_STR;
-        else if (RunMode == RUN_MODE.RUN_DISABLE) return RUN_MODE_STR.RUN_DISABLE_STR;
-
-        return RUN_MODE_STR.RUN_NORMAL_STR;
-    }
-    public enum SUB_TYPE
-    {
-        SUB_USER = 0,
-        SUB_PROC,
-        SUB_SHARE,
-        SUB_GROUP,
-        SUB_UNKNOWN
-    }
-
-    public static class SUB_TYPE_STR
-    {
-        public const String SUB_USER_STR = "user";
-        public const String SUB_GROUP_STR = "group";
-        public const String SUB_PROC_STR = "proc";
-        public const String SUB_SHARE_STR = "share";
-    }
     class CommFunc
     {
+        public enum RUN_MODE : int
+        {
+            RUN_NORMAL = 0,
+            RUN_TEST,
+            RUN_DISABLE
+        }
+
+        public static class RUN_MODE_STR
+        {
+            public const String RUN_NORMAL_STR = "normal";
+            public const String RUN_TEST_STR = "test";
+            public const String RUN_DISABLE_STR = "disable";
+        }
+
+        public RUN_MODE StrToRunMode(String RunModeStr)
+        {
+            if (RunModeStr == RUN_MODE_STR.RUN_TEST_STR) return RUN_MODE.RUN_TEST;
+            else if (RunModeStr == RUN_MODE_STR.RUN_DISABLE_STR) return RUN_MODE.RUN_DISABLE;
+
+            return RUN_MODE.RUN_NORMAL;
+        }
+
+        public String RunModeToStr(RUN_MODE RunMode)
+        {
+            if (RunMode == RUN_MODE.RUN_TEST) return RUN_MODE_STR.RUN_TEST_STR;
+            else if (RunMode == RUN_MODE.RUN_DISABLE) return RUN_MODE_STR.RUN_DISABLE_STR;
+
+            return RUN_MODE_STR.RUN_NORMAL_STR;
+        }
+        public enum SUB_TYPE
+        {
+            SUB_USER = 0,
+            SUB_PROC,
+            SUB_SHARE,
+            SUB_GROUP,
+            SUB_UNKNOWN
+        }
+
+        public static class SUB_TYPE_STR
+        {
+            public const String SUB_USER_STR = "user";
+            public const String SUB_GROUP_STR = "group";
+            public const String SUB_PROC_STR = "proc";
+            public const String SUB_SHARE_STR = "share";
+        }
+
         public SUB_TYPE StrToSubType(String SubTypeStr)
         {
             if (SubTypeStr == SUB_TYPE_STR.SUB_USER_STR) return SUB_TYPE.SUB_USER;
