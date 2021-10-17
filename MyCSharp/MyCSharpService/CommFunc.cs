@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -287,6 +288,14 @@ namespace MyCSharpService
             }
 
             return ActionStr.ToString();
+        }
+
+        public SecurityIdentifier GetUserSId(String UserName)
+        {
+            NTAccount Account = new NTAccount(UserName);
+            SecurityIdentifier UserSId = (SecurityIdentifier)Account.Translate(typeof(SecurityIdentifier));
+
+            return UserSId;
         }
     }
 }
