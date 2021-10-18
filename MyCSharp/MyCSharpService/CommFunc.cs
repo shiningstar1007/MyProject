@@ -297,5 +297,23 @@ namespace MyCSharpService
 
             return UserSId;
         }
+
+        public UInt64 GetSIdKey(SecurityIdentifier UserSId)
+        {
+            String[] SidStr = UserSId.ToString().Split(new char[] { '-' });
+            UInt64 SIdKey = 0;
+
+            foreach (var data in SidStr)
+            {
+                try
+                {
+                    UInt64 Sid = UInt64.Parse(data);
+                    SIdKey += Sid;
+                }
+                catch { }
+            }
+
+            return SIdKey;
+        }
     }
 }
