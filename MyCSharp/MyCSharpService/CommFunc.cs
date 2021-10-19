@@ -315,5 +315,25 @@ namespace MyCSharpService
 
             return SIdKey;
         }
+
+        public UInt64 GetObjKey(OBJ_TYPE ObjType, String ObjPath)
+        {
+            IntPtr hFile;
+            NativeAPI.BY_HANDLE_FILE_INFORMATION FileInfo = new NativeAPI.BY_HANDLE_FILE_INFORMATION();
+            UInt64 ObjKey = 0;
+
+            hFile = NativeAPI.CreateFile(ObjPath, NativeAPI.GENERIC_READ, FileShare.Read, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
+            if (hFile.ToInt32() != NativeAPI.INVALID_HANDLE_VALUE)
+            {
+                if (NativeAPI.GetFileInformationByHandle(hFile, out FileInfo))
+                {
+                    ObjKey = ((UInt64)FileInfo.FileIndexHigh << 32) | (UInt64)FileInfo.FileIndexLow;
+                }
+
+                NativeAPI.CloseHandle(hFile);
+            }
+
+            return ObjKey;
+        }
     }
 }
