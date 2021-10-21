@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,5 +21,9 @@ namespace MyCSharpService
             int dwFlagsAndAttributes,
             IntPtr hTemplateFile
             );
+
+        [DllImport("kernel32", SetLastError = true)]
+        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+        public extern static bool CloseHandle(IntPtr FileHandle);
     }
 }
