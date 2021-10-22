@@ -25,5 +25,20 @@ namespace MyCSharpService
         [DllImport("kernel32", SetLastError = true)]
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
         public extern static bool CloseHandle(IntPtr FileHandle);
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct BY_HANDLE_FILE_INFORMATION
+        {
+            public uint FileAttributes;
+            public FILETIME CreationTime;
+            public FILETIME LastAccessTime;
+            public FILETIME LastWriteTime;
+            public uint VolumeSerialNumber;
+            public uint FileSizeHigh;
+            public uint FileSizeLow;
+            public uint NumberOfLinks;
+            public uint FileIndexHigh;
+            public uint FileIndexLow;
+        }
     }
 }
