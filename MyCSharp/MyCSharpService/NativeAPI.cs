@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace MyCSharpService
 {
@@ -40,5 +39,11 @@ namespace MyCSharpService
             public uint FileIndexHigh;
             public uint FileIndexLow;
         }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool GetFileInformationByHandle(
+            IntPtr hFile,
+            out BY_HANDLE_FILE_INFORMATION lpFileInformation
+        );
     }
 }
