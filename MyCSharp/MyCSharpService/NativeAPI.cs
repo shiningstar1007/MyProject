@@ -45,5 +45,16 @@ namespace MyCSharpService
             IntPtr hFile,
             out BY_HANDLE_FILE_INFORMATION lpFileInformation
         );
+
+        [DllImport("fltlib", SetLastError = true)]
+        public static extern int FilterConnectCommunicationPort(
+            [MarshalAs (UnmanagedType.LPWStr)]
+            string portName,
+            uint options,
+            IntPtr context,
+            uint sizeOfContext,
+            IntPtr securityAttributes,
+            IntPtr hPort
+        );
     }
 }
