@@ -56,5 +56,13 @@ namespace MyCSharpService
             IntPtr securityAttributes,
             IntPtr hPort
         );
+
+        [DllImport("fltlib", SetLastError = true)]
+        public static extern int FilterGetMessage(
+            IntPtr hPort,
+            IntPtr msgBuffer,
+            uint msgBufSize,
+            IntPtr lpOverlapped
+        );
     }
 }
