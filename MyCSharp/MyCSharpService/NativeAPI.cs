@@ -64,5 +64,15 @@ namespace MyCSharpService
             uint msgBufSize,
             IntPtr lpOverlapped
         );
+
+        [DllImport("fltlib", SetLastError = true)]
+        public static extern int FilterSendMessage(
+            IntPtr hPort,
+            IntPtr inBuffer,
+            uint inBufferSize,
+            IntPtr outBuffer,
+            uint outBufferSize,
+            uint bytesReturned
+        );
     }
 }
