@@ -5,6 +5,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
+using static MyCSharp.Service.Win32API;
 
 namespace MyCSharpService
 {
@@ -74,5 +75,10 @@ namespace MyCSharpService
             uint outBufferSize,
             uint bytesReturned
         );
+
+        [DllImport("ntdll.dll", SetLastError = true)]
+        internal static extern NTSTATUS NtQueryInformationFile(IntPtr FileHandle,
+            ref IO_STATUS_BLOCK IoStatusBlock, IntPtr FileInformation, uint FileInformationLength,
+            FILE_INFORMATION_CLASS FileStreamInformation);
     }
 }
