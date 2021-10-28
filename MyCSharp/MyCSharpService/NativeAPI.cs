@@ -80,5 +80,8 @@ namespace MyCSharpService
         internal static extern NTSTATUS NtQueryInformationFile(IntPtr FileHandle,
             ref IO_STATUS_BLOCK IoStatusBlock, IntPtr FileInformation, uint FileInformationLength,
             FILE_INFORMATION_CLASS FileStreamInformation);
+
+        [DllImport("kernel32")]
+        public static extern Int32 GetLastError();
     }
 }
