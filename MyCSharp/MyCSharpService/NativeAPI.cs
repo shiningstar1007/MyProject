@@ -26,21 +26,6 @@ namespace MyCSharpService
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
         public extern static bool CloseHandle(IntPtr FileHandle);
 
-        [StructLayout(LayoutKind.Sequential, Pack = 4)]
-        public struct BY_HANDLE_FILE_INFORMATION
-        {
-            public uint FileAttributes;
-            public FILETIME CreationTime;
-            public FILETIME LastAccessTime;
-            public FILETIME LastWriteTime;
-            public uint VolumeSerialNumber;
-            public uint FileSizeHigh;
-            public uint FileSizeLow;
-            public uint NumberOfLinks;
-            public uint FileIndexHigh;
-            public uint FileIndexLow;
-        }
-
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool GetFileInformationByHandle(
             IntPtr hFile,
@@ -83,5 +68,31 @@ namespace MyCSharpService
 
         [DllImport("kernel32")]
         public static extern Int32 GetLastError();
+
+        #region Structures
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct IO_STATUS_BLOCK
+        {
+            public UInt32 Status;
+            public UInt64 Information;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        public struct BY_HANDLE_FILE_INFORMATION
+        {
+            public uint FileAttributes;
+            public FILETIME CreationTime;
+            public FILETIME LastAccessTime;
+            public FILETIME LastWriteTime;
+            public uint VolumeSerialNumber;
+            public uint FileSizeHigh;
+            public uint FileSizeLow;
+            public uint NumberOfLinks;
+            public uint FileIndexHigh;
+            public uint FileIndexLow;
+        }
+        #endregion
+
     }
 }
