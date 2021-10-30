@@ -92,6 +92,17 @@ namespace MyCSharpService
             public uint FileIndexHigh;
             public uint FileIndexLow;
         }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 1)]
+        public struct FILE_STREAM_INFORMATION
+        {
+            public UInt32 NextEntryOffset;
+            public UInt32 StreamNameLen;
+            public UInt64 StreamSize;           //LARGE_INTEGER
+            public UInt64 StreamAllocationSize; //LARGE_INTEGER
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+            internal Byte[] StreamName;
+        }
         #endregion
 
     }
