@@ -105,5 +105,18 @@ namespace MyCSharpService
         }
         #endregion
 
+        #region Enumerations
+        [Flags]
+        public enum NTSTATUS : uint
+        {
+            STATUS_SUCCESS = 0x00000000,
+            STATUS_INFO_LENGTH_MISMATCH = 0xC0000004
+        }
+
+
+        #endregion
+
+
+
     }
 }
