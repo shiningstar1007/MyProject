@@ -113,6 +113,12 @@ namespace MyCSharpService
             STATUS_INFO_LENGTH_MISMATCH = 0xC0000004
         }
 
+        [Flags]
+        public enum FILE_INFORMATION_CLASS
+        {
+            FileStreamInformation = 22
+        }
+
 
         #endregion
 
