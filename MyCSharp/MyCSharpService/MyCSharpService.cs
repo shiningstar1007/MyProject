@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.ServiceModel;
 using System.Runtime.InteropServices;
-using System.Timers;
 using System.IO;
 using System.Security.AccessControl;
-using System.Runtime.ConstrainedExecution;
-using System.Security;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Diagnostics;
@@ -19,122 +16,23 @@ using Microsoft.Win32;
 
 namespace MyCSharp.Service
 {
-    [SuppressUnmanagedCodeSecurity()]
     public class Win32API
     {
-        #region Native Method Signatures
-        [DllImport("fltlib", SetLastError = true)]
-        public static extern int FilterConnectCommunicationPort (
-            [MarshalAs (UnmanagedType.LPWStr)]
-            string portName,
-            uint options,
-            IntPtr context,
-            uint sizeOfContext,
-            IntPtr securityAttributes,
-            IntPtr hPort
-        );
-
-        [DllImport("fltlib", SetLastError = true)]
-        public static extern int FilterGetMessage (
-            IntPtr hPort,
-            IntPtr msgBuffer,
-            uint msgBufSize,
-            IntPtr lpOverlapped
-        );
-
-        [DllImport("fltlib", SetLastError = true)]
-        public static extern int FilterSendMessage (
-            IntPtr hPort,
-            IntPtr inBuffer,
-            uint inBufferSize,
-            IntPtr outBuffer,
-            uint outBufferSize,
-            uint bytesReturned
-        );
-
-        internal const int GENERIC_READ = unchecked((int)0x80000000);
-        internal const int GENERIC_WRITE = unchecked((int)0x40000000);
-        internal const int INVALID_HANDLE_VALUE = -1;
-        internal const int ERROR_FILE_EXISTS = unchecked((int)0x00000050);
-        internal const string CheckStreamName = ":pske:$DATA";
-
-        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal extern static IntPtr CreateFile(String fileName,
-           int dwDesiredAccess, System.IO.FileShare dwShareMode,
-           IntPtr securityAttrs_MustBeZero, System.IO.FileMode dwCreationDisposition,
-           int dwFlagsAndAttributes, IntPtr hTemplateFile_MustBeZero);
-
-        [DllImport("kernel32", SetLastError = true)]
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        internal extern static bool CloseHandle(IntPtr FileHandle);
-
-        [DllImport("ntdll.dll", SetLastError = true)]
-        internal static extern NTSTATUS NtQueryInformationFile(IntPtr FileHandle,
-            ref IO_STATUS_BLOCK IoStatusBlock, IntPtr FileInformation, uint FileInformationLength,
-            FILE_INFORMATION_CLASS FileStreamInformation);
-
-        [DllImport("kernel32")]
-        public static extern Int32 GetLastError();
-
-        #endregion
-
-        #region Structures
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct IO_STATUS_BLOCK
-        {
-            public UInt32 Status;
-            public UInt64 Information;
-        }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 1)]
-        public struct FILE_STREAM_INFORMATION
-        {
-            public UInt32 NextEntryOffset;
-            public UInt32 StreamNameLen;
-            public UInt64 StreamSize;           //LARGE_INTEGER
-            public UInt64 StreamAllocationSize; //LARGE_INTEGER
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-            internal Byte[] StreamName;
-        }
-
-        #endregion
-
-        #region Enumerations
-
-        [Flags]
-        public enum NTSTATUS : uint
-        {
-            STATUS_SUCCESS = 0x00000000,
-            STATUS_INFO_LENGTH_MISMATCH = 0xC0000004
-        }
-
-
-        [Flags]
-        public enum FILE_INFORMATION_CLASS
-        {
-            FileStreamInformation = 22
-        }
-
-        #endregion
-
-        #region Functions
-
         public static bool CreateStreamFile(string FileName)
         {
             bool bStreamFile = false;
             IntPtr FileHandle;
             string StreamName = FileName + ":MiniFlt";
 
-            FileHandle = Win32API.CreateFile(StreamName, Win32API.GENERIC_READ | Win32API.GENERIC_WRITE,
+            FileHandle = NativeAPI.CreateFile(StreamName, NativeAPI.GENERIC_READ | NativeAPI.GENERIC_WRITE,
                 0, IntPtr.Zero, FileMode.CreateNew, 0, IntPtr.Zero);
 
-            if (FileHandle.ToInt32() != Win32API.INVALID_HANDLE_VALUE)
+            if (FileHandle.ToInt32() != NativeAPI.INVALID_HANDLE_VALUE)
             {
-                Win32API.CloseHandle(FileHandle);
+            NativeAPI.CloseHandle(FileHandle);
                 bStreamFile = true;
             }
-            else if (Win32API.ERROR_FILE_EXISTS == Win32API.GetLastError())
+            else if (NativeAPI.ERROR_FILE_EXISTS == NativeAPI.GetLastError())
             {
                 bStreamFile = true;
             }
@@ -146,35 +44,35 @@ namespace MyCSharp.Service
         {
             bool bStreamFile = false;
             IntPtr FileHandle;
-            IO_STATUS_BLOCK IoStatusBlock = new IO_STATUS_BLOCK();
+            NativeAPI.IO_STATUS_BLOCK IoStatusBlock = new NativeAPI.IO_STATUS_BLOCK();
             uint BufSize = 0x10000;   //initial buffer size of 65536 bytes
             IntPtr pBuffer = Marshal.AllocHGlobal((int)BufSize);
 
-            FileHandle = Win32API.CreateFile(FileName, Win32API.GENERIC_READ | Win32API.GENERIC_WRITE,
+            FileHandle = NativeAPI.CreateFile(FileName, NativeAPI.GENERIC_READ | NativeAPI.GENERIC_WRITE,
                 FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
 
-            if (FileHandle.ToInt32() != Win32API.INVALID_HANDLE_VALUE)
+            if (FileHandle.ToInt32() != NativeAPI.INVALID_HANDLE_VALUE)
             {
-                NTSTATUS Status = Win32API.NtQueryInformationFile(FileHandle, ref IoStatusBlock, pBuffer, BufSize,
-                    FILE_INFORMATION_CLASS.FileStreamInformation);
+                NativeAPI.NTSTATUS Status = NativeAPI.NtQueryInformationFile(FileHandle, ref IoStatusBlock, pBuffer, BufSize,
+                    NativeAPI.FILE_INFORMATION_CLASS.FileStreamInformation);
 
-                Win32API.CloseHandle(FileHandle);
+            NativeAPI.CloseHandle(FileHandle);
 
-                if (Status == NTSTATUS.STATUS_SUCCESS)
+                if (Status == NativeAPI.NTSTATUS.STATUS_SUCCESS)
                 {
-                    int StructSize = Marshal.SizeOf(typeof(FILE_STREAM_INFORMATION));
-                    FILE_STREAM_INFORMATION FileStreamInfo;
+                    int StructSize = Marshal.SizeOf(typeof(NativeAPI.FILE_STREAM_INFORMATION));
+                    NativeAPI.FILE_STREAM_INFORMATION FileStreamInfo;
                     string StreamName;
                     IntPtr DataPtr = pBuffer;
 
                     do
                     {
-                        FileStreamInfo = (FILE_STREAM_INFORMATION)Marshal.PtrToStructure(DataPtr, typeof(FILE_STREAM_INFORMATION));
+                        FileStreamInfo = (NativeAPI.FILE_STREAM_INFORMATION)Marshal.PtrToStructure(DataPtr, typeof(NativeAPI.FILE_STREAM_INFORMATION));
 
                         if (FileStreamInfo.StreamNameLen == 0) break;
 
                         StreamName = Marshal.PtrToStringUni(DataPtr + StructSize - 2, (int)FileStreamInfo.StreamNameLen / 2);
-                        if (CheckStreamName.Equals(StreamName) == true)
+                        if (NativeAPI.CheckStreamName.Equals(StreamName) == true)
                         {
                             bStreamFile = true;
                             break;
@@ -196,14 +94,14 @@ namespace MyCSharp.Service
             IntPtr FileHandle;
 
             string streamName = FileName + ":" + StreamName;
-            FileHandle = Win32API.CreateFile(streamName, Win32API.GENERIC_READ | Win32API.GENERIC_WRITE,
+            FileHandle = NativeAPI.CreateFile(streamName, NativeAPI.GENERIC_READ | NativeAPI.GENERIC_WRITE,
                 FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
 
-            if (FileHandle.ToInt32() != Win32API.INVALID_HANDLE_VALUE) // skip file target
+            if (FileHandle.ToInt32() != NativeAPI.INVALID_HANDLE_VALUE) // skip file target
             {
                 bCheckFile = true;
 
-                Win32API.CloseHandle(FileHandle);
+                NativeAPI.CloseHandle(FileHandle);
             }
 
             return bCheckFile;

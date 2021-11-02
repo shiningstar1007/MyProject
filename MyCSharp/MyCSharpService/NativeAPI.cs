@@ -5,9 +5,8 @@ using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
-using static MyCSharp.Service.Win32API;
 
-namespace MyCSharpService
+namespace MyCSharp.Service
 {
     class NativeAPI
     {
@@ -121,6 +120,12 @@ namespace MyCSharpService
 
 
         #endregion
+
+        internal const int GENERIC_READ = unchecked((int)0x80000000);
+        internal const int GENERIC_WRITE = unchecked((int)0x40000000);
+        internal const int INVALID_HANDLE_VALUE = -1;
+        internal const int ERROR_FILE_EXISTS = unchecked((int)0x00000050);
+        internal const string CheckStreamName = ":MyCSharp:$DATA";
 
 
 
