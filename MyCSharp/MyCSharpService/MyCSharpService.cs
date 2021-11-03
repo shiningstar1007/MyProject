@@ -515,15 +515,26 @@ namespace MyCSharp.Service
     public class ACL_Subject
     {
         public string subjectName;
-        public UInt64 permissions;
+        public UInt32 permissions;
     }
 
     public class ACL_Object
     {
         public string objectName;
-        public UInt64 permissions;
+        public UInt32 permissions;
 
         public IList<ACL_Subject> aclSubject = new List<ACL_Subject>();
+    }
+
+    public class ACL_data
+    {
+        ACL_Subject aclSubject;
+        ACL_Object aclObject;
+    }
+
+    public class ACL_link
+    {
+        IList<ACL_data> aclData = new List<ACL_data>();
     }
 
     public class ACLSubject
