@@ -523,7 +523,18 @@ namespace MyCSharp.Service
         public string objectName;
         public UInt32 permissions;
 
-        public IList<ACL_Subject> aclSubject = new List<ACL_Subject>();
+        public ACL_link aclSubject = new ACL_link();
+
+        public ACL_Object()
+        {
+
+        }
+
+        public ACL_Object(ACL_Object aclObject)
+        {
+            this.objectName = aclObject.objectName;
+            this.permissions = aclObject.permissions;
+        }
     }
 
     public class ACL_data
@@ -556,7 +567,7 @@ namespace MyCSharp.Service
 
             return aclSub;
         }
-        public void ACLSubjectAdd(string subjectName, UInt64 permissions)
+        public void ACLSubjectAdd(string subjectName, UInt32 permissions)
         {
             ACL_Subject aclSub;
 
@@ -615,7 +626,7 @@ namespace MyCSharp.Service
             return aclObj;
         }
 
-        public void ACLObjectAdd(string objectName, UInt64 permissions)
+        public void ACLObjectAdd(string objectName, UInt32 permissions)
         {
             ACL_Object aclObj;
 
