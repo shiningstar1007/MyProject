@@ -516,6 +516,19 @@ namespace MyCSharp.Service
     {
         public string subjectName;
         public UInt32 permissions;
+
+        public ACL_link aclObject = new ACL_link();
+
+        public ACL_Subject()
+        {
+
+        }
+
+        public ACL_Subject(ACL_Subject aclSubject)
+        {
+            this.subjectName = aclSubject.subjectName;
+            this.permissions = aclSubject.permissions;
+         }
     }
 
     public class ACL_Object
