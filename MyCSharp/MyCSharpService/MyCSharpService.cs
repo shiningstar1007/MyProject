@@ -512,10 +512,21 @@ namespace MyCSharp.Service
 
     }
 
+    public enum SUB_TYPE
+    {
+        SUB_USER = 0,
+        SUB_PROC,
+        SUB_SHARE,
+        SUB_GROUP,
+        SUB_UNKNOWN
+    }
+
     public class ACL_Subject
     {
+        public SUB_TYPE subType;
         public string subjectName;
         public UInt32 permissions;
+
 
         public ACL_link aclObject = new ACL_link();
 
@@ -528,11 +539,19 @@ namespace MyCSharp.Service
         {
             this.subjectName = aclSubject.subjectName;
             this.permissions = aclSubject.permissions;
+            this.subType = aclSubject.subType;
          }
     }
 
+    public enum OBJ_TYPE : int
+    {
+        OBJ_FILE = 0,
+        OBJ_DIR,
+        OBJ_UNKNOWN
+    }
     public class ACL_Object
     {
+        public OBJ_TYPE objType;
         public string objectName;
         public UInt32 permissions;
 
@@ -547,6 +566,7 @@ namespace MyCSharp.Service
         {
             this.objectName = aclObject.objectName;
             this.permissions = aclObject.permissions;
+            this.objType = aclObject.objType;
         }
     }
 
