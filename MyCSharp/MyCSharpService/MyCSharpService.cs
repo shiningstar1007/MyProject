@@ -13,6 +13,7 @@ using System.Net.Sockets;
 using System.Management;
 using System.Security.Principal;
 using Microsoft.Win32;
+using MyCSharpService;
 
 namespace MyCSharp.Service
 {
@@ -554,6 +555,11 @@ namespace MyCSharp.Service
         public OBJ_TYPE objType;
         public string objectName;
         public UInt32 permissions;
+        public UInt32 DefAction;
+        public String CrossPath;
+
+        public ONOFF_MODE RunMode;
+        public ONOFF_MODE LogMode;
 
         public ACL_link aclSubject = new ACL_link();
 
@@ -567,6 +573,10 @@ namespace MyCSharp.Service
             this.objectName = aclObject.objectName;
             this.permissions = aclObject.permissions;
             this.objType = aclObject.objType;
+            this.DefAction = aclObject.DefAction;
+            this.CrossPath = aclObject.CrossPath;
+            this.RunMode = aclObject.RunMode;
+            this.LogMode = aclObject.LogMode;
         }
     }
 
