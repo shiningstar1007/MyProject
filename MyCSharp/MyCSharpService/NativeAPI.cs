@@ -68,6 +68,15 @@ namespace MyCSharp.Service
         [DllImport("kernel32")]
         public static extern Int32 GetLastError();
 
+        [DllImport("kernel32.dll", EntryPoint = "LoadLibrary")]
+        public extern static IntPtr LoadLibrary(string librayName);
+
+        [DllImport("kernel32.dll", EntryPoint = "GetProcAddress", CharSet = CharSet.Ansi)]
+        public extern static IntPtr GetProcAddress(IntPtr hwnd, string procedureName);
+
+        [DllImport("kernel32.dll", EntryPoint = "FreeLibrary")]
+        public extern static bool FreeLibrary(IntPtr hModule);
+
         #region Structures
 
         [StructLayout(LayoutKind.Sequential)]

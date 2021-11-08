@@ -558,8 +558,8 @@ namespace MyCSharp.Service
         public UInt32 DefAction;
         public String CrossPath;
 
-        public ONOFF_MODE RunMode;
-        public ONOFF_MODE LogMode;
+        public CommFunc.ONOFF_MODE RunMode;
+        public CommFunc.ONOFF_MODE LogMode;
 
         public ACL_link aclSubject = new ACL_link();
 
