@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccessControl.cs" />
     <Compile Include="CommFunc.cs" />
     <Compile Include="MyCSharpService.cs" />
     <Compile Include="NativeAPI.cs" />
