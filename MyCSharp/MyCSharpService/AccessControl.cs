@@ -20,6 +20,36 @@ namespace MyCSharpService
         public IList<ACL_DATA> ACLData = new List<ACL_DATA>();
     }
 
+    public class ACL_POL
+    {
+        public String PolName;
+        public ONOFF_MODE LogMode;
+        public ONOFF_MODE RunMode;
+
+        public ACL_LINK ACLSubs = new ACL_LINK();
+        public ACL_LINK ACLObjs = new ACL_LINK();
+
+        public ACL_POL()
+        {
+            this.PolName = "";
+            this.LogMode = ONOFF_MODE.OFM_OFF;
+            this.RunMode = ONOFF_MODE.OFM_OFF;
+        }
+
+        public ACL_POL(ACL_POL polParam)
+        {
+            this.PolName = polParam.PolName;
+            this.LogMode = polParam.LogMode;
+            this.RunMode = polParam.RunMode;
+        }
+
+        public void Copy(ACL_POL polParam)
+        {
+            this.LogMode = polParam.LogMode;
+            this.RunMode = polParam.RunMode;
+        }
+    }
+
     public enum SUB_TYPE
     {
         SUB_USER = 0,
