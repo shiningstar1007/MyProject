@@ -7,6 +7,18 @@ using System.Threading.Tasks;
 
 namespace MyCSharpService
 {
+    public enum ONOFF_MODE : int
+    {
+        OFM_ON = 0,
+        OFM_OFF,
+    }
+
+    public enum LOGGING_TYPE : int
+    {
+        LOG_DENY = 0,
+        LOG_ALLOW,
+        LOG_ALL
+    }
     public class ACL_DATA
     {
         public ACL_POL ACLPol;
