@@ -102,6 +102,41 @@ namespace MyCSharpService
         }
     }
 
+    public class SUPER_SUB
+    {
+        public UInt64 SubKey;
+        public SUB_TYPE SubType;
+        public String SubName;
+
+        public SecurityIdentifier UserSId;
+        public String UserSIdBuf;
+
+        public EFFECT_MODE DecPerm;
+
+        public SUPER_SUB()
+        {
+            this.SubKey = 0;
+            this.SubType = SUB_TYPE.SUB_PROC;
+            this.SubName = "";
+
+            this.UserSId = null;
+            this.UserSIdBuf = "";
+
+            this.DecPerm = EFFECT_MODE.EFT_ALLOW;
+        }
+
+        public SUPER_SUB(SUPER_SUB superParam)
+        {
+            this.SubKey = superParam.SubKey;
+            this.SubType = superParam.SubType;
+            this.SubName = superParam.SubName;
+
+            this.UserSId = superParam.UserSId;
+            this.UserSIdBuf = superParam.UserSIdBuf;
+
+            this.DecPerm = superParam.DecPerm;
+        }
+    }
     class AccessControl
     {
     }
