@@ -101,6 +101,31 @@ namespace MyCSharpService
         {
         }
     }
+    public class SUB_PERM
+    {
+        public ACL_POL ACLPol;
+        public EFFECT_MODE Effect;
+        public UInt32 Action;
+
+        public EFFECT_MODE DecPerm;
+        public PROC_USER ProcUser;
+
+        public SUB_PERM()
+        {
+            this.ACLPol = null;
+            this.Effect = EFFECT_MODE.EFT_UNKNOWN;
+            this.Action = 0;
+            this.DecPerm = EFFECT_MODE.EFT_UNKNOWN;
+        }
+
+        public SUB_PERM(SUB_PERM permParam)
+        {
+            this.ACLPol = new ACL_POL(permParam.ACLPol);
+            this.Effect = permParam.Effect;
+            this.Action = permParam.Action;
+            this.DecPerm = permParam.DecPerm;
+        }
+    }
 
     public class SUPER_SUB
     {
