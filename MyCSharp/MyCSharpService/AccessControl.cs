@@ -19,6 +19,14 @@ namespace MyCSharpService
         LOG_ALLOW,
         LOG_ALL
     }
+
+    public enum EFFECT_MODE
+    {
+        EFT_DENY = 0,
+        EFT_ALLOW,
+        EFT_UNKNOWN
+    }
+
     public class ACL_DATA
     {
         public ACL_POL ACLPol;
