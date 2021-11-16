@@ -109,6 +109,27 @@ namespace MyCSharpService
         {
         }
     }
+
+    public class PROC_USER
+    {
+        public SUB_TYPE SubType;
+        public String SubName;
+        public SecurityIdentifier UserSId;
+
+        public PROC_USER()
+        {
+            this.SubType = SUB_TYPE.SUB_UNKNOWN;
+            this.SubName = "";
+            this.UserSId = null;
+        }
+
+        public PROC_USER(PROC_USER procParam)
+        {
+            this.SubType = procParam.SubType;
+            this.SubName = procParam.SubName;
+            this.UserSId = procParam.UserSId;
+        }
+    }
     public class SUB_PERM
     {
         public ACL_POL ACLPol;
