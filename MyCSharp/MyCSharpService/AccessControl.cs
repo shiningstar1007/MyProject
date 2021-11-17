@@ -156,6 +156,62 @@ namespace MyCSharpService
         }
     }
 
+    public class ACL_OBJ
+    {
+        public UInt64 ObjKey;
+        public OBJ_TYPE ObjType;
+        public String ObjPath;
+        public ONOFF_MODE SubDir;
+        public UInt32 DefAction;
+        public String CrossPath;
+
+        public ONOFF_MODE RunMode;
+        public ONOFF_MODE LogMode;
+        public LOGGING_TYPE LoggingType;
+        public SHARED_PERM SharedPerm;
+
+        public ACL_LINK ACLPols = new ACL_LINK();
+
+        public ACL_OBJ()
+        {
+            ObjKey = 0;
+            ObjType = OBJ_TYPE.OBJ_UNKNOWN;
+            ObjPath = @"";
+            SubDir = ONOFF_MODE.OFM_OFF;
+            DefAction = 0;
+            CrossPath = @"";
+            RunMode = ONOFF_MODE.OFM_OFF;
+            LogMode = ONOFF_MODE.OFM_OFF;
+            LoggingType = LOGGING_TYPE.LOG_DENY;
+            SharedPerm = SHARED_PERM.SDP_UNKNOWN;
+        }
+
+        public ACL_OBJ(ACL_OBJ objParam)
+        {
+            ObjKey = objParam.ObjKey;
+            ObjType = objParam.ObjType;
+            ObjPath = objParam.ObjPath;
+            SubDir = objParam.SubDir;
+            DefAction = objParam.DefAction;
+            CrossPath = objParam.CrossPath;
+            RunMode = objParam.RunMode;
+            LogMode = objParam.LogMode;
+            LoggingType = objParam.LoggingType;
+            SharedPerm = objParam.SharedPerm;
+        }
+
+        public void Copy(ACL_OBJ objParam)
+        {
+            SubDir = objParam.SubDir;
+            DefAction = objParam.DefAction;
+            CrossPath = objParam.CrossPath;
+            RunMode = objParam.RunMode;
+            LogMode = objParam.LogMode;
+            LoggingType = objParam.LoggingType;
+            SharedPerm = objParam.SharedPerm;
+        }
+    }
+
     public class SUPER_SUB
     {
         public UInt64 SubKey;
