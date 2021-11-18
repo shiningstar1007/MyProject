@@ -156,6 +156,21 @@ namespace MyCSharpService
         }
     }
 
+    public enum OBJ_TYPE : int
+    {
+        OBJ_FILE = 0,
+        OBJ_DIR,
+        OBJ_UNKNOWN
+    }
+
+    public enum SHARED_PERM : int
+    {
+        SDP_DECRYPT = 0,
+        SDP_ENCRYPT,
+        SDP_DENY,
+        SDP_UNKNOWN
+    }
+
     public class ACL_OBJ
     {
         public UInt64 ObjKey;
