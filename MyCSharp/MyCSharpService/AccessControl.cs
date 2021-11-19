@@ -264,5 +264,21 @@ namespace MyCSharpService
     }
     class AccessControl
     {
+        IList<ACL_POL> g_ACLPolicy = new List<ACL_POL>();
+        IList<ACL_SUB> g_ACLSubject = new List<ACL_SUB>();
+        IList<ACL_OBJ> g_ACLObject = new List<ACL_OBJ>();
+        IList<SUPER_SUB> g_SuperSub = new List<SUPER_SUB>();
+
+        public ACL_POL aclPolicyFind(String polName)
+        {
+            foreach (var aclPol in g_ACLPolicy)
+            {
+                if (String.Equals(aclPol.PolName, polName) == false) continue;
+
+                return aclPol;
+            }
+
+            return null;
+        }
     }
 }
