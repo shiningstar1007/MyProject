@@ -297,5 +297,21 @@ namespace MyCSharpService
 
             return errCode;
         }
+
+        public ERR_CODE aclPolicyModify(ACL_POL polParam)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_KE_SUCCESS;
+            ACL_POL aclPol;
+
+            aclPol = aclPolicyFind(polParam.PolName);
+            if (aclPol == null) return ERR_CODE.ERR_ACLPOL_NOT_EXIST;
+
+            errCode = sendACLPolInfo(polParam, KERNEL_COMMAND.ACL_POLICY_MODIFY);
+            if (errCode != ERR_CODE.ERR_KE_SUCCESS) return errCode;
+
+            aclPol.Copy(polParam);
+
+            return ERR_CODE.ERR_KE_SUCCESS;
+        }
     }
 }
