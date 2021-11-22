@@ -313,5 +313,22 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_KE_SUCCESS;
         }
+
+        public ERR_CODE aclPolicyDelete(ACL_POL polParam)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_KE_SUCCESS;
+            ACL_POL aclPol;
+
+            aclPol = aclPolicyFind(polParam.PolName);
+            if (aclPol == null) return ERR_CODE.ERR_KE_SUCCESS;
+
+            errCode = sendACLPolInfo(polParam, KERNEL_COMMAND.ACL_POLICY_DELETE);
+            if (errCode != ERR_CODE.ERR_KE_SUCCESS) return errCode;
+
+            g_ACLPolicy.Remove(aclPol);
+
+            return ERR_CODE.ERR_KE_SUCCESS;
+        }
+
     }
 }
