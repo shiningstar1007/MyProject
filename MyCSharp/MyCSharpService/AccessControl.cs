@@ -330,5 +330,19 @@ namespace MyCSharpService
             return ERR_CODE.ERR_KE_SUCCESS;
         }
 
+        public ERR_CODE aclPolicyClear()
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_KE_SUCCESS;
+            Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
+
+            sendMessageDriver(KERNEL_COMMAND.ACL_POLICY_CLEAR, null, 0, ref byteCode, (UInt32)byteCode.Length);
+            errCode = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
+            if (errCode != ERR_CODE.ERR_KE_SUCCESS) return errCode;
+
+            g_ACLPolicy.Clear();
+
+            return ERR_CODE.ERR_KE_SUCCESS;
+        }
+
     }
 }
