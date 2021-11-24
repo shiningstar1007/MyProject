@@ -344,5 +344,30 @@ namespace MyCSharpService
             return ERR_CODE.ERR_KE_SUCCESS;
         }
 
+        public ERR_CODE aclPolicyList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, String polName, out String polList)
+        {
+            String copyBuf = "";
+            Int32 offSet = 0;
+
+            foreach (var pol in g_ACLPolicy)
+            {
+                if (String.IsNullOrEmpty(polName) == false && String.Equals(polName, pol.PolName)) continue;
+
+                if (offSet > 0) copyBuf += "\n";
+
+                if (addCmd == ONOFF_MODE.OFM_ON) copyBuf += String.Format("aclpoladd ");
+
+                copyBuf += String.Format("polname={0} runmode={1} logmode={2}",
+                     pol.PolName, CommFunc.onOffModeToStr(pol.RunMode), CommFunc.onOffModeToStr(pol.LogMode));
+
+                offSet = copyBuf.Length;
+            }
+
+            polList = String.Copy(copyBuf);
+            polList += "\0";
+
+            return ERR_CODE.ERR_KE_SUCCESS;
+        }
+
     }
 }
