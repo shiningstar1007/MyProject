@@ -283,14 +283,14 @@ namespace MyCSharpService
 
         public ERR_CODE aclPolicyAdd(ACL_POL polParam)
         {
-            ERR_CODE errCode = ERR_CODE.ERR_KE_SUCCESS;
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
             ACL_POL aclPol;
 
             aclPol = aclPolicyFind(polParam.PolName);
             if (aclPol != null) return ERR_CODE.ERR_ACLPOL_EXIST;
 
             errCode = sendACLPolInfo(polParam, KERNEL_COMMAND.ACL_POLICY_ADD);
-            if (errCode != ERR_CODE.ERR_KE_SUCCESS) return errCode;
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
 
             aclPol = new ACL_POL(polParam);
             g_ACLPolicy.Add(aclPol);
@@ -300,48 +300,48 @@ namespace MyCSharpService
 
         public ERR_CODE aclPolicyModify(ACL_POL polParam)
         {
-            ERR_CODE errCode = ERR_CODE.ERR_KE_SUCCESS;
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
             ACL_POL aclPol;
 
             aclPol = aclPolicyFind(polParam.PolName);
             if (aclPol == null) return ERR_CODE.ERR_ACLPOL_NOT_EXIST;
 
             errCode = sendACLPolInfo(polParam, KERNEL_COMMAND.ACL_POLICY_MODIFY);
-            if (errCode != ERR_CODE.ERR_KE_SUCCESS) return errCode;
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
 
             aclPol.Copy(polParam);
 
-            return ERR_CODE.ERR_KE_SUCCESS;
+            return ERR_CODE.ERR_SUCCESS;
         }
 
         public ERR_CODE aclPolicyDelete(ACL_POL polParam)
         {
-            ERR_CODE errCode = ERR_CODE.ERR_KE_SUCCESS;
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
             ACL_POL aclPol;
 
             aclPol = aclPolicyFind(polParam.PolName);
-            if (aclPol == null) return ERR_CODE.ERR_KE_SUCCESS;
+            if (aclPol == null) return ERR_CODE.ERR_SUCCESS;
 
             errCode = sendACLPolInfo(polParam, KERNEL_COMMAND.ACL_POLICY_DELETE);
-            if (errCode != ERR_CODE.ERR_KE_SUCCESS) return errCode;
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
 
             g_ACLPolicy.Remove(aclPol);
 
-            return ERR_CODE.ERR_KE_SUCCESS;
+            return ERR_CODE.ERR_SUCCESS;
         }
 
         public ERR_CODE aclPolicyClear()
         {
-            ERR_CODE errCode = ERR_CODE.ERR_KE_SUCCESS;
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
             Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
 
             sendMessageDriver(KERNEL_COMMAND.ACL_POLICY_CLEAR, null, 0, ref byteCode, (UInt32)byteCode.Length);
             errCode = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
-            if (errCode != ERR_CODE.ERR_KE_SUCCESS) return errCode;
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
 
             g_ACLPolicy.Clear();
 
-            return ERR_CODE.ERR_KE_SUCCESS;
+            return ERR_CODE.ERR_SUCCESS;
         }
 
         public ERR_CODE aclPolicyList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, String polName, out String polList)
@@ -366,7 +366,27 @@ namespace MyCSharpService
             polList = String.Copy(copyBuf);
             polList += "\0";
 
-            return ERR_CODE.ERR_KE_SUCCESS;
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
+        public ERR_CODE aclSubjectAdd(ACL_SUB subParam)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
+            ACL_SUB aclSub;
+
+            errCode = setACLSubInfo(subParam);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            aclSub = aclSubjectFind(subParam.SubType, subParam.SubKey, subParam.SubName);
+            if (aclSub != null) return ERR_CODE.ERR_ACLSUB_EXIST;
+
+            errCode = sendACLSubInfo(subParam, null, KERNEL_COMMAND.ACL_SUBJECT_ADD);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            aclSub = new ACL_SUB(subParam);
+            g_ACLSubject.Add(aclSub);
+
+            return errCode;
         }
 
     }
