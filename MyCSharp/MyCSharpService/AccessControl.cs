@@ -389,5 +389,24 @@ namespace MyCSharpService
             return errCode;
         }
 
+        public ERR_CODE aclSubjectModify(ACL_SUB subParam)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
+            ACL_SUB aclSub;
+
+            errCode = setACLSubInfo(subParam);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            aclSub = aclSubjectFind(subParam.SubType, subParam.SubKey, subParam.SubName);
+            if (aclSub == null) return ERR_CODE.ERR_ACLSUB_NOT_EXIST;
+
+            errCode = sendACLSubInfo(subParam, null, KERNEL_COMMAND.ACL_SUBJECT_MODIFY);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            aclSub.Copy(subParam);
+
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
     }
 }
