@@ -408,5 +408,24 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public ERR_CODE aclSubjectDelete(ACL_SUB subParam)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_KE_SUCCESS;
+            ACL_SUB aclSub;
+
+            errCode = setACLSubInfo(subParam);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            aclSub = aclSubjectFind(subParam.SubType, subParam.SubKey, subParam.SubName);
+            if (aclSub == null) return ERR_CODE.ERR_SUCCESS;
+
+            errCode = sendACLSubInfo(subParam, null, KERNEL_COMMAND.ACL_SUBJECT_DELETE);
+            if (errCode != ERR_CODE.ERR_KE_SUCCESS) return errCode;
+
+            g_ACLSubject.Remove(aclSub);
+
+            return ACLCode.ERR_SUCCESS;
+        }
+
     }
 }
