@@ -424,7 +424,21 @@ namespace MyCSharpService
 
             g_ACLSubject.Remove(aclSub);
 
-            return ACLCode.ERR_SUCCESS;
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
+        public ERR_CODE aclSubjectClear()
+        {
+            ERR_CODE errCode = ACLCode.ERR_KE_SUCCESS;
+            Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
+
+            sendMessageDriver(PSKE_COMMAND.ACL_SUBJECT_CLEAR, null, 0, ref byteCode, (UInt32)byteCode.Length);
+            errCode = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            g_ACLSubject.Clear(); ;
+
+            return ERR_CODE.ERR_SUCCESS;
         }
 
     }
