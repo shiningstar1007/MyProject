@@ -429,7 +429,7 @@ namespace MyCSharpService
 
         public ERR_CODE aclSubjectClear()
         {
-            ERR_CODE errCode = ACLCode.ERR_KE_SUCCESS;
+            ERR_CODE errCode = ERR_CODE.ERR_KE_SUCCESS;
             Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
 
             sendMessageDriver(PSKE_COMMAND.ACL_SUBJECT_CLEAR, null, 0, ref byteCode, (UInt32)byteCode.Length);
@@ -439,6 +439,74 @@ namespace MyCSharpService
             g_ACLSubject.Clear(); ;
 
             return ERR_CODE.ERR_SUCCESS;
+        }
+
+        public ERR_CODE aclSubjectList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, String subName, SUB_TYPE subType, out String subList)
+        {
+            String copyBuf = "", ruleID;
+            Int32 offSet = 0, repeat;
+            IList<ACL_DATA> targetData;
+
+            foreach (var sub in g_ACLSubject)
+            {
+                if (String.IsNullOrEmpty(subName) == false && String.Equals(subName, sub.SubName)) continue;
+
+                if (subType != SUB_TYPE.SUB_UNKNOWN && subType != sub.SubType) continue;
+
+                if (offSet > 0) copyBuf += "\n";
+
+                if (addCmd == ONOFF_MODE.OFM_ON)
+                {
+                    copyBuf += String.Format("aclsubadd ");
+                }
+
+                ruleID = String.Format("subtype={0} subname=\"{1}\"", CommFunc.subTypeToStr(sub.SubType), sub.SubName);
+                copyBuf += ruleID;
+
+                if (addCmd == ONOFF_MODE.OFM_ON)
+                {
+                    copyBuf += String.Format(" subkey={0}", sub.SubKey);
+                }
+
+                offSet = copyBuf.Length;
+
+                if (listOnly == ONOFF_MODE.OFM_ON) continue;
+
+                for (repeat = 0; repeat < 2; repeat++)
+                {
+                    if (repeat == 0) targetData = sub.AllowPols.ACLData;
+                    else if (repeat == 1) targetData = sub.DenyPols.ACLData;
+                    else break;
+
+                    foreach (var polData in targetData)
+                    {
+                        if (offSet > 0) copyBuf += "\n";
+
+                        if (addCmd == ONOFF_MODE.OFM_ON) copyBuf += String.Format("aclsubpoladd ");
+
+                        copyBuf += String.Format("{0} polname=\"{1}\" action={2} effect={3} decrypt={4}",
+                            ruleID, polData.ACLPol.PolName, CommFunc.actionToStr(polData.SubPerm.Action),
+                            CommFunc.effectModeToStr(polData.SubPerm.Effect), CommFunc.effectModeToStr(polData.SubPerm.DecPerm));
+
+                        if (polData.SubPerm.ProcUser.SubType != SUB_TYPE.SUB_UNKNOWN)
+                        {
+                            copyBuf += String.Format(" subsubtype={0} subsubname=\"{1}\"",
+                            CommFunc.subTypeToStr(polData.SubPerm.ProcUser.SubType), polData.SubPerm.ProcUser.SubName);
+
+                        }
+
+                        if (addCmd == ONOFF_MODE.OFM_ON)
+                            copyBuf += String.Format(" subkey={0}", sub.SubKey);
+
+                        offSet = copyBuf.Length;
+                    }
+                }
+            }
+
+            subList = String.Copy(copyBuf);
+            subList += "\0";
+
+            return ERR_CODE.ERR_KE_SUCCESS;
         }
 
     }
