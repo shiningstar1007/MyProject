@@ -506,7 +506,23 @@ namespace MyCSharpService
             subList = String.Copy(copyBuf);
             subList += "\0";
 
-            return ERR_CODE.ERR_KE_SUCCESS;
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
+        public ACL_OBJ aclObjectFind(OBJ_TYPE objType, UInt64 objKey, String objPath)
+        {
+            foreach (var aclObj in g_ACLObject)
+            {
+                if (aclObj.ObjType != objType) continue;
+
+                if (aclObj.ObjKey != objKey) continue;
+
+                if (String.Equals(aclObj.ObjPath, objPath) == false) continue;
+
+                return aclObj;
+            }
+
+            return null;
         }
 
     }
