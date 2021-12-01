@@ -525,5 +525,25 @@ namespace MyCSharpService
             return null;
         }
 
+        public ERR_CODE aclObjectAdd(ACL_OBJ objParam)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
+            ACL_OBJ aclObj;
+
+            errCode = setACLObjInfo(objParam);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            aclObj = aclObjectFind(objParam.ObjType, objParam.ObjKey, objParam.ObjPath);
+            if (aclObj != null) return ERR_CODE.ERR_ACLOBJ_EXIST;
+
+            errCode = sendACLObjInfo(objParam, null, KERNEL_COMMAND.ACL_OBJECT_ADD);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            aclObj = new ACL_OBJ(objParam);
+            g_ACLObject.Add(aclObj);
+
+            return errCode;
+        }
+
     }
 }
