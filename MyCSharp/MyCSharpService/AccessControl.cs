@@ -564,5 +564,24 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public ERR_CODE aclObjectDelete(ACL_OBJ objParam)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
+            ACL_OBJ aclObj;
+
+            errCode = setACLObjInfo(objParam);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            aclObj = aclObjectFind(objParam.ObjType, objParam.ObjKey, objParam.ObjPath);
+            if (aclObj == null) return ERR_CODE.ERR_SUCCESS;
+
+            errCode = sendACLObjInfo(objParam, null, KERNEL_COMMAND.ACL_OBJECT_DELETE);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            g_ACLObject.Remove(aclObj);
+
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
     }
 }
