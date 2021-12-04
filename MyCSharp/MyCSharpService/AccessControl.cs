@@ -583,5 +583,19 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public ERR_CODE aclObjectClear()
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
+            Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
+
+            sendMessageDriver(KERNEL_COMMAND.ACL_OBJECT_CLEAR, String.Empty, ref byteCode, (UInt32)byteCode.Length);
+            ERR_CODE = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            g_ACLObject.Clear(); ;
+
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
     }
 }
