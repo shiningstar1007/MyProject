@@ -597,5 +597,40 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public ERR_CODE aclObjectList(ONOFF_MODE addCmd, String objPath, out String objList)
+        {
+            String copyBuf = "", ruleID;
+            Int32 offSet = 0;
+
+            objList = "";
+
+            foreach (var obj in g_ACLObject)
+            {
+                if (String.IsNullOrEmpty(objPath) == false && String.Equals(objPath, obj.ObjPath) == false) continue;
+
+                if (offSet > 0) copyBuf += "\n";
+
+                if (addCmd == ONOFF_MODE.OFM_ON) copyBuf += String.Format("aclobjadd objkey={0} ", obj.ObjKey);
+
+                ruleID = String.Format("objtype={0} objpath=\"{1}\"", CommFunc.objTypeToStr(obj.ObjType), obj.ObjPath);
+
+                if (String.IsNullOrEmpty(obj.CrossPath) == false) ruleID += String.Format(" crosspath=\"{0}\"", obj.CrossPath);
+
+                copyBuf += String.Format("{0} action={1} subdir={2} runmode={3} logmode={4} logging={5} sharedperm={6}", ruleID,
+                     CommFunc.actionToStr(obj.DefAction), CommFunc.onOffModeToStr(obj.SubDir), CommFunc.onOffModeToStr(obj.RunMode),
+                     CommFunc.onOffModeToStr(obj.LogMode), CommFunc.loggingTypeToStr(obj.LoggingType), CommFunc.sharedPermToStr(obj.SharedPerm));
+
+                offSet = copyBuf.Length;
+            }
+
+            if (copyBuf != "")
+            {
+                objList = String.Copy(copyBuf);
+                objList += "\0";
+            }
+
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
     }
 }
