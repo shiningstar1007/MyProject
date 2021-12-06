@@ -617,8 +617,8 @@ namespace MyCSharpService
                 if (String.IsNullOrEmpty(obj.CrossPath) == false) ruleID += String.Format(" crosspath=\"{0}\"", obj.CrossPath);
 
                 copyBuf += String.Format("{0} action={1} subdir={2} runmode={3} logmode={4} logging={5} sharedperm={6}", ruleID,
-                     CommFunc.actionToStr(obj.DefAction), CommFunc.onOffModeToStr(obj.SubDir), CommFunc.onOffModeToStr(obj.RunMode),
-                     CommFunc.onOffModeToStr(obj.LogMode), CommFunc.loggingTypeToStr(obj.LoggingType), CommFunc.sharedPermToStr(obj.SharedPerm));
+                     CommFunc.ActionToStr(obj.DefAction), CommFunc.OnOffModeToStr(obj.SubDir), CommFunc.OnOffModeToStr(obj.RunMode),
+                     CommFunc.OnOffModeToStr(obj.LogMode), CommFunc.LoggingTypeToStr(obj.LoggingType), CommFunc.SharedPermToStr(obj.SharedPerm));
 
                 offSet = copyBuf.Length;
             }
@@ -630,6 +630,22 @@ namespace MyCSharpService
             }
 
             return ERR_CODE.ERR_SUCCESS;
+        }
+
+        public SUPER_SUB superSubFind(SUB_TYPE subType, UInt64 subKey, String subName)
+        {
+            foreach (var superSub in g_SuperSub)
+            {
+                if (superSub.SubType != subType) continue;
+
+                if (superSub.SubKey != subKey) continue;
+
+                if (String.Equals(superSub.SubName, subName) == false) continue;
+
+                return superSub;
+            }
+
+            return null;
         }
 
     }
