@@ -648,5 +648,28 @@ namespace MyCSharpService
             return null;
         }
 
+        public ERR_CODE superSubAdd(SUPER_SUB superParam, Boolean autoLoad = true)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
+            SUPER_SUB superSub;
+
+            errCode = setSuperSubInfo(superParam);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            superSub = superSubFind(superParam.SubType, superParam.SubKey, superParam.SubName);
+            if (superSub != null) return ERR_CODE.ERR_ACLSUB_EXIST;
+
+            if (autoLoad == true)
+            {
+                errCode = sendSuperSubInfo(superParam, KERNEL_COMMAND.SUPER_PROCESS_ADD);
+                if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+            }
+
+            superSub = new SUPER_SUB(superParam);
+            g_SuperSub.Add(superSub);
+
+            return errCode;
+        }
+
     }
 }
