@@ -671,5 +671,24 @@ namespace MyCSharpService
             return errCode;
         }
 
+        public ERR_CODE superSubDelete(SUPER_SUB superParam)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
+            SUPER_SUB superSub;
+
+            errCode = setSuperSubInfo(superParam);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            superSub = superSubFind(superParam.SubType, superParam.SubKey, superParam.SubName);
+            if (superSub == null) return ERR_CODE.ERR_SUCCESS;
+
+            errCode = sendSuperSubInfo(superParam, KERNEL_COMMAND.SUPER_PROCESS_DELETE);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            g_SuperSub.Remove(superSub);
+
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
     }
 }
