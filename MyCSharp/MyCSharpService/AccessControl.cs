@@ -690,5 +690,30 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public ERR_CODE superSubList(ONOFF_MODE addCmd, out String superSubList)
+        {
+            String copyBuf = "";
+            Int32 offSet = 0;
+
+            foreach (var superSub in g_SuperSub)
+            {
+                if (offSet > 0) copyBuf += "\n";
+
+                if (addCmd == ONOFF_MODE.OFM_ON)
+                {
+                    copyBuf += String.Format("suprocadd subkey={0} ", superSub.SubKey);
+                }
+
+                copyBuf += String.Format("subtype={0} subname=\"{1}\" decrypt={2}",
+                    CommFunc.SubTypeToStr(superSub.SubType), superSub.SubName, CommFunc.EffectModeToStr(superSub.DecPerm));
+
+                offSet = copyBuf.Length;
+            }
+
+            superSubList = String.Copy(copyBuf);
+
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
     }
 }
