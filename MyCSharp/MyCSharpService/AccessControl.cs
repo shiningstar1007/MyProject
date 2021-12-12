@@ -729,5 +729,69 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public Int64 sendMessageDriver(KERNEL_COMMAND cmd, String inString, ref Byte[] outByte, UInt32 outSize)
+        {
+            const String portName = "\\miniPort";
+            Int64 hResult = 0;
+            Int32 outBufferSize = 0;
+            IntPtr outBuffer = IntPtr.Zero;
+            IntPtr pBuffer = IntPtr.Zero;
+            IntPtr hPort = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
+            UInt32 byteResult = 0, inByteLen = 0;
+            COMMAND_MESSAGE cmdMsg;
+
+            try
+            {
+                hResult = NativeAPI.FilterConnectCommunicationPort(portName, 0, IntPtr.Zero, 0, IntPtr.Zero, out hPsKePort);
+                if (hResult != 0) return hResult;
+
+                if (outByte != null)
+                {
+                    outBufferSize = (Int32)maxRegSize;
+                    outBuffer = Marshal.AllocHGlobal(outBufferSize);
+
+                    if (outBuffer == IntPtr.Zero) return hResult;
+                }
+
+                cmdMsg = new COMMAND_MESSAGE();
+                cmdMsg.command = cmd;
+                cmdMsg.data = new Byte[4096];
+                if (string.IsNullOrEmpty(inString) == false)
+                {
+                    Array.Copy(Encoding.Default.GetBytes(inString), cmdMsg.data, inString.Length);
+                    inByteLen = (UInt32)inString.Length;
+                }
+
+                Int32 pBufferSize = Marshal.SizeOf(typeof(COMMAND_MESSAGE));
+                pBuffer = Marshal.AllocHGlobal(pBufferSize);
+
+                Marshal.StructureToPtr(cmdMsg, pBuffer, false);
+
+                hResult = NativeAPI.FilterSendMessage(hPort, pBuffer, (UInt32)pBufferSize,
+                    outBuffer, (UInt32)outBufferSize, out byteResult);
+
+                if (hResult != 0) return hResult;
+
+                if (outByte != null && byteResult > 0)
+                {
+                    Marshal.Copy(outBuffer, outByte, 0, (int)outSize);
+                }
+            }
+            finally
+            {
+                if (hPort != IntPtr.Zero)
+                {
+                    NativeAPI.CloseHandle(hPort);
+                    Marshal.FreeHGlobal(hPort);
+                }
+
+                if (outBuffer != IntPtr.Zero) Marshal.FreeHGlobal(outBuffer);
+
+                if (pBuffer != IntPtr.Zero) Marshal.FreeHGlobal(pBuffer);
+            }
+
+            return hResult;
+        }
+
     }
 }
