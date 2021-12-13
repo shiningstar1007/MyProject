@@ -278,6 +278,29 @@ VOID StopProcessNotifyRoutine()
 	else DbgPrint("PsSetCreateProcessNotifyRoutineEx success");
 }
 
+NTSTATUS IoSessionNotificationFunction(
+	_In_  PVOID SessionObject,
+	_In_  PVOID IoObject,
+	_In_  ULONG Event,
+	_In_  PVOID Context,
+	_In_  PVOID NotificationPayload,
+	_In_  ULONG PayloadLength
+)
+{
+	NTSTATUS Status;
+	IO_SESSION_STATE_INFORMATION SessionStateInfo = { 0 };
+	Status = IoGetContainerInformation(
+		IoSessionStateInformation,
+		SessionObject,
+		&SessionStateInfo,
+		sizeof(IO_SESSION_STATE_INFORMATION));
+	if (NT_SUCCESS(Status)) {
+		DbgPrint("SessionId[%u]", SessionStateInfo.SessionId);
+		DbgPrint("SessionState[%u]", SessionStateInfo.SessionState);
+	}
+	return Status;
+}
+
 NTSTATUS InitializeData(
 	_In_ PUNICODE_STRING RegistryPath
 )
