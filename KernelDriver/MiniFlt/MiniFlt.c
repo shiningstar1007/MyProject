@@ -301,6 +301,27 @@ NTSTATUS IoSessionNotificationFunction(
 	return Status;
 }
 
+VOID RegisterSessionNotification(_In_ PDRIVER_OBJECT DriverObject)
+{
+	NTSTATUS Status;
+
+	IO_SESSION_STATE_NOTIFICATION SessionStateNotification = { 0 };
+	SessionStateNotification.Size = sizeof(IO_SESSION_STATE_NOTIFICATION);
+	SessionStateNotification.IoObject = (PVOID)DriverObject;
+	SessionStateNotification.EventMask = IO_SESSION_STATE_ALL_EVENTS;
+
+	Status = IoRegisterContainerNotification(
+		IoSessionStateNotification,
+		(PIO_CONTAINER_NOTIFICATION_FUNCTION)IoSessionNotificationFunction,
+		&SessionStateNotification,
+		sizeof(SessionStateNotification),
+		&g_SessionNotificationHandle
+	);
+
+	if (NT_SUCCESS(Status)) DbgPrint("PsKeRegisterSessionNotification success");
+	else DbgPrint("PsKeRegisterSessionNotification failed [0x%X]", Status);
+}
+
 NTSTATUS InitializeData(
 	_In_ PUNICODE_STRING RegistryPath
 )
