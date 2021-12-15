@@ -294,6 +294,7 @@ NTSTATUS IoSessionNotificationFunction(
 		SessionObject,
 		&SessionStateInfo,
 		sizeof(IO_SESSION_STATE_INFORMATION));
+
 	if (NT_SUCCESS(Status)) {
 		DbgPrint("SessionId[%u]", SessionStateInfo.SessionId);
 		DbgPrint("SessionState[%u]", SessionStateInfo.SessionState);
@@ -320,6 +321,14 @@ VOID RegisterSessionNotification(_In_ PDRIVER_OBJECT DriverObject)
 
 	if (NT_SUCCESS(Status)) DbgPrint("PsKeRegisterSessionNotification success");
 	else DbgPrint("PsKeRegisterSessionNotification failed [0x%X]", Status);
+}
+
+VOID UnRegisterSessionNotification()
+{
+	if (g_SessionNotificationHandle != NULL) {
+		IoUnregisterContainerNotification(g_SessionNotificationHandle);
+		g_SessionNotificationHandle = NULL;
+	}
 }
 
 NTSTATUS InitializeData(
