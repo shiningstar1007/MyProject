@@ -278,6 +278,59 @@ VOID StopProcessNotifyRoutine()
 	else DbgPrint("PsSetCreateProcessNotifyRoutineEx success");
 }
 
+NTSTATUS IoSessionNotificationFunction(
+	_In_  PVOID SessionObject,
+	_In_  PVOID IoObject,
+	_In_  ULONG Event,
+	_In_  PVOID Context,
+	_In_  PVOID NotificationPayload,
+	_In_  ULONG PayloadLength
+)
+{
+	NTSTATUS Status;
+	IO_SESSION_STATE_INFORMATION SessionStateInfo = { 0 };
+	Status = IoGetContainerInformation(
+		IoSessionStateInformation,
+		SessionObject,
+		&SessionStateInfo,
+		sizeof(IO_SESSION_STATE_INFORMATION));
+
+	if (NT_SUCCESS(Status)) {
+		DbgPrint("SessionId[%u]", SessionStateInfo.SessionId);
+		DbgPrint("SessionState[%u]", SessionStateInfo.SessionState);
+	}
+	return Status;
+}
+
+VOID RegisterSessionNotification(_In_ PDRIVER_OBJECT DriverObject)
+{
+	NTSTATUS Status;
+
+	IO_SESSION_STATE_NOTIFICATION SessionStateNotification = { 0 };
+	SessionStateNotification.Size = sizeof(IO_SESSION_STATE_NOTIFICATION);
+	SessionStateNotification.IoObject = (PVOID)DriverObject;
+	SessionStateNotification.EventMask = IO_SESSION_STATE_ALL_EVENTS;
+
+	Status = IoRegisterContainerNotification(
+		IoSessionStateNotification,
+		(PIO_CONTAINER_NOTIFICATION_FUNCTION)IoSessionNotificationFunction,
+		&SessionStateNotification,
+		sizeof(SessionStateNotification),
+		&g_SessionNotificationHandle
+	);
+
+	if (NT_SUCCESS(Status)) DbgPrint("PsKeRegisterSessionNotification success");
+	else DbgPrint("PsKeRegisterSessionNotification failed [0x%X]", Status);
+}
+
+VOID UnRegisterSessionNotification()
+{
+	if (g_SessionNotificationHandle != NULL) {
+		IoUnregisterContainerNotification(g_SessionNotificationHandle);
+		g_SessionNotificationHandle = NULL;
+	}
+}
+
 NTSTATUS InitializeData(
 	_In_ PUNICODE_STRING RegistryPath
 )
