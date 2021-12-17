@@ -11,6 +11,16 @@ namespace MyCSharpService
 
     }
 
+    public static class RegDefine
+    {
+        public const string REG_KEY_ROOT = @"Software\My MiniFilter\App";
+        public const string REG_KEY_CONFIG = @"Software\My MiniFilter\App\Config";
+        public const string REG_NAME_ACLPOLICY = "ACLPolicy";
+        public const string REG_NAME_ACLSUBJECT = "ACLSubject";
+        public const string REG_NAME_ACLOBJECT = "ACLObject";
+        public const string REG_NAME_SUPERSUB = "SuperProcess";
+    }
+
     public enum ERR_CODE : int
     {
         ERR_SUCCESS = 0x00000000,
