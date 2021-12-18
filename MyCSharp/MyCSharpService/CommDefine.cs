@@ -21,6 +21,19 @@ namespace MyCSharpService
         public const string REG_NAME_SUPERSUB = "SuperProcess";
     }
 
+    public static class LogDefine
+    {
+        public const string LOGLEVEL_WARN = "WARN";
+        public const string LOGLEVEL_DEBUG = "DEBUG";
+        public const string LOGLEVEL_INFO = "INFO";
+        public const string LOGLEVEL_ALL = LOGLEVEL_INFO;
+
+        // log file define
+        public const string ServiceLog = @"log\service_log.db";
+        public const string NormalLog = @"log\normal_log.db";
+        public const string FildACLog = @"log\access_log.db";
+    }
+
     public enum ERR_CODE : int
     {
         ERR_SUCCESS = 0x00000000,
