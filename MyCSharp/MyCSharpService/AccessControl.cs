@@ -9,6 +9,41 @@ using System.Threading.Tasks;
 
 namespace MyCSharpService
 {
+
+    public enum COMMAND_MESSAGE : int
+    {
+        ACL_POLICY_ADD,
+        ACL_POLICY_MODIFY,
+        ACL_POLICY_DELETE,
+        ACL_POLICY_CLEAR,
+        ACL_POLICY_SUB_CLEAR,
+        ACL_POLICY_OBJ_CLEAR,
+        ACL_POLICY_LIST,
+
+        ACL_SUBJECT_ADD,
+        ACL_SUBJECT_MODIFY,
+        ACL_SUBJECT_DELETE,
+        ACL_SUBJECT_CLEAR,
+        ACL_SUBJECT_POL_ADD,
+        ACL_SUBJECT_POL_DEL,
+        ACL_SUBJECT_LIST,
+
+        ACL_OBJECT_ADD,
+        ACL_OBJECT_MODIFY,
+        ACL_OBJECT_DELETE,
+        ACL_OBJECT_CLEAR,
+        ACL_OBJECT_POL_ADD,
+        ACL_OBJECT_POL_DEL,
+        ACL_OBJECT_LIST,
+
+        SUPER_PROCESS_ADD,
+        SUPER_PROCESS_DELETE,
+        SUPER_PROCESS_CLEAR,
+        SUPER_PROCESS_LIST,
+
+        ACL_SET,
+        ACL_MODE,
+    }
     public enum ONOFF_MODE : int
     {
         OFM_ON = 0,
