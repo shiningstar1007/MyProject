@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace MyCSharpService
 {
 
-    public enum COMMAND_MESSAGE : int
+    public enum KERNEL_COMMAND : int
     {
         ACL_POLICY_ADD,
         ACL_POLICY_MODIFY,
@@ -44,6 +44,16 @@ namespace MyCSharpService
         ACL_SET,
         ACL_MODE,
     }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+    public struct COMMAND_MESSAGE
+    {
+        public KERNEL_COMMAND command;
+        public UInt32 reserved;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4096)]
+        public Byte[] data;
+    }
+
     public enum ONOFF_MODE : int
     {
         OFM_ON = 0,
