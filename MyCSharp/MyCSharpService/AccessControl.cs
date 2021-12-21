@@ -316,6 +316,21 @@ namespace MyCSharpService
         IList<ACL_OBJ> g_ACLObject = new List<ACL_OBJ>();
         IList<SUPER_SUB> g_SuperSub = new List<SUPER_SUB>();
 
+        public ERR_CODE sendACLPolInfo(ACL_POL polParam, KERNEL_COMMAND cmdParam)
+        {
+            ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
+            String dataBuf;
+            Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
+
+            dataBuf = String.Format("polname={0} runmode={1} logmode={2}", polParam.PolName,
+            CommFunc.OnOffModeToStr(polParam.RunMode), CommFunc.OnOffModeToStr(polParam.LogMode));
+
+            sendMessageDriver(cmdParam, dataBuf, ref byteCode, (UInt32)byteCode.Length);
+            ErrCode = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
+
+            return ErrCode;
+        }
+
         public ACL_POL aclPolicyFind(String polName)
         {
             foreach (var aclPol in g_ACLPolicy)
