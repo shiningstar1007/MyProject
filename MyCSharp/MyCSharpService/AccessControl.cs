@@ -431,6 +431,22 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public ACL_SUB aclSubjectFind(SUB_TYPE subType, UInt64 subKey, String subName)
+        {
+            foreach (var aclSub in g_ACLSubject)
+            {
+                if (aclSub.SubType != subType) continue;
+
+                if (aclSub.SubKey != subKey) continue;
+
+                if (String.Equals(aclSub.SubName, subName) == false) continue;
+
+                return aclSub;
+            }
+
+            return null;
+        }
+
         public ERR_CODE aclSubjectAdd(ACL_SUB subParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
