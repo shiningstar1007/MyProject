@@ -431,6 +431,40 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public ERR_CODE setACLSubInfo(ACL_SUB subParam)
+        {
+            if (String.IsNullOrEmpty(subParam.SubName) == true) return ERR_CODE.ERR_ACLSUB_INVALID_NAME;
+            else if (subParam.SubType == SUB_TYPE.SUB_UNKNOWN) return ERR_CODE.ERR_ACLSUB_INVALID_TYPE;
+
+            if (subParam.SubType == SUB_TYPE.SUB_USER || subParam.SubType == SUB_TYPE.SUB_GROUP)
+            {
+                subParam.UserSId = CommFunc.getUserSId(subParam.SubName);
+                if (subParam.UserSId != null)
+                {
+                    subParam.SubKey = CommFunc.getSIdKey(subParam.UserSId);
+                    subParam.UserSIdBuf = subParam.UserSId.ToString();
+                }
+                else return ERR_CODE.ERR_ACLSUB_GET_SID_FAIL;
+            }
+            else if (subParam.SubType == SUB_TYPE.SUB_PROC)
+            {
+                int lastIndex = subParam.SubName.LastIndexOf('.');
+                if (lastIndex == -1) return ERR_CODE.ERR_ACLSUB_NO_PROCESS;
+                else if (CommFunc.checkProcessExt(subParam.SubName.Substring(lastIndex)) == false) return ERR_CODE.ERR_ACLSUB_NO_PROCESS;
+
+                subParam.SubKey = CommFunc.getObjKey(OBJ_TYPE.OBJ_DIR, subParam.SubName);
+            }
+            else if (subParam.SubType == SUB_TYPE.SUB_SHARE)
+            {
+                subParam.SubKey = (UInt64)SUB_TYPE.SUB_SHARE;
+                subParam.SubName = SUB_TYPE_STR.SUB_SHARE_STR;
+            }
+
+            if (subParam.SubKey == 0) return ERR_CODE.ERR_ACLSUB_GET_SID_FAIL;
+
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
         public ACL_SUB aclSubjectFind(SUB_TYPE subType, UInt64 subKey, String subName)
         {
             foreach (var aclSub in g_ACLSubject)
