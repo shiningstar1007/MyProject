@@ -1,4 +1,5 @@
-﻿using MyCSharp.Service;
+﻿using Microsoft.Win32;
+using MyCSharp.Service;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -336,6 +337,24 @@ namespace MyCSharpService
             }
 
             return ObjKey;
+        }
+
+        public Boolean CheckProcessExt(String procExt)
+        {
+            Boolean bExeFile = false;
+            String buffer;
+
+            try
+            {
+                using (RegistryKey regKey = Registry.ClassesRoot.OpenSubKey(procExt, true))
+                {
+                    buffer = (string)regKey.GetValue("");
+                    if (String.Equals(buffer, "exefile")) bExeFile = true;
+                }
+            }
+            catch { }
+
+            return bExeFile;
         }
     }
 }
