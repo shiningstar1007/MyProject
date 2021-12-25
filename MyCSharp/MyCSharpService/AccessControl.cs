@@ -117,14 +117,6 @@ namespace MyCSharpService
         }
     }
 
-    public enum SUB_TYPE
-    {
-        SUB_USER = 0,
-        SUB_GROUP,
-        SUB_PROC,
-        SUB_UNKNOWN
-    }
-
     public class ACL_SUB
     {
         public UInt64 SubKey;
@@ -201,21 +193,6 @@ namespace MyCSharpService
             this.Action = permParam.Action;
             this.DecPerm = permParam.DecPerm;
         }
-    }
-
-    public enum OBJ_TYPE : int
-    {
-        OBJ_FILE = 0,
-        OBJ_DIR,
-        OBJ_UNKNOWN
-    }
-
-    public enum SHARED_PERM : int
-    {
-        SDP_DECRYPT = 0,
-        SDP_ENCRYPT,
-        SDP_DENY,
-        SDP_UNKNOWN
     }
 
     public class ACL_OBJ
@@ -397,13 +374,40 @@ namespace MyCSharpService
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
             Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
 
-            sendMessageDriver(KERNEL_COMMAND.ACL_POLICY_CLEAR, null, 0, ref byteCode, (UInt32)byteCode.Length);
+            SendMessageDriver(KERNEL_COMMAND.ACL_POLICY_CLEAR, null, 0, ref byteCode, (UInt32)byteCode.Length);
             errCode = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
             if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
 
             g_ACLPolicy.Clear();
 
             return ERR_CODE.ERR_SUCCESS;
+        }
+
+        public ERR_CODE sendACLSubInfo(ACL_SUB subParam, SUB_PERM subPerm, KERNEL_COMMAND cmdParam)
+        {
+            ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
+            String dataBuf;
+            Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
+
+            dataBuf = String.Format("subkey={0} subtype={1} subname=\"{2}\"",
+                subParam.SubKey, CommFunc.SubTypeToStr(subParam.SubType), subParam.SubName);
+
+            if (subPerm != null)
+            {
+                dataBuf += String.Format(" polname=\"{0}\" action={1} effect={2} decrypt={3}",
+                    subPerm.ACLPol.PolName, subPerm.Action, CommFunc.EffectModeToStr(subPerm.Effect), CommFunc.EffectModeToStr(subPerm.DecPerm));
+
+                if (subParam.SubType == SUB_TYPE.SUB_PROC && subPerm.ProcUser.SubType != SUB_TYPE.SUB_UNKNOWN)
+                {
+                    dataBuf += String.Format(" subsubtype={0} subsubname=\"{1}\"",
+                        CommFunc.SubTypeToStr(subPerm.ProcUser.SubType), subPerm.ProcUser.SubName);
+                }
+            }
+
+            sendMessageDriver(cmdParam, dataBuf, ref byteCode, (UInt32)byteCode.Length);
+            ErrCode = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
+
+            return ErrCode;
         }
 
         public ERR_CODE aclPolicyList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, String polName, out String polList)
@@ -420,7 +424,7 @@ namespace MyCSharpService
                 if (addCmd == ONOFF_MODE.OFM_ON) copyBuf += String.Format("aclpoladd ");
 
                 copyBuf += String.Format("polname={0} runmode={1} logmode={2}",
-                     pol.PolName, CommFunc.onOffModeToStr(pol.RunMode), CommFunc.onOffModeToStr(pol.LogMode));
+                     pol.PolName, CommFunc.OnOffModeToStr(pol.RunMode), CommFunc.OnOffModeToStr(pol.LogMode));
 
                 offSet = copyBuf.Length;
             }
@@ -438,11 +442,10 @@ namespace MyCSharpService
 
             if (subParam.SubType == SUB_TYPE.SUB_USER || subParam.SubType == SUB_TYPE.SUB_GROUP)
             {
-                subParam.UserSId = CommFunc.getUserSId(subParam.SubName);
+                subParam.UserSId = CommFunc.GetUserSId(subParam.SubName);
                 if (subParam.UserSId != null)
                 {
-                    subParam.SubKey = CommFunc.getSIdKey(subParam.UserSId);
-                    subParam.UserSIdBuf = subParam.UserSId.ToString();
+                    subParam.SubKey = CommFunc.GetSIdKey(subParam.UserSId);
                 }
                 else return ERR_CODE.ERR_ACLSUB_GET_SID_FAIL;
             }
@@ -450,9 +453,9 @@ namespace MyCSharpService
             {
                 int lastIndex = subParam.SubName.LastIndexOf('.');
                 if (lastIndex == -1) return ERR_CODE.ERR_ACLSUB_NO_PROCESS;
-                else if (CommFunc.checkProcessExt(subParam.SubName.Substring(lastIndex)) == false) return ERR_CODE.ERR_ACLSUB_NO_PROCESS;
+                else if (CommFunc.CheckProcessExt(subParam.SubName.Substring(lastIndex)) == false) return ERR_CODE.ERR_ACLSUB_NO_PROCESS;
 
-                subParam.SubKey = CommFunc.getObjKey(OBJ_TYPE.OBJ_DIR, subParam.SubName);
+                subParam.SubKey = CommFunc.GetObjKey(OBJ_TYPE.OBJ_DIR, subParam.SubName);
             }
             else if (subParam.SubType == SUB_TYPE.SUB_SHARE)
             {

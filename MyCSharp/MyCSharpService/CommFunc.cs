@@ -293,7 +293,7 @@ namespace MyCSharpService
             return ActionStr.ToString();
         }
 
-        public SecurityIdentifier GetUserSId(String UserName)
+        public static SecurityIdentifier GetUserSId(String UserName)
         {
             NTAccount Account = new NTAccount(UserName);
             SecurityIdentifier UserSId = (SecurityIdentifier)Account.Translate(typeof(SecurityIdentifier));
@@ -301,7 +301,7 @@ namespace MyCSharpService
             return UserSId;
         }
 
-        public UInt64 GetSIdKey(SecurityIdentifier UserSId)
+        public static UInt64 GetSIdKey(SecurityIdentifier UserSId)
         {
             String[] SidStr = UserSId.ToString().Split(new char[] { '-' });
             UInt64 SIdKey = 0;
@@ -339,7 +339,7 @@ namespace MyCSharpService
             return ObjKey;
         }
 
-        public Boolean CheckProcessExt(String procExt)
+        public static Boolean CheckProcessExt(String procExt)
         {
             Boolean bExeFile = false;
             String buffer;
