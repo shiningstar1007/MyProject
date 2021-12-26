@@ -544,10 +544,10 @@ namespace MyCSharpService
 
         public ERR_CODE aclSubjectClear()
         {
-            ERR_CODE errCode = ERR_CODE.ERR_KE_SUCCESS;
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
             Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
 
-            sendMessageDriver(PSKE_COMMAND.ACL_SUBJECT_CLEAR, null, 0, ref byteCode, (UInt32)byteCode.Length);
+            sendMessageDriver(KERNEL_COMMAND.ACL_SUBJECT_CLEAR, null, ref byteCode, (UInt32)byteCode.Length);
             errCode = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
             if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
 
@@ -600,13 +600,13 @@ namespace MyCSharpService
                         if (addCmd == ONOFF_MODE.OFM_ON) copyBuf += String.Format("aclsubpoladd ");
 
                         copyBuf += String.Format("{0} polname=\"{1}\" action={2} effect={3} decrypt={4}",
-                            ruleID, polData.ACLPol.PolName, CommFunc.actionToStr(polData.SubPerm.Action),
-                            CommFunc.effectModeToStr(polData.SubPerm.Effect), CommFunc.effectModeToStr(polData.SubPerm.DecPerm));
+                            ruleID, polData.ACLPol.PolName, CommFunc.ActionToStr(polData.SubPerm.Action),
+                            CommFunc.EffectModeToStr(polData.SubPerm.Effect), CommFunc.EffectModeToStr(polData.SubPerm.DecPerm));
 
                         if (polData.SubPerm.ProcUser.SubType != SUB_TYPE.SUB_UNKNOWN)
                         {
                             copyBuf += String.Format(" subsubtype={0} subsubname=\"{1}\"",
-                            CommFunc.subTypeToStr(polData.SubPerm.ProcUser.SubType), polData.SubPerm.ProcUser.SubName);
+                            CommFunc.SubTypeToStr(polData.SubPerm.ProcUser.SubType), polData.SubPerm.ProcUser.SubName);
 
                         }
 
@@ -620,6 +620,19 @@ namespace MyCSharpService
 
             subList = String.Copy(copyBuf);
             subList += "\0";
+
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
+        public ERR_CODE setACLObjInfo(ACL_OBJ objParam)
+        {
+            if (String.IsNullOrEmpty(objParam.ObjPath) == true) return ERR_CODE.ERR_ACLOBJ_INVALID_PATH;
+            else if (objParam.ObjType == OBJ_TYPE.OBJ_UNKNOWN) return ERR_CODE.ERR_ACLOBJ_INVALID_TYPE;
+
+            objParam.ObjKey = CommFunc.GetObjKey(objParam.ObjType, objParam.ObjPath);
+            if (objParam.ObjKey == 0) return ERR_CODE.ERR_ACLOBJ_GET_KEY_FAIL;
+
+            if (objParam.ObjType == OBJ_TYPE.OBJ_DIR) objParam.SubDir = ONOFF_MODE.OFM_OFF;
 
             return ERR_CODE.ERR_SUCCESS;
         }
