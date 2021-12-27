@@ -624,6 +624,28 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public ERR_CODE sendACLObjInfo(ACL_OBJ objParam, ACL_POL polParam, KERNEL_COMMAND cmdParam)
+        {
+            ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
+            String dataBuf;
+            Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
+
+            dataBuf = String.Format("objkey={0} objtype={1} objpath=\"{2}\" action={3} subdir={4} runmode={5} logmode={6} logging={7} sharedperm={8} crosspath=\"{9}\"",
+            objParam.ObjKey, CommFunc.ObjTypeToStr(objParam.ObjType), objParam.ObjPath, CommFunc.ActionToStr(objParam.DefAction),
+            CommFunc.OnOffModeToStr(objParam.SubDir), CommFunc.OnOffModeToStr(objParam.RunMode), CommFunc.OnOffModeToStr(objParam.LogMode),
+            CommFunc.LoggingTypeToStr(objParam.LoggingType), CommFunc.SharedPermToStr(objParam.SharedPerm), objParam.CrossPath);
+
+            if (polParam != null)
+            {
+                dataBuf += String.Format(" polname=\"{0}\"", polParam.PolName);
+            }
+
+            sendMessageDriver(cmdParam, dataBuf, ref byteCode, (UInt32)byteCode.Length);
+            ErrCode = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
+
+            return ErrCode;
+        }
+
         public ERR_CODE setACLObjInfo(ACL_OBJ objParam)
         {
             if (String.IsNullOrEmpty(objParam.ObjPath) == true) return ERR_CODE.ERR_ACLOBJ_INVALID_PATH;
