@@ -739,7 +739,7 @@ namespace MyCSharpService
             Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
 
             sendMessageDriver(KERNEL_COMMAND.ACL_OBJECT_CLEAR, String.Empty, ref byteCode, (UInt32)byteCode.Length);
-            ERR_CODE = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
+            errCode = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
             if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
 
             g_ACLObject.Clear(); ;
@@ -778,6 +778,41 @@ namespace MyCSharpService
                 objList = String.Copy(copyBuf);
                 objList += "\0";
             }
+
+            return ERR_CODE.ERR_SUCCESS;
+        }
+
+        public ERR_CODE setSuperSubInfo(SUPER_SUB superParam)
+        {
+            if (String.IsNullOrEmpty(superParam.SubName) == true) return ERR_CODE.ERR_ACLSUB_INVALID_NAME;
+            else if (superParam.SubType == SUB_TYPE.SUB_UNKNOWN) return ERR_CODE.ERR_ACLSUB_INVALID_TYPE;
+            else if (superParam.DecPerm == EFFECT_MODE.EFT_UNKNOWN) return ERR_CODE.ERR_ACLSUB_INVALID_EFFECT;
+
+            if (superParam.SubType == SUB_TYPE.SUB_USER || superParam.SubType == SUB_TYPE.SUB_GROUP)
+            {
+                superParam.UserSId = CommFunc.GetUserSId(superParam.SubName);
+                if (superParam.UserSId != null)
+                {
+                    superParam.SubKey = CommFunc.GetSIdKey(superParam.UserSId);
+                    superParam.UserSIdBuf = superParam.UserSId.ToString();
+                }
+                else return ERR_CODE.ERR_ACLSUB_GET_SID_FAIL;
+            }
+            else if (superParam.SubType == SUB_TYPE.SUB_PROC)
+            {
+                int lastIndex = superParam.SubName.LastIndexOf('.');
+                if (lastIndex == -1) return ERR_CODE.ERR_ACLSUB_NO_PROCESS;
+                else if (CommFunc.CheckProcessExt(superParam.SubName.Substring(lastIndex)) == false) return ERR_CODE.ERR_ACLSUB_NO_PROCESS;
+
+                superParam.SubKey = CommFunc.GetObjKey(OBJ_TYPE.OBJ_DIR, superParam.SubName);
+            }
+            else if (superParam.SubType == SUB_TYPE.SUB_SHARE)
+            {
+                superParam.SubKey = (UInt64)SUB_TYPE.SUB_SHARE;
+                superParam.SubName = SUB_TYPE_STR.SUB_SHARE_STR;
+            }
+
+            if (superParam.SubKey == 0) return ERR_CODE.ERR_ACLSUB_GET_SID_FAIL;
 
             return ERR_CODE.ERR_SUCCESS;
         }
