@@ -782,6 +782,22 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public ERR_CODE sendSuperSubInfo(SUPER_SUB superParam, KERNEL_COMMAND cmdParam)
+        {
+            ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
+            String dataBuf;
+            Byte[] byteCode = new Byte[sizeof(ERR_CODE)];
+
+            dataBuf = String.Format("subkey={0} subtype={1} subname=\"{2}\" decrypt={3}",
+                superParam.SubKey, CommFunc.SubTypeToStr(superParam.SubType),
+                superParam.SubName, CommFunc.EffectModeToStr(superParam.DecPerm));
+
+            sendMessageDriver(cmdParam, dataBuf, ref byteCode, (UInt32)byteCode.Length);
+            ErrCode = (ERR_CODE)BitConverter.ToInt32(byteCode, 0);
+
+            return ErrCode;
+        }
+
         public ERR_CODE setSuperSubInfo(SUPER_SUB superParam)
         {
             if (String.IsNullOrEmpty(superParam.SubName) == true) return ERR_CODE.ERR_ACLSUB_INVALID_NAME;
