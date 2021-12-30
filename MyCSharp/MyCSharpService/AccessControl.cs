@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace MyCSharpService
 {
-
     public enum KERNEL_COMMAND : int
     {
         ACL_POLICY_ADD,
@@ -54,10 +53,69 @@ namespace MyCSharpService
         public Byte[] data;
     }
 
+
+    public enum EFFECT_MODE
+    {
+        EFT_DENY = 0,
+        EFT_ALLOW,
+        EFT_UNKNOWN
+    }
+
+    public static class EFFECT_MODE_STR
+    {
+        public const String EFT_ALLOW_STR = "allow";
+        public const String EFT_DENY_STR = "deny";
+        public const String EFT_UNKNOWN_STR = "unknown";
+    }
+
+    public enum RUN_MODE : ulong
+    {
+        PSKE_FLAG_ACCESS_CONTROL_NORMAL = 0x00000100,
+        PSKE_FLAG_ACCESS_CONTROL_TEST = 0x00000200,
+        PSKE_FLAG_ACCESS_CONTROL_DISABLE = 0x00000400
+    }
+
+    public static class RUN_MODE_STR
+    {
+        public const String RUN_NORMAL_STR = "normal";
+        public const String RUN_TEST_STR = "test";
+        public const String RUN_DISABLE_STR = "disable";
+    }
+
+    public enum ACL_ACTION : ulong
+    {
+        ACT_READ = 0x00000001,
+        ACT_WRITE = 0x00000002,
+        ACT_TRAVERSE = 0x00000004,
+        ACT_EXECUTE = 0x00000008,
+        ACT_DELETE = 0x00000010,
+        ACT_CREATE = 0x00000020,
+        ACT_DEC = 0x00000040,
+        ACT_ALL = 0xFFFFFFFF
+    }
+
+    public static class ACL_ACTION_STR
+    {
+        public const String ACT_READ_STR = "read";
+        public const String ACT_WRITE_STR = "write";
+        public const String ACT_TRAVERSE_STR = "traverse";
+        public const String ACT_EXECUTE_STR = "execute";
+        public const String ACT_DELETE_STR = "delete";
+        public const String ACT_CREATE_STR = "create";
+        public const String ACT_DEC_STR = "dec";
+        public const String ACT_ALL_STR = "all";
+    }
+
     public enum ONOFF_MODE : int
     {
         OFM_ON = 0,
         OFM_OFF,
+    }
+
+    public static class ONOFF_MODE_STR
+    {
+        public const String OFM_ON_STR = "on";
+        public const String OFM_OFF_STR = "off";
     }
 
     public enum LOGGING_TYPE : int
@@ -67,11 +125,27 @@ namespace MyCSharpService
         LOG_ALL
     }
 
-    public enum EFFECT_MODE
+    public static class LOGGING_TYPE_STR
     {
-        EFT_DENY = 0,
-        EFT_ALLOW,
-        EFT_UNKNOWN
+        public const String LOG_ALLOW_STR = "allow";
+        public const String LOG_DENY_STR = "deny";
+        public const String LOG_ALL_STR = "all";
+    }
+
+    public enum SHARED_PERM : int
+    {
+        SDP_DECRYPT = 0,
+        SDP_ENCRYPT,
+        SDP_DENY,
+        SDP_UNKNOWN
+    }
+
+    public static class SHARED_PERM_STR
+    {
+        public const String SDP_DECRYPT_STR = "decrypt";
+        public const String SDP_ENCRYPT_STR = "encrypt";
+        public const String SDP_DENY_STR = "deny";
+        public const String SDP_UNKNOWN_STR = "unknown";
     }
 
     public class ACL_DATA
