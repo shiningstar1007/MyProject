@@ -41,23 +41,6 @@ namespace MyCSharpService
 
             return RUN_MODE_STR.RUN_NORMAL_STR;
         }
-        public enum SUB_TYPE
-        {
-            SUB_USER = 0,
-            SUB_PROC,
-            SUB_SHARE,
-            SUB_GROUP,
-            SUB_UNKNOWN
-        }
-
-        public static class SUB_TYPE_STR
-        {
-            public const String SUB_USER_STR = "user";
-            public const String SUB_GROUP_STR = "group";
-            public const String SUB_PROC_STR = "proc";
-            public const String SUB_SHARE_STR = "share";
-        }
-
         public SUB_TYPE StrToSubType(String SubTypeStr)
         {
             if (SubTypeStr == SUB_TYPE_STR.SUB_USER_STR) return SUB_TYPE.SUB_USER;
@@ -78,19 +61,6 @@ namespace MyCSharpService
             return "";
         }
 
-        public enum OBJ_TYPE : int
-        {
-            OBJ_FILE = 0,
-            OBJ_DIR,
-            OBJ_UNKNOWN
-        }
-
-        public static class OBJ_TYPE_STR
-        {
-            public const String OBJ_FILE_STR = "file";
-            public const String OBJ_DIR_STR = "dir";
-        }
-
         public OBJ_TYPE StrToObjType(String ObjTypeStr)
         {
             if (ObjTypeStr == OBJ_TYPE_STR.OBJ_FILE_STR) return OBJ_TYPE.OBJ_FILE;
@@ -105,20 +75,6 @@ namespace MyCSharpService
             else if (ObjType == OBJ_TYPE.OBJ_DIR) return OBJ_TYPE_STR.OBJ_DIR_STR;
 
             return "";
-        }
-
-        public enum EFFECT_MODE
-        {
-            EFT_DENY = 0,
-            EFT_ALLOW,
-            EFT_UNKNOWN
-        }
-
-        public static class EFFECT_MODE_STR
-        {
-            public const String EFT_ALLOW_STR = "allow";
-            public const String EFT_DENY_STR = "deny";
-            public const String EFT_UNKNOWN_STR = "unknown";
         }
 
         public EFFECT_MODE StrToEffectMode(String EffectModeStr)
@@ -137,20 +93,6 @@ namespace MyCSharpService
             return "";
         }
 
-        public enum LOGGING_TYPE : int
-        {
-            LOG_DENY = 0,
-            LOG_ALLOW,
-            LOG_ALL
-        }
-
-        public static class LOGGING_TYPE_STR
-        {
-            public const String LOG_ALLOW_STR = "allow";
-            public const String LOG_DENY_STR = "deny";
-            public const String LOG_ALL_STR = "all";
-        }
-
         public LOGGING_TYPE StrToLoggingType(String LoggingTypeStr)
         {
             if (LoggingTypeStr == LOGGING_TYPE_STR.LOG_ALLOW_STR) return LOGGING_TYPE.LOG_ALLOW;
@@ -165,22 +107,6 @@ namespace MyCSharpService
             else if (LoggingType == LOGGING_TYPE.LOG_DENY) return LOGGING_TYPE_STR.LOG_DENY_STR;
 
             return LOGGING_TYPE_STR.LOG_ALL_STR;
-        }
-
-        public enum SHARED_PERM : int
-        {
-            SDP_DECRYPT = 0,
-            SDP_ENCRYPT,
-            SDP_DENY,
-            SDP_UNKNOWN
-        }
-
-        public static class SHARED_PERM_STR
-        {
-            public const String SDP_DECRYPT_STR = "decrypt";
-            public const String SDP_ENCRYPT_STR = "encrypt";
-            public const String SDP_DENY_STR = "deny";
-            public const String SDP_UNKNOWN_STR = "unknown";
         }
 
         public SHARED_PERM StrToSharedPerm(String SharedPermStr)
@@ -199,18 +125,6 @@ namespace MyCSharpService
             else if (SharedPerm == SHARED_PERM.SDP_DENY) return SHARED_PERM_STR.SDP_DENY_STR;
 
             return "";
-        }
-
-        public enum ONOFF_MODE : int
-        {
-            OFM_ON = 0,
-            OFM_OFF,
-        }
-
-        public static class ONOFF_MODE_STR
-        {
-            public const String OFM_ON_STR = "on";
-            public const String OFM_OFF_STR = "off";
         }
 
         public ONOFF_MODE StrToOnOffMode(String OnOffModeStr)
