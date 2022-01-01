@@ -12,20 +12,6 @@ namespace MyCSharpService
 {
     class CommFunc
     {
-        public enum RUN_MODE : int
-        {
-            RUN_NORMAL = 0,
-            RUN_TEST,
-            RUN_DISABLE
-        }
-
-        public static class RUN_MODE_STR
-        {
-            public const String RUN_NORMAL_STR = "normal";
-            public const String RUN_TEST_STR = "test";
-            public const String RUN_DISABLE_STR = "disable";
-        }
-
         public RUN_MODE StrToRunMode(String RunModeStr)
         {
             if (RunModeStr == RUN_MODE_STR.RUN_TEST_STR) return RUN_MODE.RUN_TEST;
