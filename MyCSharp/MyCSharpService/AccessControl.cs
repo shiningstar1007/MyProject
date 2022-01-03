@@ -68,7 +68,7 @@ namespace MyCSharpService
         public const String EFT_UNKNOWN_STR = "unknown";
     }
 
-    public enum RUN_MODE : ulong
+    public static enum RUN_MODE : ulong
     {
         PSKE_FLAG_ACCESS_CONTROL_NORMAL = 0x00000100,
         PSKE_FLAG_ACCESS_CONTROL_TEST = 0x00000200,
@@ -82,7 +82,7 @@ namespace MyCSharpService
         public const String RUN_DISABLE_STR = "disable";
     }
 
-    public enum ACL_ACTION : ulong
+    public static enum ACL_ACTION : ulong
     {
         ACT_READ = 0x00000001,
         ACT_WRITE = 0x00000002,
@@ -106,7 +106,7 @@ namespace MyCSharpService
         public const String ACT_ALL_STR = "all";
     }
 
-    public enum ONOFF_MODE : int
+    public static enum ONOFF_MODE : int
     {
         OFM_ON = 0,
         OFM_OFF,
@@ -118,7 +118,7 @@ namespace MyCSharpService
         public const String OFM_OFF_STR = "off";
     }
 
-    public enum LOGGING_TYPE : int
+    public static enum LOGGING_TYPE : int
     {
         LOG_DENY = 0,
         LOG_ALLOW,
@@ -132,7 +132,7 @@ namespace MyCSharpService
         public const String LOG_ALL_STR = "all";
     }
 
-    public enum SHARED_PERM : int
+    public static enum SHARED_PERM : int
     {
         SDP_DECRYPT = 0,
         SDP_ENCRYPT,
