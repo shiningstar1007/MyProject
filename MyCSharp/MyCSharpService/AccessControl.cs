@@ -68,11 +68,11 @@ namespace MyCSharpService
         public const String EFT_UNKNOWN_STR = "unknown";
     }
 
-    public static enum RUN_MODE : ulong
+    public enum RUN_MODE : ulong
     {
-        PSKE_FLAG_ACCESS_CONTROL_NORMAL = 0x00000100,
-        PSKE_FLAG_ACCESS_CONTROL_TEST = 0x00000200,
-        PSKE_FLAG_ACCESS_CONTROL_DISABLE = 0x00000400
+        RUN_NORMAL = 0,
+        RUN_TEST,
+        RUN_DISABLE
     }
 
     public static class RUN_MODE_STR
@@ -82,7 +82,7 @@ namespace MyCSharpService
         public const String RUN_DISABLE_STR = "disable";
     }
 
-    public static enum ACL_ACTION : ulong
+    public enum ACL_ACTION : ulong
     {
         ACT_READ = 0x00000001,
         ACT_WRITE = 0x00000002,
@@ -106,7 +106,7 @@ namespace MyCSharpService
         public const String ACT_ALL_STR = "all";
     }
 
-    public static enum ONOFF_MODE : int
+    public enum ONOFF_MODE : int
     {
         OFM_ON = 0,
         OFM_OFF,
@@ -118,7 +118,7 @@ namespace MyCSharpService
         public const String OFM_OFF_STR = "off";
     }
 
-    public static enum LOGGING_TYPE : int
+    public enum LOGGING_TYPE : int
     {
         LOG_DENY = 0,
         LOG_ALLOW,
@@ -132,7 +132,7 @@ namespace MyCSharpService
         public const String LOG_ALL_STR = "all";
     }
 
-    public static enum SHARED_PERM : int
+    public enum SHARED_PERM : int
     {
         SDP_DECRYPT = 0,
         SDP_ENCRYPT,
@@ -189,6 +189,23 @@ namespace MyCSharpService
             this.LogMode = polParam.LogMode;
             this.RunMode = polParam.RunMode;
         }
+    }
+
+    public enum SUB_TYPE
+    {
+        SUB_USER = 0,
+        SUB_PROC,
+        SUB_SHARE,
+        SUB_GROUP,
+        SUB_UNKNOWN
+    }
+
+    public static class SUB_TYPE_STR
+    {
+        public const String SUB_USER_STR = "user";
+        public const String SUB_GROUP_STR = "group";
+        public const String SUB_PROC_STR = "proc";
+        public const String SUB_SHARE_STR = "share";
     }
 
     public class ACL_SUB

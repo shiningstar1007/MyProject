@@ -513,15 +513,6 @@ namespace MyCSharp.Service
 
     }
 
-    public enum SUB_TYPE
-    {
-        SUB_USER = 0,
-        SUB_PROC,
-        SUB_SHARE,
-        SUB_GROUP,
-        SUB_UNKNOWN
-    }
-
     public class ACL_Subject
     {
         public SUB_TYPE subType;
