@@ -286,6 +286,13 @@ namespace MyCSharpService
         }
     }
 
+    public enum OBJ_TYPE : int
+    {
+        OBJ_FILE = 0,
+        OBJ_DIR,
+        OBJ_UNKNOWN
+    }
+
     public class ACL_OBJ
     {
         public UInt64 ObjKey;
