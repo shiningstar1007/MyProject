@@ -293,6 +293,14 @@ namespace MyCSharpService
         OBJ_UNKNOWN
     }
 
+    public static class SUB_TYPE_STR
+    {
+        public const String SUB_USER_STR = "user";
+        public const String SUB_GROUP_STR = "group";
+        public const String SUB_PROC_STR = "proc";
+        public const String SUB_SHARE_STR = "share";
+    }
+
     public class ACL_OBJ
     {
         public UInt64 ObjKey;
