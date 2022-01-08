@@ -12,7 +12,7 @@ namespace MyCSharpService
 {
     class CommFunc
     {
-        public RUN_MODE StrToRunMode(String RunModeStr)
+        public static RUN_MODE StrToRunMode(String RunModeStr)
         {
             if (RunModeStr == RUN_MODE_STR.RUN_TEST_STR) return RUN_MODE.RUN_TEST;
             else if (RunModeStr == RUN_MODE_STR.RUN_DISABLE_STR) return RUN_MODE.RUN_DISABLE;
@@ -20,14 +20,14 @@ namespace MyCSharpService
             return RUN_MODE.RUN_NORMAL;
         }
 
-        public String RunModeToStr(RUN_MODE RunMode)
+        public static String RunModeToStr(RUN_MODE RunMode)
         {
             if (RunMode == RUN_MODE.RUN_TEST) return RUN_MODE_STR.RUN_TEST_STR;
             else if (RunMode == RUN_MODE.RUN_DISABLE) return RUN_MODE_STR.RUN_DISABLE_STR;
 
             return RUN_MODE_STR.RUN_NORMAL_STR;
         }
-        public SUB_TYPE StrToSubType(String SubTypeStr)
+        public static SUB_TYPE StrToSubType(String SubTypeStr)
         {
             if (SubTypeStr == SUB_TYPE_STR.SUB_USER_STR) return SUB_TYPE.SUB_USER;
             else if (SubTypeStr == SUB_TYPE_STR.SUB_PROC_STR) return SUB_TYPE.SUB_PROC;
@@ -37,7 +37,7 @@ namespace MyCSharpService
             return SUB_TYPE.SUB_UNKNOWN;
         }
 
-        public String SubTypeToStr(SUB_TYPE SubType)
+        public static String SubTypeToStr(SUB_TYPE SubType)
         {
             if (SubType == SUB_TYPE.SUB_USER) return SUB_TYPE_STR.SUB_USER_STR;
             else if (SubType == SUB_TYPE.SUB_PROC) return SUB_TYPE_STR.SUB_PROC_STR;
@@ -47,7 +47,7 @@ namespace MyCSharpService
             return "";
         }
 
-        public OBJ_TYPE StrToObjType(String ObjTypeStr)
+        public static OBJ_TYPE StrToObjType(String ObjTypeStr)
         {
             if (ObjTypeStr == OBJ_TYPE_STR.OBJ_FILE_STR) return OBJ_TYPE.OBJ_FILE;
             else if (ObjTypeStr == OBJ_TYPE_STR.OBJ_DIR_STR) return OBJ_TYPE.OBJ_DIR;
@@ -55,7 +55,7 @@ namespace MyCSharpService
             return OBJ_TYPE.OBJ_UNKNOWN;
         }
 
-        public String ObjTypeToStr(OBJ_TYPE ObjType)
+        public static String ObjTypeToStr(OBJ_TYPE ObjType)
         {
             if (ObjType == OBJ_TYPE.OBJ_FILE) return OBJ_TYPE_STR.OBJ_FILE_STR;
             else if (ObjType == OBJ_TYPE.OBJ_DIR) return OBJ_TYPE_STR.OBJ_DIR_STR;
@@ -63,7 +63,7 @@ namespace MyCSharpService
             return "";
         }
 
-        public EFFECT_MODE StrToEffectMode(String EffectModeStr)
+        public static EFFECT_MODE StrToEffectMode(String EffectModeStr)
         {
             if (EffectModeStr == EFFECT_MODE_STR.EFT_ALLOW_STR) return EFFECT_MODE.EFT_ALLOW;
             else if (EffectModeStr == EFFECT_MODE_STR.EFT_DENY_STR) return EFFECT_MODE.EFT_DENY;
@@ -71,7 +71,7 @@ namespace MyCSharpService
             return EFFECT_MODE.EFT_UNKNOWN;
         }
 
-        public String EffectModeToStr(EFFECT_MODE EffectMode)
+        public static String EffectModeToStr(EFFECT_MODE EffectMode)
         {
             if (EffectMode == EFFECT_MODE.EFT_ALLOW) return EFFECT_MODE_STR.EFT_ALLOW_STR;
             else if (EffectMode == EFFECT_MODE.EFT_DENY) return EFFECT_MODE_STR.EFT_DENY_STR;
@@ -79,7 +79,7 @@ namespace MyCSharpService
             return "";
         }
 
-        public LOGGING_TYPE StrToLoggingType(String LoggingTypeStr)
+        public static LOGGING_TYPE StrToLoggingType(String LoggingTypeStr)
         {
             if (LoggingTypeStr == LOGGING_TYPE_STR.LOG_ALLOW_STR) return LOGGING_TYPE.LOG_ALLOW;
             else if (LoggingTypeStr == LOGGING_TYPE_STR.LOG_DENY_STR) return LOGGING_TYPE.LOG_DENY;
@@ -87,7 +87,7 @@ namespace MyCSharpService
             return LOGGING_TYPE.LOG_ALL;
         }
 
-        public String LoggingTypeToStr(LOGGING_TYPE LoggingType)
+        public static String LoggingTypeToStr(LOGGING_TYPE LoggingType)
         {
             if (LoggingType == LOGGING_TYPE.LOG_ALLOW) return LOGGING_TYPE_STR.LOG_ALLOW_STR;
             else if (LoggingType == LOGGING_TYPE.LOG_DENY) return LOGGING_TYPE_STR.LOG_DENY_STR;
@@ -95,7 +95,7 @@ namespace MyCSharpService
             return LOGGING_TYPE_STR.LOG_ALL_STR;
         }
 
-        public SHARED_PERM StrToSharedPerm(String SharedPermStr)
+        public static SHARED_PERM StrToSharedPerm(String SharedPermStr)
         {
             if (SharedPermStr == SHARED_PERM_STR.SDP_DECRYPT_STR) return SHARED_PERM.SDP_DECRYPT;
             else if (SharedPermStr == SHARED_PERM_STR.SDP_ENCRYPT_STR) return SHARED_PERM.SDP_ENCRYPT;
@@ -104,7 +104,7 @@ namespace MyCSharpService
             return SHARED_PERM.SDP_UNKNOWN;
         }
 
-        public String SharedPermToStr(SHARED_PERM SharedPerm)
+        public static String SharedPermToStr(SHARED_PERM SharedPerm)
         {
             if (SharedPerm == SHARED_PERM.SDP_DECRYPT) return SHARED_PERM_STR.SDP_DECRYPT_STR;
             else if (SharedPerm == SHARED_PERM.SDP_ENCRYPT) return SHARED_PERM_STR.SDP_ENCRYPT_STR;
@@ -113,14 +113,14 @@ namespace MyCSharpService
             return "";
         }
 
-        public ONOFF_MODE StrToOnOffMode(String OnOffModeStr)
+        public static ONOFF_MODE StrToOnOffMode(String OnOffModeStr)
         {
             if (OnOffModeStr == ONOFF_MODE_STR.OFM_ON_STR) return ONOFF_MODE.OFM_ON;
 
             return ONOFF_MODE.OFM_OFF;
         }
 
-        public String OnOffModeToStr(ONOFF_MODE OnOffMode)
+        public static String OnOffModeToStr(ONOFF_MODE OnOffMode)
         {
             if (OnOffMode == ONOFF_MODE.OFM_ON) return ONOFF_MODE_STR.OFM_ON_STR;
 
@@ -151,7 +151,7 @@ namespace MyCSharpService
             public const String ACT_ALL_STR = "all";
         }
 
-        public ACL_ACTION StrToAction(String ActionStr)
+        public static ACL_ACTION StrToAction(String ActionStr)
         {
             String[] ActionBuf;
             ACL_ACTION Action = 0;
@@ -174,7 +174,7 @@ namespace MyCSharpService
             return Action;
         }
 
-        public String ActionToStr(ACL_ACTION Action)
+        public static String ActionToStr(ACL_ACTION Action)
         {
             var ActionStr = new StringBuilder();
 
@@ -219,7 +219,7 @@ namespace MyCSharpService
             return SIdKey;
         }
 
-        public UInt64 GetObjKey(OBJ_TYPE ObjType, String ObjPath)
+        public static UInt64 GetObjKey(OBJ_TYPE ObjType, String ObjPath)
         {
             IntPtr hFile;
             NativeAPI.BY_HANDLE_FILE_INFORMATION FileInfo = new NativeAPI.BY_HANDLE_FILE_INFORMATION();

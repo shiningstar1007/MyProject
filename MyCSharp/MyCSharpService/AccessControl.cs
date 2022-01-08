@@ -866,7 +866,7 @@ namespace MyCSharpService
 
                 if (addCmd == ONOFF_MODE.OFM_ON) copyBuf += String.Format("aclobjadd objkey={0} ", obj.ObjKey);
 
-                ruleID = String.Format("objtype={0} objpath=\"{1}\"", CommFunc.objTypeToStr(obj.ObjType), obj.ObjPath);
+                ruleID = String.Format("objtype={0} objpath=\"{1}\"", CommFunc.ObjTypeToStr(obj.ObjType), obj.ObjPath);
 
                 if (String.IsNullOrEmpty(obj.CrossPath) == false) ruleID += String.Format(" crosspath=\"{0}\"", obj.CrossPath);
 
