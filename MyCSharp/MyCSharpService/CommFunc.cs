@@ -127,7 +127,7 @@ namespace MyCSharpService
             return ONOFF_MODE_STR.OFM_OFF_STR;
         }
 
-        public enum ACL_ACTION : ulong
+        public enum ACL_ACTION : UInt32
         {
             ACT_READ = 0x00000001,
             ACT_WRITE = 0x00000002,
@@ -151,10 +151,10 @@ namespace MyCSharpService
             public const String ACT_ALL_STR = "all";
         }
 
-        public static ACL_ACTION StrToAction(String ActionStr)
+        public static UInt32 StrToAction(String ActionStr)
         {
             String[] ActionBuf;
-            ACL_ACTION Action = 0;
+            UInt32 Action = 0;
 
             if (ActionStr == ACL_ACTION_STR.ACT_ALL_STR) return ACL_ACTION.ACT_ALL;
 
@@ -174,7 +174,7 @@ namespace MyCSharpService
             return Action;
         }
 
-        public static String ActionToStr(ACL_ACTION Action)
+        public static String ActionToStr(UInt32 Action)
         {
             var ActionStr = new StringBuilder();
 
