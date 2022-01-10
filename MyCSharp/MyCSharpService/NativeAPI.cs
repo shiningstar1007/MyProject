@@ -32,16 +32,14 @@ namespace MyCSharp.Service
             out BY_HANDLE_FILE_INFORMATION lpFileInformation
         );
 
-        [DllImport("fltlib", SetLastError = true)]
-        public static extern int FilterConnectCommunicationPort(
-            [MarshalAs (UnmanagedType.LPWStr)]
-            string portName,
-            uint options,
-            IntPtr context,
-            uint sizeOfContext,
-            IntPtr securityAttributes,
-            IntPtr hPort
-        );
+        [DllImport("FltLib", SetLastError = true)]
+        public static extern Int16 FilterConnectCommunicationPort(
+            [MarshalAs(UnmanagedType.LPWStr)] String lpPortName,
+            UInt16 dwOptions,
+            IntPtr lpContext,
+            UInt16 wSizeOfContext,
+            IntPtr lpSecurityAttributes,
+            out IntPtr hPort);
 
         [DllImport("fltlib", SetLastError = true)]
         public static extern int FilterGetMessage(
@@ -51,15 +49,14 @@ namespace MyCSharp.Service
             IntPtr lpOverlapped
         );
 
-        [DllImport("fltlib", SetLastError = true)]
-        public static extern int FilterSendMessage(
+        [DllImport("FltLib", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto)]
+        public static extern Int16 FilterSendMessage(
             IntPtr hPort,
-            IntPtr inBuffer,
-            uint inBufferSize,
-            IntPtr outBuffer,
-            uint outBufferSize,
-            uint bytesReturned
-        );
+            IntPtr lpInBuffer,
+            UInt32 dwInBufferSize,
+            [In, Out] IntPtr lpOutBuffer,
+            UInt32 dwOutBufferSize,
+            out UInt32 lpBytesReturned);
 
         [DllImport("ntdll.dll", SetLastError = true)]
         internal static extern NTSTATUS NtQueryInformationFile(IntPtr FileHandle,

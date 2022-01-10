@@ -1044,10 +1044,11 @@ namespace MyCSharpService
             IntPtr hPort = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)));
             UInt32 byteResult = 0, inByteLen = 0;
             COMMAND_MESSAGE cmdMsg;
+            const UInt32 maxRegSize = 0x100000;
 
             try
             {
-                hResult = NativeAPI.FilterConnectCommunicationPort(portName, 0, IntPtr.Zero, 0, IntPtr.Zero, out hPsKePort);
+                hResult = NativeAPI.FilterConnectCommunicationPort(portName, 0, IntPtr.Zero, 0, IntPtr.Zero, out hPort);
                 if (hResult != 0) return hResult;
 
                 if (outByte != null)
