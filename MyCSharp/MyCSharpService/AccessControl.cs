@@ -629,7 +629,7 @@ namespace MyCSharpService
 
         public ERR_CODE aclSubjectDelete(ACL_SUB subParam)
         {
-            ERR_CODE errCode = ERR_CODE.ERR_KE_SUCCESS;
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
             ACL_SUB aclSub;
 
             errCode = setACLSubInfo(subParam);
@@ -639,7 +639,7 @@ namespace MyCSharpService
             if (aclSub == null) return ERR_CODE.ERR_SUCCESS;
 
             errCode = sendACLSubInfo(subParam, null, KERNEL_COMMAND.ACL_SUBJECT_DELETE);
-            if (errCode != ERR_CODE.ERR_KE_SUCCESS) return errCode;
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
 
             g_ACLSubject.Remove(aclSub);
 
@@ -679,7 +679,7 @@ namespace MyCSharpService
                     copyBuf += String.Format("aclsubadd ");
                 }
 
-                ruleID = String.Format("subtype={0} subname=\"{1}\"", CommFunc.subTypeToStr(sub.SubType), sub.SubName);
+                ruleID = String.Format("subtype={0} subname=\"{1}\"", CommFunc.SubTypeToStr(sub.SubType), sub.SubName);
                 copyBuf += ruleID;
 
                 if (addCmd == ONOFF_MODE.OFM_ON)
