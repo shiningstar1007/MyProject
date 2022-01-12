@@ -156,19 +156,19 @@ namespace MyCSharpService
             String[] ActionBuf;
             UInt32 Action = 0;
 
-            if (ActionStr == ACL_ACTION_STR.ACT_ALL_STR) return ACL_ACTION.ACT_ALL;
+            if (ActionStr == ACL_ACTION_STR.ACT_ALL_STR) return (UInt32)ACL_ACTION.ACT_ALL;
 
             ActionBuf = ActionStr.Split(new char[] { ',' });
 
             foreach (var data in ActionBuf)
             {
-                if (data == ACL_ACTION_STR.ACT_READ_STR) Action |= ACL_ACTION.ACT_READ;
-                else if (data == ACL_ACTION_STR.ACT_WRITE_STR) Action |= ACL_ACTION.ACT_WRITE;
-                else if (data == ACL_ACTION_STR.ACT_TRAVERSE_STR) Action |= ACL_ACTION.ACT_TRAVERSE;
-                else if (data == ACL_ACTION_STR.ACT_EXECUTE_STR) Action |= ACL_ACTION.ACT_EXECUTE;
-                else if (data == ACL_ACTION_STR.ACT_DELETE_STR) Action |= ACL_ACTION.ACT_DELETE;
-                else if (data == ACL_ACTION_STR.ACT_CREATE_STR) Action |= ACL_ACTION.ACT_CREATE;
-                else if (data == ACL_ACTION_STR.ACT_DEC_STR) Action |= ACL_ACTION.ACT_DEC;
+                if (data == ACL_ACTION_STR.ACT_READ_STR) Action |= (UInt32)ACL_ACTION.ACT_READ;
+                else if (data == ACL_ACTION_STR.ACT_WRITE_STR) Action |= (UInt32)ACL_ACTION.ACT_WRITE;
+                else if (data == ACL_ACTION_STR.ACT_TRAVERSE_STR) Action |= (UInt32)ACL_ACTION.ACT_TRAVERSE;
+                else if (data == ACL_ACTION_STR.ACT_EXECUTE_STR) Action |= (UInt32)ACL_ACTION.ACT_EXECUTE;
+                else if (data == ACL_ACTION_STR.ACT_DELETE_STR) Action |= (UInt32)ACL_ACTION.ACT_DELETE;
+                else if (data == ACL_ACTION_STR.ACT_CREATE_STR) Action |= (UInt32)ACL_ACTION.ACT_CREATE;
+                else if (data == ACL_ACTION_STR.ACT_DEC_STR) Action |= (UInt32)ACL_ACTION.ACT_DEC;
             }
 
             return Action;
@@ -178,16 +178,16 @@ namespace MyCSharpService
         {
             var ActionStr = new StringBuilder();
 
-            if (Action == ACL_ACTION.ACT_ALL) return ACL_ACTION_STR.ACT_ALL_STR;
+            if (Action == (UInt32)ACL_ACTION.ACT_ALL) return ACL_ACTION_STR.ACT_ALL_STR;
             else
             {
-                if ((Action & ACL_ACTION.ACT_READ) == ACL_ACTION.ACT_READ) ActionStr.Append(ACL_ACTION_STR.ACT_READ_STR);
-                if ((Action & ACL_ACTION.ACT_WRITE) == ACL_ACTION.ACT_WRITE) ActionStr.Append("," + ACL_ACTION_STR.ACT_WRITE_STR);
-                if ((Action & ACL_ACTION.ACT_TRAVERSE) == ACL_ACTION.ACT_TRAVERSE) ActionStr.Append("," + ACL_ACTION_STR.ACT_TRAVERSE_STR);
-                if ((Action & ACL_ACTION.ACT_EXECUTE) == ACL_ACTION.ACT_EXECUTE) ActionStr.Append("," + ACL_ACTION_STR.ACT_EXECUTE_STR);
-                if ((Action & ACL_ACTION.ACT_DELETE) == ACL_ACTION.ACT_DELETE) ActionStr.Append("," + ACL_ACTION_STR.ACT_DELETE_STR);
-                if ((Action & ACL_ACTION.ACT_CREATE) == ACL_ACTION.ACT_CREATE) ActionStr.Append("," + ACL_ACTION_STR.ACT_CREATE_STR);
-                if ((Action & ACL_ACTION.ACT_DEC) == ACL_ACTION.ACT_DEC) ActionStr.Append("," + ACL_ACTION_STR.ACT_DEC_STR);
+                if ((Action & (UInt32)ACL_ACTION.ACT_READ) == (UInt32)ACL_ACTION.ACT_READ) ActionStr.Append(ACL_ACTION_STR.ACT_READ_STR);
+                if ((Action & (UInt32)ACL_ACTION.ACT_WRITE) == (UInt32)ACL_ACTION.ACT_WRITE) ActionStr.Append("," + ACL_ACTION_STR.ACT_WRITE_STR);
+                if ((Action & (UInt32)ACL_ACTION.ACT_TRAVERSE) == (UInt32)ACL_ACTION.ACT_TRAVERSE) ActionStr.Append("," + ACL_ACTION_STR.ACT_TRAVERSE_STR);
+                if ((Action & (UInt32)ACL_ACTION.ACT_EXECUTE) == (UInt32)ACL_ACTION.ACT_EXECUTE) ActionStr.Append("," + ACL_ACTION_STR.ACT_EXECUTE_STR);
+                if ((Action & (UInt32)ACL_ACTION.ACT_DELETE) == (UInt32)ACL_ACTION.ACT_DELETE) ActionStr.Append("," + ACL_ACTION_STR.ACT_DELETE_STR);
+                if ((Action & (UInt32)ACL_ACTION.ACT_CREATE) == (UInt32)ACL_ACTION.ACT_CREATE) ActionStr.Append("," + ACL_ACTION_STR.ACT_CREATE_STR);
+                if ((Action & (UInt32)ACL_ACTION.ACT_DEC) == (UInt32)ACL_ACTION.ACT_DEC) ActionStr.Append("," + ACL_ACTION_STR.ACT_DEC_STR);
             }
 
             return ActionStr.ToString();
