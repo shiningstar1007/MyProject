@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
@@ -255,6 +256,23 @@ namespace MyCSharpService
             catch { }
 
             return bExeFile;
+        }
+
+        public static List<String> GetCurrentProcessList()
+        {
+            ManagementClass management = new ManagementClass("Win32_Process");
+            ManagementObjectCollection mCollection = management.GetInstances();
+            List<string> processList = new List<string>();
+
+            foreach (ManagementObject ps in mCollection)
+            {
+                if ((string)ps["ExecutablePath"] != null)
+                {
+                    processList.Add((string)ps["ExecutablePath"]);
+                }
+            }
+
+            return processList;
         }
     }
 }
