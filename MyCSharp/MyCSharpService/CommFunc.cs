@@ -258,6 +258,19 @@ namespace MyCSharpService
             return bExeFile;
         }
 
+        public static List<String> GetGroupList()
+        {
+            SelectQuery userQuery = new SelectQuery("Win32_Group");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(userQuery);
+            List<string> groupNameList = new List<string>();
+
+            foreach (ManagementObject envVar in searcher.Get())
+            {
+                groupNameList.Add((String)envVar["Name"]);
+            }
+
+            return groupNameList;
+        }
         public static List<String> GetCurrentProcessList()
         {
             ManagementClass management = new ManagementClass("Win32_Process");
