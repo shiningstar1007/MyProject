@@ -258,6 +258,20 @@ namespace MyCSharpService
             return bExeFile;
         }
 
+        public static List<String> userList()
+        {
+            SelectQuery userQuery = new SelectQuery("Win32_UserAccount");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(userQuery);
+            List<string> userNameList = new List<string>();
+
+            foreach (ManagementObject envVar in searcher.Get())
+            {
+                userNameList.Add((String)envVar["Name"]);
+            }
+
+            return userNameList;
+        }
+
         public static List<String> GetGroupList()
         {
             SelectQuery userQuery = new SelectQuery("Win32_Group");
