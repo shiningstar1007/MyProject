@@ -240,6 +240,20 @@ namespace MyCSharpService
             return ObjKey;
         }
 
+        public UInt64 getStrKey(String objPath)
+        {
+            UInt64 strKey = 0;
+            char[] PathArr = objPath.ToCharArray();
+
+            foreach (var data in PathArr)
+            {
+                if (data >= 'a' && data <= 'z') strKey += (UInt64)(data - 32);
+                else strKey += data;
+            }
+
+            return strKey;
+        }
+
         public static Boolean CheckProcessExt(String procExt)
         {
             Boolean bExeFile = false;
