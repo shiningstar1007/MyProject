@@ -728,6 +728,39 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public ERR_CODE AddACLSubFromPol(ACL_SUB subParam, SUB_PERM subPerm, Boolean autoLoad = true)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
+
+            if (subParam.SubType == SUB_TYPE.SUB_PROC && subPerm.ProcUser.SubType != SUB_TYPE.SUB_UNKNOWN)
+            {
+                if (subPerm.ProcUser.SubType != SUB_TYPE.SUB_USER && subPerm.ProcUser.SubType != SUB_TYPE.SUB_GROUP)
+                    return ERR_CODE.ERR_ACLSUB_INVALID_TYPE;
+                else
+                {
+                    subPerm.ProcUser.UserSId = CommFunc.GetUserSId(subPerm.ProcUser.SubName);
+                }
+            }
+
+            if (autoLoad == true)
+            {
+                errCode = sendACLSubInfo(subParam, subPerm, KERNEL_COMMAND.ACL_SUBJECT_POL_ADD);
+                if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+            }
+
+            ACL_DATA newData = new ACL_DATA();
+            newData.SubPerm = subPerm;
+            newData.ACLSub = subParam;
+            newData.ACLPol = subPerm.ACLPol;
+
+            if (subPerm.Effect == EFFECT_MODE.EFT_ALLOW) subParam.AllowPols.ACLData.Add(newData);
+            else subParam.DenyPols.ACLData.Add(newData);
+
+            subPerm.ACLPol.ACLSubs.ACLData.Add(newData);
+
+            return errCode;
+        }
+
         public ERR_CODE sendACLObjInfo(ACL_OBJ objParam, ACL_POL polParam, KERNEL_COMMAND cmdParam)
         {
             ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
