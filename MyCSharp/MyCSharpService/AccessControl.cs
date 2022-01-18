@@ -761,6 +761,50 @@ namespace MyCSharpService
             return errCode;
         }
 
+        public ERR_CODE DelACLSubFromPol(ACL_SUB subParam, SUB_PERM subPerm)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
+
+            if (subParam.SubType == SUB_TYPE.SUB_PROC)
+            {
+                if (subPerm.ProcUser.SubType != SUB_TYPE.SUB_USER && subPerm.ProcUser.SubType != SUB_TYPE.SUB_GROUP)
+                    return ERR_CODE.ERR_ACLSUB_INVALID_TYPE;
+                else
+                {
+                    subPerm.ProcUser.UserSId = CommFunc.GetUserSId(subPerm.ProcUser.SubName);
+                }
+            }
+
+            errCode = sendACLSubInfo(subParam, subPerm, KERNEL_COMMAND.ACL_SUBJECT_POL_DEL);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            IList<ACL_DATA> aclDataList;
+
+            if (subPerm.Effect == EFFECT_MODE.EFT_ALLOW) aclDataList = subParam.AllowPols.ACLData;
+            else aclDataList = subParam.DenyPols.ACLData;
+
+            foreach (ACL_DATA polData in aclDataList)
+            {
+                if (String.Equals(polData.ACLSub.SubName, subParam.SubName) == true)
+                {
+                    if (String.Equals(polData.ACLPol.PolName, subPerm.ACLPol.PolName) == true)
+                    {
+                        if (String.Equals(polData.SubPerm.ProcUser.SubName, subPerm.ProcUser.SubName) == true)
+                        {
+                            if (subPerm.Effect == EFFECT_MODE.EFT_ALLOW) subParam.AllowPols.ACLData.Remove(polData);
+                            else subParam.DenyPols.ACLData.Remove(polData);
+
+                            subPerm.ACLPol.ACLSubs.ACLData.Remove(polData);
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return errCode;
+        }
+
         public ERR_CODE sendACLObjInfo(ACL_OBJ objParam, ACL_POL polParam, KERNEL_COMMAND cmdParam)
         {
             ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
