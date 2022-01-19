@@ -805,6 +805,42 @@ namespace MyCSharpService
             return errCode;
         }
 
+        public void ClearACLSubFromPol(ACL_SUB subParam)
+        {
+            IList<ACL_DATA> delDataList = new List<ACL_DATA>();
+            IList<ACL_DATA> aclDataList;
+
+            for (int repeat = 0; repeat < 2; repeat++)
+            {
+                if (repeat == 0) aclDataList = subParam.AllowPols.ACLData;
+                else if (repeat == 1) aclDataList = subParam.DenyPols.ACLData;
+                else break;
+
+                foreach (ACL_DATA polData in aclDataList)
+                {
+                    foreach (ACL_DATA subData in polData.ACLPol.ACLSubs.ACLData)
+                    {
+                        if (String.Equals(subData.ACLSub.SubName, subParam.SubName) == true)
+                        {
+                            delDataList.Add(subData);
+                        }
+                    }
+
+                    if (delDataList.Count > 0)
+                    {
+                        foreach (var delData in delDataList)
+                        {
+                            polData.ACLPol.ACLSubs.ACLData.Remove(delData);
+                        }
+                        delDataList.Clear();
+                    }
+                }
+            }
+
+            subParam.AllowPols.ACLData.Clear();
+            subParam.DenyPols.ACLData.Clear();
+        }
+
         public ERR_CODE sendACLObjInfo(ACL_OBJ objParam, ACL_POL polParam, KERNEL_COMMAND cmdParam)
         {
             ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
