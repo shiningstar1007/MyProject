@@ -999,6 +999,26 @@ namespace MyCSharpService
             return ERR_CODE.ERR_SUCCESS;
         }
 
+        public ERR_CODE AddACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam, Boolean autoLoad = true)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
+
+            if (autoLoad == true)
+            {
+                errCode = sendACLObjInfo(objParam, polParam, KERNEL_COMMAND.ACL_OBJECT_POL_ADD);
+                if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+            }
+
+            ACL_DATA newData = new ACL_DATA();
+            newData.ACLPol = polParam;
+            newData.ACLObj = objParam;
+
+            objParam.ACLPols.ACLData.Add(newData);
+            polParam.ACLObjs.ACLData.Add(newData);
+
+            return errCode;
+        }
+
         public ERR_CODE sendSuperSubInfo(SUPER_SUB superParam, KERNEL_COMMAND cmdParam)
         {
             ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
