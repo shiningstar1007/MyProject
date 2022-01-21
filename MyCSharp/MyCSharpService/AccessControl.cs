@@ -1019,6 +1019,30 @@ namespace MyCSharpService
             return errCode;
         }
 
+        public ERR_CODE DelACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam)
+        {
+            ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
+
+            errCode = sendACLObjInfo(objParam, polParam, KERNEL_COMMAND.ACL_OBJECT_POL_DEL);
+            if (errCode != ERR_CODE.ERR_SUCCESS) return errCode;
+
+            foreach (ACL_DATA aclData in objParam.ACLPols.ACLData)
+            {
+                if (String.Equals(aclData.ACLObj.ObjPath, objParam.ObjPath) == true)
+                {
+                    if (String.Equals(aclData.ACLPol.PolName, polParam.PolName) == true)
+                    {
+                        objParam.ACLPols.ACLData.Remove(aclData);
+                        polParam.ACLObjs.ACLData.Remove(aclData);
+
+                        break;
+                    }
+                }
+            }
+
+            return errCode;
+        }
+
         public ERR_CODE sendSuperSubInfo(SUPER_SUB superParam, KERNEL_COMMAND cmdParam)
         {
             ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
