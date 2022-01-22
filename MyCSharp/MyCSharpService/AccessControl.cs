@@ -1042,6 +1042,32 @@ namespace MyCSharpService
 
             return errCode;
         }
+        public void ClearACLObjFromPol(ACL_OBJ objParam)
+        {
+            IList<ACL_DATA> delDataList = new List<ACL_DATA>();
+
+            foreach (ACL_DATA polData in objParam.ACLPols.ACLData)
+            {
+                foreach (ACL_DATA objData in polData.ACLPol.ACLObjs.ACLData)
+                {
+                    if (String.Equals(objData.ACLObj.ObjPath, objParam.ObjPath) == true)
+                    {
+                        delDataList.Add(objData);
+                    }
+                }
+
+                if (delDataList.Count > 0)
+                {
+                    foreach (var delData in delDataList)
+                    {
+                        polData.ACLPol.ACLObjs.ACLData.Remove(delData);
+                    }
+                    delDataList.Clear();
+                }
+            }
+
+            objParam.ACLPols.ACLData.Clear();
+        }
 
         public ERR_CODE sendSuperSubInfo(SUPER_SUB superParam, KERNEL_COMMAND cmdParam)
         {
