@@ -411,7 +411,6 @@ namespace MyCSharpService
 
             return ErrCode;
         }
-
         public ACL_POL aclPolicyFind(String polName)
         {
             foreach (var aclPol in g_ACLPolicy)
@@ -423,7 +422,6 @@ namespace MyCSharpService
 
             return null;
         }
-
         public ERR_CODE aclPolicyAdd(ACL_POL polParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -440,7 +438,6 @@ namespace MyCSharpService
 
             return errCode;
         }
-
         public ERR_CODE aclPolicyModify(ACL_POL polParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -456,7 +453,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE aclPolicyDelete(ACL_POL polParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -472,7 +468,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE aclPolicyClear()
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -486,7 +481,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE sendACLSubInfo(ACL_SUB subParam, SUB_PERM subPerm, KERNEL_COMMAND cmdParam)
         {
             ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
@@ -513,7 +507,6 @@ namespace MyCSharpService
 
             return ErrCode;
         }
-
         public ERR_CODE aclPolicyList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, String polName, out String polList)
         {
             String copyBuf = "";
@@ -538,7 +531,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE setACLSubInfo(ACL_SUB subParam)
         {
             if (String.IsNullOrEmpty(subParam.SubName) == true) return ERR_CODE.ERR_ACLSUB_INVALID_NAME;
@@ -571,7 +563,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ACL_SUB aclSubjectFind(SUB_TYPE subType, UInt64 subKey, String subName)
         {
             foreach (var aclSub in g_ACLSubject)
@@ -587,7 +578,6 @@ namespace MyCSharpService
 
             return null;
         }
-
         public ERR_CODE aclSubjectAdd(ACL_SUB subParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -607,7 +597,6 @@ namespace MyCSharpService
 
             return errCode;
         }
-
         public ERR_CODE aclSubjectModify(ACL_SUB subParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -626,7 +615,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE aclSubjectDelete(ACL_SUB subParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -645,7 +633,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE aclSubjectClear()
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -659,7 +646,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE aclSubjectList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, String subName, SUB_TYPE subType, out String subList)
         {
             String copyBuf = "", ruleID;
@@ -727,7 +713,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE AddACLSubFromPol(ACL_SUB subParam, SUB_PERM subPerm, Boolean autoLoad = true)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -760,7 +745,6 @@ namespace MyCSharpService
 
             return errCode;
         }
-
         public ERR_CODE DelACLSubFromPol(ACL_SUB subParam, SUB_PERM subPerm)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -804,7 +788,6 @@ namespace MyCSharpService
 
             return errCode;
         }
-
         public void ClearACLSubFromPol(ACL_SUB subParam)
         {
             IList<ACL_DATA> delDataList = new List<ACL_DATA>();
@@ -840,7 +823,6 @@ namespace MyCSharpService
             subParam.AllowPols.ACLData.Clear();
             subParam.DenyPols.ACLData.Clear();
         }
-
         public ERR_CODE sendACLObjInfo(ACL_OBJ objParam, ACL_POL polParam, KERNEL_COMMAND cmdParam)
         {
             ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
@@ -862,7 +844,6 @@ namespace MyCSharpService
 
             return ErrCode;
         }
-
         public ERR_CODE setACLObjInfo(ACL_OBJ objParam)
         {
             if (String.IsNullOrEmpty(objParam.ObjPath) == true) return ERR_CODE.ERR_ACLOBJ_INVALID_PATH;
@@ -875,7 +856,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ACL_OBJ aclObjectFind(OBJ_TYPE objType, UInt64 objKey, String objPath)
         {
             foreach (var aclObj in g_ACLObject)
@@ -891,7 +871,6 @@ namespace MyCSharpService
 
             return null;
         }
-
         public ERR_CODE aclObjectAdd(ACL_OBJ objParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -911,7 +890,6 @@ namespace MyCSharpService
 
             return errCode;
         }
-
         public ERR_CODE aclObjectModify(ACL_OBJ objParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -930,7 +908,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE aclObjectDelete(ACL_OBJ objParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -949,7 +926,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE aclObjectClear()
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -963,7 +939,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE aclObjectList(ONOFF_MODE addCmd, String objPath, out String objList)
         {
             String copyBuf = "", ruleID;
@@ -998,7 +973,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE AddACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam, Boolean autoLoad = true)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -1018,7 +992,6 @@ namespace MyCSharpService
 
             return errCode;
         }
-
         public ERR_CODE DelACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -1068,7 +1041,6 @@ namespace MyCSharpService
 
             objParam.ACLPols.ACLData.Clear();
         }
-
         public ERR_CODE sendSuperSubInfo(SUPER_SUB superParam, KERNEL_COMMAND cmdParam)
         {
             ERR_CODE ErrCode = ERR_CODE.ERR_SUCCESS;
@@ -1084,7 +1056,6 @@ namespace MyCSharpService
 
             return ErrCode;
         }
-
         public ERR_CODE setSuperSubInfo(SUPER_SUB superParam)
         {
             if (String.IsNullOrEmpty(superParam.SubName) == true) return ERR_CODE.ERR_ACLSUB_INVALID_NAME;
@@ -1119,7 +1090,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public SUPER_SUB superSubFind(SUB_TYPE subType, UInt64 subKey, String subName)
         {
             foreach (var superSub in g_SuperSub)
@@ -1135,7 +1105,6 @@ namespace MyCSharpService
 
             return null;
         }
-
         public ERR_CODE superSubAdd(SUPER_SUB superParam, Boolean autoLoad = true)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -1158,7 +1127,6 @@ namespace MyCSharpService
 
             return errCode;
         }
-
         public ERR_CODE superSubDelete(SUPER_SUB superParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -1177,7 +1145,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE superSubList(ONOFF_MODE addCmd, out String superSubList)
         {
             String copyBuf = "";
@@ -1202,7 +1169,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public ERR_CODE superSubClear()
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
@@ -1216,7 +1182,6 @@ namespace MyCSharpService
 
             return ERR_CODE.ERR_SUCCESS;
         }
-
         public Int64 sendMessageDriver(KERNEL_COMMAND cmd, String inString, ref Byte[] outByte, UInt32 outSize)
         {
             const String portName = "\\miniPort";
