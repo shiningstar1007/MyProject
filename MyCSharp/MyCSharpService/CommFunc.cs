@@ -194,6 +194,14 @@ namespace MyCSharpService
             return ActionStr.ToString();
         }
 
+        public Boolean checkWindows8OrGreater()
+        {
+            int MajorVer = Environment.OSVersion.Version.Major;
+            int MinorVer = Environment.OSVersion.Version.Minor;
+
+            return (MajorVer >= 6 && MinorVer >= 2) ? true : false;
+        }
+
         public static SecurityIdentifier GetUserSId(String UserName)
         {
             NTAccount Account = new NTAccount(UserName);
