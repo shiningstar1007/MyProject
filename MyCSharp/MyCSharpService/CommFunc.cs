@@ -20,7 +20,6 @@ namespace MyCSharpService
 
             return RUN_MODE.RUN_NORMAL;
         }
-
         public static String RunModeToStr(RUN_MODE RunMode)
         {
             if (RunMode == RUN_MODE.RUN_TEST) return RUN_MODE_STR.RUN_TEST_STR;
@@ -37,7 +36,6 @@ namespace MyCSharpService
 
             return SUB_TYPE.SUB_UNKNOWN;
         }
-
         public static String SubTypeToStr(SUB_TYPE SubType)
         {
             if (SubType == SUB_TYPE.SUB_USER) return SUB_TYPE_STR.SUB_USER_STR;
@@ -47,7 +45,6 @@ namespace MyCSharpService
 
             return "";
         }
-
         public static OBJ_TYPE StrToObjType(String ObjTypeStr)
         {
             if (ObjTypeStr == OBJ_TYPE_STR.OBJ_FILE_STR) return OBJ_TYPE.OBJ_FILE;
@@ -55,7 +52,6 @@ namespace MyCSharpService
 
             return OBJ_TYPE.OBJ_UNKNOWN;
         }
-
         public static String ObjTypeToStr(OBJ_TYPE ObjType)
         {
             if (ObjType == OBJ_TYPE.OBJ_FILE) return OBJ_TYPE_STR.OBJ_FILE_STR;
@@ -63,7 +59,6 @@ namespace MyCSharpService
 
             return "";
         }
-
         public static EFFECT_MODE StrToEffectMode(String EffectModeStr)
         {
             if (EffectModeStr == EFFECT_MODE_STR.EFT_ALLOW_STR) return EFFECT_MODE.EFT_ALLOW;
@@ -71,7 +66,6 @@ namespace MyCSharpService
 
             return EFFECT_MODE.EFT_UNKNOWN;
         }
-
         public static String EffectModeToStr(EFFECT_MODE EffectMode)
         {
             if (EffectMode == EFFECT_MODE.EFT_ALLOW) return EFFECT_MODE_STR.EFT_ALLOW_STR;
@@ -79,7 +73,6 @@ namespace MyCSharpService
 
             return "";
         }
-
         public static LOGGING_TYPE StrToLoggingType(String LoggingTypeStr)
         {
             if (LoggingTypeStr == LOGGING_TYPE_STR.LOG_ALLOW_STR) return LOGGING_TYPE.LOG_ALLOW;
@@ -87,7 +80,6 @@ namespace MyCSharpService
 
             return LOGGING_TYPE.LOG_ALL;
         }
-
         public static String LoggingTypeToStr(LOGGING_TYPE LoggingType)
         {
             if (LoggingType == LOGGING_TYPE.LOG_ALLOW) return LOGGING_TYPE_STR.LOG_ALLOW_STR;
@@ -95,7 +87,6 @@ namespace MyCSharpService
 
             return LOGGING_TYPE_STR.LOG_ALL_STR;
         }
-
         public static SHARED_PERM StrToSharedPerm(String SharedPermStr)
         {
             if (SharedPermStr == SHARED_PERM_STR.SDP_DECRYPT_STR) return SHARED_PERM.SDP_DECRYPT;
@@ -104,7 +95,6 @@ namespace MyCSharpService
 
             return SHARED_PERM.SDP_UNKNOWN;
         }
-
         public static String SharedPermToStr(SHARED_PERM SharedPerm)
         {
             if (SharedPerm == SHARED_PERM.SDP_DECRYPT) return SHARED_PERM_STR.SDP_DECRYPT_STR;
@@ -113,21 +103,18 @@ namespace MyCSharpService
 
             return "";
         }
-
         public static ONOFF_MODE StrToOnOffMode(String OnOffModeStr)
         {
             if (OnOffModeStr == ONOFF_MODE_STR.OFM_ON_STR) return ONOFF_MODE.OFM_ON;
 
             return ONOFF_MODE.OFM_OFF;
         }
-
         public static String OnOffModeToStr(ONOFF_MODE OnOffMode)
         {
             if (OnOffMode == ONOFF_MODE.OFM_ON) return ONOFF_MODE_STR.OFM_ON_STR;
 
             return ONOFF_MODE_STR.OFM_OFF_STR;
         }
-
         public enum ACL_ACTION : UInt32
         {
             ACT_READ = 0x00000001,
@@ -139,7 +126,6 @@ namespace MyCSharpService
             ACT_DEC = 0x00000040,
             ACT_ALL = 0xFFFFFFFF
         }
-
         public static class ACL_ACTION_STR
         {
             public const String ACT_READ_STR = "read";
@@ -151,7 +137,6 @@ namespace MyCSharpService
             public const String ACT_DEC_STR = "dec";
             public const String ACT_ALL_STR = "all";
         }
-
         public static UInt32 StrToAction(String ActionStr)
         {
             String[] ActionBuf;
@@ -174,7 +159,6 @@ namespace MyCSharpService
 
             return Action;
         }
-
         public static String ActionToStr(UInt32 Action)
         {
             var ActionStr = new StringBuilder();
@@ -193,7 +177,6 @@ namespace MyCSharpService
 
             return ActionStr.ToString();
         }
-
         public Boolean checkWindowsGreater(int nMajor, int nMinor)
         {
             int MajorVer = Environment.OSVersion.Version.Major;
@@ -201,7 +184,6 @@ namespace MyCSharpService
 
             return (nMajor >= MajorVer && nMinor >= MinorVer) ? true : false;
         }
-
         public static SecurityIdentifier GetUserSId(String UserName)
         {
             NTAccount Account = new NTAccount(UserName);
@@ -209,7 +191,6 @@ namespace MyCSharpService
 
             return UserSId;
         }
-
         public static UInt64 GetSIdKey(SecurityIdentifier UserSId)
         {
             String[] SidStr = UserSId.ToString().Split(new char[] { '-' });
@@ -227,7 +208,6 @@ namespace MyCSharpService
 
             return SIdKey;
         }
-
         public static UInt64 GetObjKey(OBJ_TYPE ObjType, String ObjPath)
         {
             IntPtr hFile;
@@ -247,7 +227,6 @@ namespace MyCSharpService
 
             return ObjKey;
         }
-
         public UInt64 getStrKey(String objPath)
         {
             UInt64 strKey = 0;
@@ -261,7 +240,6 @@ namespace MyCSharpService
 
             return strKey;
         }
-
         public static Boolean CheckProcessExt(String procExt)
         {
             Boolean bExeFile = false;
@@ -279,7 +257,6 @@ namespace MyCSharpService
 
             return bExeFile;
         }
-
         public static List<String> userList()
         {
             SelectQuery userQuery = new SelectQuery("Win32_UserAccount");
@@ -293,7 +270,6 @@ namespace MyCSharpService
 
             return userNameList;
         }
-
         public static List<String> GetGroupList()
         {
             SelectQuery userQuery = new SelectQuery("Win32_Group");
