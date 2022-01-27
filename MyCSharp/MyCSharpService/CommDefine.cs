@@ -30,8 +30,7 @@ namespace MyCSharpService
 
         // log file define
         public const string ServiceLog = @"log\service_log.db";
-        public const string NormalLog = @"log\normal_log.db";
-        public const string FildACLog = @"log\access_log.db";
+        public const string AccessLog = @"log\access_log.db";
     }
 
     public enum ERR_CODE : int
