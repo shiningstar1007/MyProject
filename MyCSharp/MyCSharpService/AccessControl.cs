@@ -53,7 +53,6 @@ namespace MyCSharpService
         public Byte[] data;
     }
 
-
     public enum EFFECT_MODE
     {
         EFT_DENY = 0,
@@ -90,7 +89,8 @@ namespace MyCSharpService
         ACT_EXECUTE = 0x00000008,
         ACT_DELETE = 0x00000010,
         ACT_CREATE = 0x00000020,
-        ACT_DEC = 0x00000040,
+        ACT_DECRYPT = 0x00000040,
+        ACT_ENCRYPT = 0x00000080,
         ACT_ALL = 0xFFFFFFFF
     }
 
@@ -102,7 +102,8 @@ namespace MyCSharpService
         public const String ACT_EXECUTE_STR = "execute";
         public const String ACT_DELETE_STR = "delete";
         public const String ACT_CREATE_STR = "create";
-        public const String ACT_DEC_STR = "dec";
+        public const String ACT_DECRYPT_STR = "decrypt";
+        public const String ACT_ENCRYPT_STR = "encrypt";
         public const String ACT_ALL_STR = "all";
     }
 
