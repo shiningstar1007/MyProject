@@ -361,22 +361,16 @@ namespace MyCSharpService
         public UInt64 SubKey;
         public SUB_TYPE SubType;
         public String SubName;
-
-        public SecurityIdentifier UserSId;
-        public String UserSIdBuf;
-
         public EFFECT_MODE DecPerm;
+        public SecurityIdentifier UserSId;
 
         public SUPER_SUB()
         {
             this.SubKey = 0;
             this.SubType = SUB_TYPE.SUB_PROC;
             this.SubName = "";
-
-            this.UserSId = null;
-            this.UserSIdBuf = "";
-
             this.DecPerm = EFFECT_MODE.EFT_ALLOW;
+            this.UserSId = null;
         }
 
         public SUPER_SUB(SUPER_SUB superParam)
@@ -384,11 +378,8 @@ namespace MyCSharpService
             this.SubKey = superParam.SubKey;
             this.SubType = superParam.SubType;
             this.SubName = superParam.SubName;
-
-            this.UserSId = superParam.UserSId;
-            this.UserSIdBuf = superParam.UserSIdBuf;
-
             this.DecPerm = superParam.DecPerm;
+            this.UserSId = superParam.UserSId;
         }
     }
     class AccessControl
@@ -1069,7 +1060,6 @@ namespace MyCSharpService
                 if (superParam.UserSId != null)
                 {
                     superParam.SubKey = CommFunc.GetSIdKey(superParam.UserSId);
-                    superParam.UserSIdBuf = superParam.UserSId.ToString();
                 }
                 else return ERR_CODE.ERR_ACLSUB_GET_SID_FAIL;
             }
