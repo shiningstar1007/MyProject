@@ -123,7 +123,8 @@ namespace MyCSharpService
             ACT_EXECUTE = 0x00000008,
             ACT_DELETE = 0x00000010,
             ACT_CREATE = 0x00000020,
-            ACT_DEC = 0x00000040,
+            ACT_DECRYPT = 0x00000040,
+            ACT_ENCRYPT = 0x00000080,
             ACT_ALL = 0xFFFFFFFF
         }
         public static class ACL_ACTION_STR
@@ -134,7 +135,8 @@ namespace MyCSharpService
             public const String ACT_EXECUTE_STR = "execute";
             public const String ACT_DELETE_STR = "delete";
             public const String ACT_CREATE_STR = "create";
-            public const String ACT_DEC_STR = "dec";
+            public const String ACT_DECRYPT_STR = "decrypt";
+            public const String ACT_ENCRYPT_STR = "encrypt";
             public const String ACT_ALL_STR = "all";
         }
         public static UInt32 StrToAction(String ActionStr)
@@ -154,7 +156,8 @@ namespace MyCSharpService
                 else if (data == ACL_ACTION_STR.ACT_EXECUTE_STR) Action |= (UInt32)ACL_ACTION.ACT_EXECUTE;
                 else if (data == ACL_ACTION_STR.ACT_DELETE_STR) Action |= (UInt32)ACL_ACTION.ACT_DELETE;
                 else if (data == ACL_ACTION_STR.ACT_CREATE_STR) Action |= (UInt32)ACL_ACTION.ACT_CREATE;
-                else if (data == ACL_ACTION_STR.ACT_DEC_STR) Action |= (UInt32)ACL_ACTION.ACT_DEC;
+                else if (data == ACL_ACTION_STR.ACT_DECRYPT_STR) Action |= (UInt32)ACL_ACTION.ACT_DECRYPT;
+                else if (data == ACL_ACTION_STR.ACT_ENCRYPT_STR) Action |= (UInt32)ACL_ACTION.ACT_ENCRYPT;
             }
 
             return Action;
@@ -172,7 +175,8 @@ namespace MyCSharpService
                 if ((Action & (UInt32)ACL_ACTION.ACT_EXECUTE) == (UInt32)ACL_ACTION.ACT_EXECUTE) ActionStr.Append("," + ACL_ACTION_STR.ACT_EXECUTE_STR);
                 if ((Action & (UInt32)ACL_ACTION.ACT_DELETE) == (UInt32)ACL_ACTION.ACT_DELETE) ActionStr.Append("," + ACL_ACTION_STR.ACT_DELETE_STR);
                 if ((Action & (UInt32)ACL_ACTION.ACT_CREATE) == (UInt32)ACL_ACTION.ACT_CREATE) ActionStr.Append("," + ACL_ACTION_STR.ACT_CREATE_STR);
-                if ((Action & (UInt32)ACL_ACTION.ACT_DEC) == (UInt32)ACL_ACTION.ACT_DEC) ActionStr.Append("," + ACL_ACTION_STR.ACT_DEC_STR);
+                if ((Action & (UInt32)ACL_ACTION.ACT_DECRYPT) == (UInt32)ACL_ACTION.ACT_DECRYPT) ActionStr.Append("," + ACL_ACTION_STR.ACT_DECRYPT_STR);
+                if ((Action & (UInt32)ACL_ACTION.ACT_ENCRYPT) == (UInt32)ACL_ACTION.ACT_ENCRYPT) ActionStr.Append("," + ACL_ACTION_STR.ACT_ENCRYPT_STR);
             }
 
             return ActionStr.ToString();
