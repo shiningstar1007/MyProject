@@ -513,28 +513,6 @@ namespace MyCSharp.Service
 
     }
 
-    public class ACL_Subject
-    {
-        public SUB_TYPE subType;
-        public string subjectName;
-        public UInt32 permissions;
-
-
-        public ACL_link aclObject = new ACL_link();
-
-        public ACL_Subject()
-        {
-
-        }
-
-        public ACL_Subject(ACL_Subject aclSubject)
-        {
-            this.subjectName = aclSubject.subjectName;
-            this.permissions = aclSubject.permissions;
-            this.subType = aclSubject.subType;
-         }
-    }
-
     public enum OBJ_TYPE : int
     {
         OBJ_FILE = 0,
