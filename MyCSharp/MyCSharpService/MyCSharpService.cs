@@ -519,41 +519,6 @@ namespace MyCSharp.Service
         OBJ_DIR,
         OBJ_UNKNOWN
     }
-    public class ACL_Object
-    {
-        public OBJ_TYPE objType;
-        public string objectName;
-        public UInt32 permissions;
-        public UInt32 DefAction;
-        public String CrossPath;
-
-        public CommFunc.ONOFF_MODE RunMode;
-        public CommFunc.ONOFF_MODE LogMode;
-
-        public ACL_link aclSubject = new ACL_link();
-
-        public ACL_Object()
-        {
-
-        }
-
-        public ACL_Object(ACL_Object aclObject)
-        {
-            this.objectName = aclObject.objectName;
-            this.permissions = aclObject.permissions;
-            this.objType = aclObject.objType;
-            this.DefAction = aclObject.DefAction;
-            this.CrossPath = aclObject.CrossPath;
-            this.RunMode = aclObject.RunMode;
-            this.LogMode = aclObject.LogMode;
-        }
-    }
-
-    public class ACL_data
-    {
-        ACL_Subject aclSubject;
-        ACL_Object aclObject;
-    }
 
     public class ACL_link
     {
