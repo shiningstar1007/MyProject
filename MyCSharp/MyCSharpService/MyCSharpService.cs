@@ -513,77 +513,8 @@ namespace MyCSharp.Service
 
     }
 
-    public enum OBJ_TYPE : int
-    {
-        OBJ_FILE = 0,
-        OBJ_DIR,
-        OBJ_UNKNOWN
-    }
 
-    public class ACL_link
-    {
-        IList<ACL_data> aclData = new List<ACL_data>();
-    }
-
-    public class ACLSubject
-    {
-        public IList<ACL_Subject> aclSubject = new List<ACL_Subject>();
-
-        public ACL_Subject SearchSubject(string subjectName)
-        {
-            ACL_Subject aclSub = null;
-
-            foreach(var sub in aclSubject)
-            {
-                if (sub.subjectName == subjectName)
-                {
-                    aclSub = sub;
-                    break;
-                }
-            }
-
-            return aclSub;
-        }
-        public void ACLSubjectAdd(string subjectName, UInt32 permissions)
-        {
-            ACL_Subject aclSub;
-
-            aclSub = SearchSubject(subjectName);
-            if (aclSub != null) return;
-            else aclSub = new ACL_Subject();
-
-            aclSub.subjectName = subjectName;
-            aclSub.permissions = permissions;
-
-            aclSubject.Add(aclSub);
-        }
-
-        public void ACLSubjectRemove(string subjectName)
-        {
-            Int32 index = -1;
-
-            foreach (var aclSub in aclSubject)
-            {
-                if (aclSub.subjectName == subjectName)
-                {
-                    index = aclSubject.IndexOf(aclSub);
-                    break;
-                }
-            }
-
-            if (index != -1) aclSubject.RemoveAt(index);
-        }
-
-        public void ACLSubjectList()
-        {
-            foreach (var aclSub in aclSubject)
-            {
-                Console.WriteLine("SubjectName={0}, permissions={1}", aclSub.subjectName, aclSub.permissions);
-            }
-        }
-    }
-
-    public class ACLObject : ACLSubject
+    public class ACLObject
     {
         public IList<ACL_Object> aclObject = new List<ACL_Object>();
 
