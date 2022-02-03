@@ -514,66 +514,7 @@ namespace MyCSharp.Service
     }
 
 
-    public class ACLObject
-    {
-        public IList<ACL_Object> aclObject = new List<ACL_Object>();
-
-        public ACL_Object SearchObject(string objectName)
-        {
-            ACL_Object aclObj = null;
-
-            foreach(var obj in aclObject)
-            {
-                if (obj.objectName == objectName)
-                {
-                    aclObj = obj;
-                    break;
-                }
-            }
-
-            return aclObj;
-        }
-
-        public void ACLObjectAdd(string objectName, UInt32 permissions)
-        {
-            ACL_Object aclObj;
-
-            aclObj = SearchObject(objectName);
-            if (aclObj != null) return;
-            else aclObj = new ACL_Object();
-
-            aclObj.objectName = objectName;
-            aclObj.permissions = permissions;
-
-            aclObject.Add(aclObj);
-        }
-
-        public void ACLObjectRemove(string objectName)
-        {
-            Int32 index = -1;
-
-            foreach (var aclObj in aclObject)
-            {
-                if (aclObj.objectName == objectName)
-                {
-                    index = aclObject.IndexOf(aclObj);
-                    break;
-                }
-            }
-
-            if (index != -1) aclObject.RemoveAt(index);
-        }
-
-        public void ACLObjectList()
-        {
-            foreach (var aclObj in aclObject)
-            {
-                Console.WriteLine("ObjectName={0}, permissions={1}", aclObj.objectName, aclObj.permissions);
-            }
-        }
-    }
-
-    public class ACLEntries : ACLObject
+        public class ACLEntries
     {
         public void ACLEntriesAdd(string objectName, string subjectName)
         {
