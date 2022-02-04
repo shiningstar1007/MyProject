@@ -513,38 +513,6 @@ namespace MyCSharp.Service
 
     }
 
-
-        public class ACLEntries
-    {
-        public void ACLEntriesAdd(string objectName, string subjectName)
-        {
-            ACL_Object aclObject = null;
-            ACL_Subject aclSubject = null;
-
-            aclObject = SearchObject(objectName);
-            if (aclObject == null) return;
-
-            aclSubject = SearchSubject(subjectName);
-            if (aclSubject == null) return;
-
-            aclObject.aclSubject.Add(aclSubject);
-        }
-
-        public void ACLEntriesRemove(string objectName, string subjectName)
-        {
-            ACL_Object aclObject = null;
-            ACL_Subject aclSubject = null;
-
-            aclObject = SearchObject(objectName);
-            if (aclObject == null) return;
-
-            aclSubject = SearchSubject(subjectName);
-            if (aclSubject == null) return;
-
-            aclObject.aclSubject.Remove(aclSubject);
-        }
-    }
-
     [ServiceContract()]
     public interface IMyCSharpService
     {
