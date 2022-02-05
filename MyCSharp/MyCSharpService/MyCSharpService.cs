@@ -19,28 +19,6 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-        public static bool CreateStreamFile(string FileName)
-        {
-            bool bStreamFile = false;
-            IntPtr FileHandle;
-            string StreamName = FileName + ":MiniFlt";
-
-            FileHandle = NativeAPI.CreateFile(StreamName, NativeAPI.GENERIC_READ | NativeAPI.GENERIC_WRITE,
-                0, IntPtr.Zero, FileMode.CreateNew, 0, IntPtr.Zero);
-
-            if (FileHandle.ToInt32() != NativeAPI.INVALID_HANDLE_VALUE)
-            {
-            NativeAPI.CloseHandle(FileHandle);
-                bStreamFile = true;
-            }
-            else if (NativeAPI.ERROR_FILE_EXISTS == NativeAPI.GetLastError())
-            {
-                bStreamFile = true;
-            }
-
-            return bStreamFile;
-        }
-
         public static bool CheckStreamFile(string FileName)
         {
             bool bStreamFile = false;
