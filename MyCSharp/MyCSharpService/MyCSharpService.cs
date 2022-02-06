@@ -19,54 +19,6 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-        public static bool CheckStreamFile(string FileName)
-        {
-            bool bStreamFile = false;
-            IntPtr FileHandle;
-            NativeAPI.IO_STATUS_BLOCK IoStatusBlock = new NativeAPI.IO_STATUS_BLOCK();
-            uint BufSize = 0x10000;   //initial buffer size of 65536 bytes
-            IntPtr pBuffer = Marshal.AllocHGlobal((int)BufSize);
-
-            FileHandle = NativeAPI.CreateFile(FileName, NativeAPI.GENERIC_READ | NativeAPI.GENERIC_WRITE,
-                FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
-
-            if (FileHandle.ToInt32() != NativeAPI.INVALID_HANDLE_VALUE)
-            {
-                NativeAPI.NTSTATUS Status = NativeAPI.NtQueryInformationFile(FileHandle, ref IoStatusBlock, pBuffer, BufSize,
-                    NativeAPI.FILE_INFORMATION_CLASS.FileStreamInformation);
-
-            NativeAPI.CloseHandle(FileHandle);
-
-                if (Status == NativeAPI.NTSTATUS.STATUS_SUCCESS)
-                {
-                    int StructSize = Marshal.SizeOf(typeof(NativeAPI.FILE_STREAM_INFORMATION));
-                    NativeAPI.FILE_STREAM_INFORMATION FileStreamInfo;
-                    string StreamName;
-                    IntPtr DataPtr = pBuffer;
-
-                    do
-                    {
-                        FileStreamInfo = (NativeAPI.FILE_STREAM_INFORMATION)Marshal.PtrToStructure(DataPtr, typeof(NativeAPI.FILE_STREAM_INFORMATION));
-
-                        if (FileStreamInfo.StreamNameLen == 0) break;
-
-                        StreamName = Marshal.PtrToStringUni(DataPtr + StructSize - 2, (int)FileStreamInfo.StreamNameLen / 2);
-                        if (NativeAPI.CheckStreamName.Equals(StreamName) == true)
-                        {
-                            bStreamFile = true;
-                            break;
-                        }
-
-                        DataPtr += (int)FileStreamInfo.NextEntryOffset;
-                    } while (FileStreamInfo.NextEntryOffset != 0);
-                }
-            }
-
-            Marshal.FreeHGlobal(pBuffer);
-
-            return bStreamFile;
-        }
-
         public static bool CheckTargetFile(string FileName, string StreamName)
         {
             bool bCheckFile = false;
