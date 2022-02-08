@@ -19,26 +19,6 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-        public bool CheckUseFile(string fileName)
-        {
-            bool bUse = false;
-
-            try
-            {
-                using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    fs.Close();
-                    bUse = true;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("ErrMsg[{0}]", e.Message.ToString());
-            }
-
-            return bUse;
-        }
-
         public static bool CheckIPType(string path)
         {
             Regex regex = new Regex(@"^\\\\(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])");
