@@ -19,13 +19,6 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-        public static bool CheckIPType(string path)
-        {
-            Regex regex = new Regex(@"^\\\\(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])");
-
-            return regex.IsMatch(path);
-        }
-
         public static bool CheckLocalDrive(string path)
         {
             var drvs = DriveInfo.GetDrives().Where(e => e.IsReady && (e.DriveType == DriveType.Fixed));

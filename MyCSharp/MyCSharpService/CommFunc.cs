@@ -7,6 +7,7 @@ using System.Linq;
 using System.Management;
 using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MyCSharpService
@@ -302,6 +303,13 @@ namespace MyCSharpService
             }
 
             return processList;
+        }
+
+        public static bool CheckIPType(string path)
+        {
+            Regex regex = new Regex(@"^\\\\(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])");
+
+            return regex.IsMatch(path);
         }
     }
 }
