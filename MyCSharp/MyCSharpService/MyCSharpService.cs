@@ -19,11 +19,6 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-        public void CloseRemoteServerEnd(string server)
-        {
-            executeCMD(string.Format("net use /delete {0}", server));
-        }
-
         public bool CheckDirectoryInfo(string path)
         {
             bool bSetProperties = false;

@@ -391,5 +391,10 @@ namespace MyCSharpService
             }
             return retValue;
         }
+
+        public void CloseRemoteServerEnd(string server)
+        {
+            executeCMD(string.Format("net use /delete {0}", server));
+        }
     }
 }
