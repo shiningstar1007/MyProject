@@ -19,23 +19,6 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-        public bool CheckDirectoryInfo(string path)
-        {
-            bool bSetProperties = false;
-
-            DirectoryInfo checkDir = new DirectoryInfo(path);
-            if ((checkDir.Attributes & FileAttributes.Compressed) == FileAttributes.Compressed)
-            {
-                bSetProperties = true;
-            }
-            else if ((checkDir.Attributes & FileAttributes.Encrypted) == FileAttributes.Encrypted)
-            {
-                bSetProperties = true;
-            }
-
-            return bSetProperties;
-        }
-
         public bool CheckDiskSize(string fileName, long fileSize)
         {
             var drvs = DriveInfo.GetDrives().Where(e => e.IsReady && (e.DriveType == DriveType.Fixed));

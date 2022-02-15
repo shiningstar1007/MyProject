@@ -396,5 +396,22 @@ namespace MyCSharpService
         {
             executeCMD(string.Format("net use /delete {0}", server));
         }
+
+        public bool CheckDirectoryInfo(string path)
+        {
+            bool bSetProperties = false;
+
+            DirectoryInfo checkDir = new DirectoryInfo(path);
+            if ((checkDir.Attributes & FileAttributes.Compressed) == FileAttributes.Compressed)
+            {
+                bSetProperties = true;
+            }
+            else if ((checkDir.Attributes & FileAttributes.Encrypted) == FileAttributes.Encrypted)
+            {
+                bSetProperties = true;
+            }
+
+            return bSetProperties;
+        }
     }
 }
