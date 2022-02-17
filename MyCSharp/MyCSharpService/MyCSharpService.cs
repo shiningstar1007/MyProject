@@ -19,31 +19,6 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-        public static string GetUNCPathFromHostName(string path)
-        {
-            string hostName = "";
-            Regex regex = new Regex(@"^\\\\(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])");
-
-            if (regex.IsMatch(path))
-            {
-                string ipName = path.Substring(2);
-                string[] name = ipName.Split(new char[] { '\\' });
-
-                try
-                {
-                    IPHostEntry IpHost = Dns.GetHostEntry(name[0]);
-                    hostName = @"\\" + IpHost.HostName + path.Substring(2 + name[0].Length);
-
-                }
-                catch (System.Net.Sockets.SocketException e)
-                {
-
-                }
-            }
-
-            return hostName;
-        }
-
 
         [DllImport("mpr.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern int WNetGetConnection([MarshalAs(UnmanagedType.LPTStr)] string localName,
