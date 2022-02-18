@@ -20,10 +20,6 @@ namespace MyCSharp.Service
     public class Win32API
     {
 
-        [DllImport("mpr.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern int WNetGetConnection([MarshalAs(UnmanagedType.LPTStr)] string localName,
-                                                [MarshalAs(UnmanagedType.LPTStr)] StringBuilder remoteName,
-                                                ref int length);
         public static string GetUNCPath(string originalPath)
         {
             StringBuilder sb = new StringBuilder(512);

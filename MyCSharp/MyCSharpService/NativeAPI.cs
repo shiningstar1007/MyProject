@@ -11,6 +11,11 @@ namespace MyCSharp.Service
 {
     class NativeAPI
     {
+        [DllImport("mpr.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern int WNetGetConnection([MarshalAs(UnmanagedType.LPTStr)] string localName,
+                                                [MarshalAs(UnmanagedType.LPTStr)] StringBuilder remoteName,
+                                                ref int length);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr CreateFile(
             String fileName,
