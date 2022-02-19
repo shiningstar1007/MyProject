@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Management;
+using System.Net;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -452,6 +453,29 @@ namespace MyCSharpService
             }
 
             return hostName;
+        }
+
+        public static string GetUNCPath(string originalPath)
+        {
+            StringBuilder sb = new StringBuilder(512);
+            int size = sb.Capacity;
+
+            if (originalPath.Length > 2 && originalPath[1] == ':')
+            {
+                char c = originalPath[0];
+                if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+                {
+                    int error = WNetGetConnection(originalPath.Substring(0, 2), sb, ref size);
+                    if (error == 0)
+                    {
+                        DirectoryInfo dir = new DirectoryInfo(originalPath);
+                        string path = System.IO.Path.GetFullPath(originalPath).Substring(System.IO.Path.GetPathRoot(originalPath).Length);
+                        return System.IO.Path.Combine(sb.ToString().TrimEnd(), path);
+                    }
+                }
+            }
+
+            return string.Empty;
         }
     }
 }
