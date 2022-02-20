@@ -477,5 +477,24 @@ namespace MyCSharpService
 
             return string.Empty;
         }
+
+        public static string GetIPInfo()
+        {
+            string IPString = "";
+
+            try
+            {
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+                IPAddress ipAddress = ipHostInfo.AddressList.FirstOrDefault(
+                                        a => a.AddressFamily == AddressFamily.InterNetwork);
+
+                IPString = ipAddress != null ? ipAddress.ToString() : "";
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return IPString;
+        }
     }
 }

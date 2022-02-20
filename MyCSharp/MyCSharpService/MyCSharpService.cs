@@ -19,48 +19,6 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-
-        public static string GetUNCPath(string originalPath)
-        {
-            StringBuilder sb = new StringBuilder(512);
-            int size = sb.Capacity;
-
-            if (originalPath.Length > 2 && originalPath[1] == ':')
-            {
-                char c = originalPath[0];
-                if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-                {
-                    int error = WNetGetConnection(originalPath.Substring(0, 2), sb, ref size);
-                    if (error == 0)
-                    {
-                        DirectoryInfo dir = new DirectoryInfo(originalPath);
-                        string path = System.IO.Path.GetFullPath(originalPath).Substring(System.IO.Path.GetPathRoot(originalPath).Length);
-                        return System.IO.Path.Combine(sb.ToString().TrimEnd(), path);
-                    }
-                }
-            }
-
-            return string.Empty;
-        }
-        public static string GetIPInfo()
-        {
-            string IPString = "";
-
-            try
-            {
-                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-                IPAddress ipAddress = ipHostInfo.AddressList.FirstOrDefault(
-                                        a => a.AddressFamily == AddressFamily.InterNetwork);
-
-                IPString = ipAddress != null ? ipAddress.ToString() : "";
-            }
-            catch (Exception ex)
-            {
-            }
-
-            return IPString;
-        }
-
         public static List<string> GetProcessInfo()
         {
             ManagementClass management = new ManagementClass("Win32_Process");
