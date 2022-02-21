@@ -19,24 +19,6 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-        public static List<string> GetProcessInfo()
-        {
-            ManagementClass management = new ManagementClass("Win32_Process");
-            ManagementObjectCollection mCollection = management.GetInstances();
-
-            List<string> processList = new List<string>();
-
-            foreach (ManagementObject ps in mCollection)
-            {
-                if ((string)ps["ExecutablePath"] != null)
-                {
-                    processList.Add((string)ps["ExecutablePath"]);
-                }
-            }
-
-            return processList;
-        }
-
         public static bool IsLocalDrive(string path)
         {
             var drvs = DriveInfo.GetDrives().Where(e => e.IsReady && (e.DriveType == DriveType.Fixed));
