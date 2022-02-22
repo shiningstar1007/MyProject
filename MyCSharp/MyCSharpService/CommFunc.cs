@@ -514,5 +514,20 @@ namespace MyCSharpService
 
             return processList;
         }
+
+        public static bool IsLocalDrive(string path)
+        {
+            var drvs = DriveInfo.GetDrives().Where(e => e.IsReady && (e.DriveType == DriveType.Fixed));
+
+            foreach (DriveInfo drv in drvs)
+            {
+                if (char.ToLower(drv.Name[0]) == char.ToLower(path[0]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
