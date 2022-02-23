@@ -529,5 +529,26 @@ namespace MyCSharpService
 
             return false;
         }
+
+        public static bool CreateDir(string dirPath)
+        {
+            if (Directory.Exists(dirPath))
+            {
+                return false;
+            }
+
+            Directory.CreateDirectory(dirPath);
+
+            DirectoryInfo dInfo = new DirectoryInfo(dirPath);
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+            dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null),
+                                                            FileSystemRights.FullControl,
+                                                            InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit,
+                                                            PropagationFlags.NoPropagateInherit,
+                                                            AccessControlType.Allow));
+            dInfo.SetAccessControl(dSecurity);
+
+            return true;
+        }
     }
 }
