@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Management;
 using System.Net;
+using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -549,6 +550,19 @@ namespace MyCSharpService
             dInfo.SetAccessControl(dSecurity);
 
             return true;
+        }
+
+
+        public string MyReadFile(string fileName, int length)
+        {
+            byte[] buffer = new byte[length];
+
+            using (FileStream fs = new FileStream(fileName, FileMode.Open, FileSystemRights.Read, FileShare.Read, (length - 1), FileOptions.Asynchronous))
+            {
+                fs.Read(buffer, 0, length);
+            }
+
+            return Encoding.Default.GetString(buffer);
         }
     }
 }

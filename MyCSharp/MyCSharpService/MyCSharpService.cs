@@ -19,18 +19,6 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-        
-        public string MyReadFile(string fileName, int length)
-        {
-            byte[] buffer = new byte[length];
-
-            using (FileStream fs = new FileStream(fileName, FileMode.Open, FileSystemRights.Read, FileShare.Read, (length - 1), FileOptions.Asynchronous))
-            {
-                fs.Read(buffer, 0, length);
-            }
-
-            return Encoding.Default.GetString(buffer);
-        }
 
         public void MyWriteFile(string fileName, string data, int length)
         {
