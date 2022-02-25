@@ -564,5 +564,16 @@ namespace MyCSharpService
 
             return Encoding.Default.GetString(buffer);
         }
+
+        public void MyWriteFile(string fileName, string data, int length)
+        {
+            using (FileStream fs = new FileStream(fileName, FileMode.Append))
+            {
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    sw.Write(data);
+                }
+            }
+        }
     }
 }
