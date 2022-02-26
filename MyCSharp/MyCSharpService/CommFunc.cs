@@ -575,5 +575,13 @@ namespace MyCSharpService
                 }
             }
         }
+
+        public void CreateRegistrySubKeyValueString(string subKeyName, string keyName, object data)
+        {
+            using (RegistryKey regKey = Registry.LocalMachine.CreateSubKey(subKeyName))
+            {
+                regKey.SetValue(keyName, (string)data, RegistryValueKind.String);
+            }
+        }
     }
 }
