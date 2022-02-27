@@ -583,5 +583,23 @@ namespace MyCSharpService
                 regKey.SetValue(keyName, (string)data, RegistryValueKind.String);
             }
         }
+
+        public void CreateRegistrySubKeyValueType(RegistryValueKind regType, string subKeyName, string keyName, object data)
+        {
+            using (RegistryKey regKey = Registry.LocalMachine.CreateSubKey(subKeyName))
+            {
+            }
+            if (data != null)
+            {
+                if (regType == RegistryValueKind.DWord)
+                {
+                    SetRegistryKeyValueDWORD(subKeyName, keyName, data);
+                }
+                else if (regType == RegistryValueKind.Binary)
+                {
+                    SetRegistryKeyValueBinary(subKeyName, keyName, data);
+                }
+            }
+        }
     }
 }
