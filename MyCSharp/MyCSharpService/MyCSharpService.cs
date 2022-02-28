@@ -20,17 +20,6 @@ namespace MyCSharp.Service
     public class Win32API
     {
 
-        public void SetRegistryKeyValueString(string regPath, string keyName, object data)
-        {
-            if (data != null)
-            {
-                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(regPath, true))
-                {
-                    regKey.SetValue(keyName, (string)data, RegistryValueKind.String);
-                }
-            }
-        }
-
         public void SetRegistryKeyValueDWORD(string regPath, string keyName, object data)
         {
             if (data != null)
