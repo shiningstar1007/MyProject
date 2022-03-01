@@ -612,5 +612,16 @@ namespace MyCSharpService
                 }
             }
         }
+
+        public void SetRegistryKeyValueDWORD(string regPath, string keyName, object data)
+        {
+            if (data != null)
+            {
+                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(regPath, true))
+                {
+                    regKey.SetValue(keyName, (int)data, RegistryValueKind.DWord);
+                }
+            }
+        }
     }
 }
