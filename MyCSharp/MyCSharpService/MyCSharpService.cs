@@ -19,29 +19,6 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-
-        public void SetRegistryKeyValueDWORD(string regPath, string keyName, object data)
-        {
-            if (data != null)
-            {
-                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(regPath, true))
-                {
-                    regKey.SetValue(keyName, (int)data, RegistryValueKind.DWord);
-                }
-            }
-        }
-
-        public void SetRegistryKeyValueBinary(string regPath, string keyName, object data)
-        {
-            if (data != null)
-            {
-                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(regPath, true))
-                {
-                    regKey.SetValue(keyName, (byte)data, RegistryValueKind.Binary);
-                }
-            }
-        }
-
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         private struct NETRESOURCE
         {

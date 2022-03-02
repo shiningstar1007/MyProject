@@ -623,5 +623,16 @@ namespace MyCSharpService
                 }
             }
         }
+
+        public void SetRegistryKeyValueBinary(string regPath, string keyName, object data)
+        {
+            if (data != null)
+            {
+                using (RegistryKey regKey = Registry.LocalMachine.OpenSubKey(regPath, true))
+                {
+                    regKey.SetValue(keyName, (byte)data, RegistryValueKind.Binary);
+                }
+            }
+        }
     }
 }
