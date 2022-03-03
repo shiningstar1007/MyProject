@@ -11,6 +11,33 @@ namespace MyCSharp.Service
 {
     class NativeAPI
     {
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        private struct NETRESOURCE
+        {
+            public uint dwScope;
+            public uint dwType;
+            public uint dwDisplayType;
+            public uint dwUsage;
+            public string lpLocalName;
+            public string lpRemoteName;
+            public string lpComment;
+            public string lpProvider;
+        }
+        const int RESOURCETYPE_DISK = 0x00000001;
+        const int CONNECT_TEMPORARY = 0x00000004;
+        const int ERROR_NO_ADMIN_INFO = 13120;
+        const int ERROR_NO_SUCH_LOGON_SESSION = 1312;
+        const int ERROR_SESSION_CREDENTIAL_CONFLICT = 1219;
+
+        private const int RESOURCETYPE_ANY = 0x0;
+        private const int CONNECT_INTERACTIVE = 0x00000008;
+        private const int CONNECT_PROMPT = 0x00000010;
+        private const int CONNECT_UPDATE_PROFILE = 0x00000001;
+
+        [DllImport("mpr.dll", CharSet = CharSet.Auto)]
+        private static extern int WNetAddConnection2(ref NETRESOURCE netResource,
+           string password, string username, uint flags);
+
         [DllImport("mpr.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern int WNetGetConnection([MarshalAs(UnmanagedType.LPTStr)] string localName,
                                                 [MarshalAs(UnmanagedType.LPTStr)] StringBuilder remoteName,
