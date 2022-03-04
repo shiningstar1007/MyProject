@@ -43,6 +43,19 @@ namespace MyCSharp.Service
                                                 [MarshalAs(UnmanagedType.LPTStr)] StringBuilder remoteName,
                                                 ref int length);
 
+        public static int NetWorkDriveConnect(string serverName, string userName, string userPwd)
+        {
+            NETRESOURCE netResource = new NETRESOURCE();
+            netResource.dwType = RESOURCETYPE_DISK;
+            netResource.lpRemoteName = serverName;
+            netResource.lpProvider = "";
+
+            int returnCode = WNetAddConnection2(ref netResource, userPwd, userName, 0);
+
+
+            return returnCode;
+        }
+
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr CreateFile(
             String fileName,

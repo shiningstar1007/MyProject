@@ -19,50 +19,8 @@ namespace MyCSharp.Service
 {
     public class Win32API
     {
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-        private struct NETRESOURCE
-        {
-            public uint dwScope;
-            public uint dwType;
-            public uint dwDisplayType;
-            public uint dwUsage;
-            public string lpLocalName;
-            public string lpRemoteName;
-            public string lpComment;
-            public string lpProvider;
-        }
-        const int RESOURCETYPE_DISK = 0x00000001;
-        const int CONNECT_TEMPORARY = 0x00000004;
-        const int ERROR_NO_ADMIN_INFO = 13120;
-        const int ERROR_NO_SUCH_LOGON_SESSION = 1312;
-        const int ERROR_SESSION_CREDENTIAL_CONFLICT = 1219;
+        
 
-        private const int RESOURCETYPE_ANY = 0x0;
-        private const int CONNECT_INTERACTIVE = 0x00000008;
-        private const int CONNECT_PROMPT = 0x00000010;
-        private const int CONNECT_UPDATE_PROFILE = 0x00000001;
-
-        // API 함수 선언
-        [DllImport("mpr.dll", CharSet = CharSet.Auto)]
-        private static extern int WNetAddConnection2(ref NETRESOURCE netResource,
-           string password, string username, uint flags);
-
-        // API 함수 선언 (공유해제)
-        [DllImport("mpr.dll", EntryPoint = "WNetCancelConnection2", CharSet = CharSet.Auto)]
-        private static extern int WNetCancelConnection2(string lpName, int dwFlags, int fForce);
-
-        public static int NetWorkDriveConnect(string serverName, string userName, string userPwd)
-        {
-            NETRESOURCE netResource = new NETRESOURCE();
-            netResource.dwType = RESOURCETYPE_DISK;
-            netResource.lpRemoteName = serverName;
-            netResource.lpProvider = "";
-
-            int returnCode = WNetAddConnection2(ref netResource, userPwd, userName, 0);
-
-
-            return returnCode;
-        }
 
         public static int NetWorkDriveDisConnect(string serverName)
         {
