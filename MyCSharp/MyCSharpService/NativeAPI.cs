@@ -56,6 +56,13 @@ namespace MyCSharp.Service
             return returnCode;
         }
 
+        public static int NetWorkDriveDisConnect(string serverName)
+        {
+            int returnCode = WNetCancelConnection2(serverName, CONNECT_UPDATE_PROFILE, 1);
+
+            return returnCode;
+        }
+
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr CreateFile(
             String fileName,

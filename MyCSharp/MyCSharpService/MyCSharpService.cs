@@ -17,19 +17,6 @@ using MyCSharpService;
 
 namespace MyCSharp.Service
 {
-    public class Win32API
-    {
-        
-
-
-        public static int NetWorkDriveDisConnect(string serverName)
-        {
-            int returnCode = WNetCancelConnection2(serverName, CONNECT_UPDATE_PROFILE, 1);
-
-            return returnCode;
-        }
-
-    }
 
     [ServiceContract()]
     public interface IMyCSharpService
