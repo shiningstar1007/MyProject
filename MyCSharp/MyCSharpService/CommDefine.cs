@@ -26,7 +26,7 @@ namespace MyCSharpService
         public const string LOGLEVEL_WARN = "WARN";
         public const string LOGLEVEL_DEBUG = "DEBUG";
         public const string LOGLEVEL_INFO = "INFO";
-        public const string LOGLEVEL_ALL = LOGLEVEL_INFO;
+        public const string LOGLEVEL_ALL = "ALL";
 
         // log file define
         public const string ServiceLog = @"log\service_log.db";
