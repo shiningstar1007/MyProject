@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace MyCSharpService
 {
-    class CommDefine
-    {
-
-    }
-
     public static class RegDefine
     {
         public const string REG_KEY_ROOT = @"Software\My MiniFilter\App";

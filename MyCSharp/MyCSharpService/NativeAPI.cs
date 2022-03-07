@@ -43,6 +43,9 @@ namespace MyCSharp.Service
                                                 [MarshalAs(UnmanagedType.LPTStr)] StringBuilder remoteName,
                                                 ref int length);
 
+        [DllImport("mpr.dll", EntryPoint = "WNetCancelConnection2", CharSet = CharSet.Auto)]
+        private static extern int WNetCancelConnection2(string lpName, int dwFlags, int fForce);
+
         public static int NetWorkDriveConnect(string serverName, string userName, string userPwd)
         {
             NETRESOURCE netResource = new NETRESOURCE();
