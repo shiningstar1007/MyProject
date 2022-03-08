@@ -55,7 +55,6 @@ namespace MyCSharp.Service
 
             int returnCode = WNetAddConnection2(ref netResource, userPwd, userName, 0);
 
-
             return returnCode;
         }
 
