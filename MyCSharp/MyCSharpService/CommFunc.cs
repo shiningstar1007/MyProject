@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Management;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
@@ -634,5 +635,10 @@ namespace MyCSharpService
                 }
             }
         }
+
+    [DllImport("mpr.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern int WNetGetConnection([MarshalAs(UnmanagedType.LPTStr)] string localName,
+                                                [MarshalAs(UnmanagedType.LPTStr)] StringBuilder remoteName,
+                                                ref int length);
     }
 }
