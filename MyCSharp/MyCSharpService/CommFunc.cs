@@ -496,6 +496,7 @@ namespace MyCSharpService
             }
             catch (Exception ex)
             {
+
             }
 
             return IPString;
