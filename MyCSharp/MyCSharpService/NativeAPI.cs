@@ -143,7 +143,6 @@ namespace MyCSharp.Service
             return false;
         }
 
-
         #region Structures
 
         [StructLayout(LayoutKind.Sequential)]
@@ -202,7 +201,6 @@ namespace MyCSharp.Service
         internal const int INVALID_HANDLE_VALUE = -1;
         internal const int ERROR_FILE_EXISTS = unchecked((int)0x00000050);
         internal const string CheckStreamName = ":MyCSharp:$DATA";
-
 
         public static bool CreateStreamFile(string FileName)
         {
@@ -312,7 +310,5 @@ namespace MyCSharp.Service
 
             return bUse;
         }
-
-
     }
 }
