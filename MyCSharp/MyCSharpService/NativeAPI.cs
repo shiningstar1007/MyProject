@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
 using RGiesecke.DllExport;
+using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace MyCSharp.Service
 {
