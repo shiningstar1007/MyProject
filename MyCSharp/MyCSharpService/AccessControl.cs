@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 
-namespace MyCSharpService
+namespace IMyCSharpService
 {
     public enum KERNEL_COMMAND : int
     {

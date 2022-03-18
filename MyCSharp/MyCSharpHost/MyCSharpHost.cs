@@ -20,7 +20,7 @@ namespace MyCSharpHost
                 serviceHost.Close();
             }
 
-            MyCSharpService myService = new MyCSharpService();
+            MyCSharp.Service.IMyCSharpService myService = new MyCSharpService();
 
             serviceHost = new ServiceHost(myService);
             serviceHost.Open();

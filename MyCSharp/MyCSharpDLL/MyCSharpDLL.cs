@@ -17,10 +17,10 @@ namespace MyCSharp.MyCSharpDLL
     {
         public void Start()
         {
-            var factory = new ChannelFactory<IMyCSharpService>(new NetNamedPipeBinding(),
+            var factory = new ChannelFactory<Service.IMyCSharpService>(new NetNamedPipeBinding(),
                                                         new EndpointAddress("net.pipe://localhost/test/myservice"));
 
-            IMyCSharpService proxy = factory.CreateChannel();
+            Service.IMyCSharpService proxy = factory.CreateChannel();
 
             proxy.testFunc();
 

@@ -14,7 +14,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MyCSharpService
+namespace IMyCSharpService
 {
     class CommFunc
     {
