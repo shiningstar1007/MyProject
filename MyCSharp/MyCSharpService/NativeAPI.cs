@@ -3,7 +3,6 @@ using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
-using RGiesecke.DllExport;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace MyCSharp.Service
@@ -127,22 +126,6 @@ namespace MyCSharp.Service
 
         [DllImport("kernel32.dll", EntryPoint = "FreeLibrary")]
         public extern static bool FreeLibrary(IntPtr hModule);
-
-        [DllExport("IsSHA2Supported", CallingConvention = CallingConvention.StdCall)]
-        public static bool IsSHA2Supported()
-        {
-            IntPtr hLib = NativeAPI.LoadLibrary("wintrust.dll");
-            if (hLib != IntPtr.Zero)
-            {
-                IntPtr fpCryptCATAdminAcquireContext2 = NativeAPI.GetProcAddress(hLib, "CryptCATAdminAcquireContext2");
-
-                NativeAPI.FreeLibrary(hLib);
-
-                if (fpCryptCATAdminAcquireContext2 != IntPtr.Zero) return true;
-            }
-
-            return false;
-        }
 
         #region Structures
 

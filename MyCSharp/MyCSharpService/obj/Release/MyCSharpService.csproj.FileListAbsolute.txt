@@ -3,3 +3,9 @@ E:\sourcecode\github\MyCSharp\MyCSharpService\bin\Release\MyCSharpService.pdb
 E:\sourcecode\github\MyCSharp\MyCSharpService\obj\Release\MyCSharpService.csproj.CoreCompileInputs.cache
 E:\sourcecode\github\MyCSharp\MyCSharpService\obj\Release\MyCSharpService.dll
 E:\sourcecode\github\MyCSharp\MyCSharpService\obj\Release\MyCSharpService.pdb
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpService\obj\Release\MyCSharpService.csproj.AssemblyReference.cache
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpService\obj\Release\MyCSharpService.csproj.CoreCompileInputs.cache
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpService\bin\Release\MyCSharpService.dll
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpService\bin\Release\MyCSharpService.pdb
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpService\obj\Release\MyCSharpService.dll
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpService\obj\Release\MyCSharpService.pdb

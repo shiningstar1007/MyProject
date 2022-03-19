@@ -10,3 +10,16 @@ E:\sourcecode\github\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.csproj.CoreC
 E:\sourcecode\github\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.csproj.CopyComplete
 E:\sourcecode\github\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.exe
 E:\sourcecode\github\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.pdb
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.csproj.AssemblyReference.cache
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.csproj.SuggestedBindingRedirects.cache
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.MyCSharpHost.resources
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.csproj.GenerateResource.cache
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.csproj.CoreCompileInputs.cache
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\bin\Release\MyCSharpHost.exe.config
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\bin\Release\MyCSharpHost.exe
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\bin\Release\MyCSharpHost.pdb
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\bin\Release\MyCSharpService.dll
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\bin\Release\MyCSharpService.pdb
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.csproj.CopyComplete
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.exe
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpHost\obj\Release\MyCSharpHost.pdb
