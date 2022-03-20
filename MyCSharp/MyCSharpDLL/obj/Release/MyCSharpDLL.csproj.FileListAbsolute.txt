@@ -7,3 +7,12 @@ E:\sourcecode\github\MyCSharp\MyCSharpDLL\bin\Release\MyCSharpService.pdb
 E:\sourcecode\github\MyCSharp\MyCSharpDLL\obj\Release\MyCSharpDLL.csproj.CopyComplete
 E:\sourcecode\github\MyCSharp\MyCSharpDLL\obj\Release\MyCSharpDLL.dll
 E:\sourcecode\github\MyCSharp\MyCSharpDLL\obj\Release\MyCSharpDLL.pdb
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpDLL\bin\Release\MyCSharpDLL.dll
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpDLL\bin\Release\MyCSharpDLL.pdb
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpDLL\bin\Release\MyCSharpService.dll
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpDLL\bin\Release\MyCSharpService.pdb
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpDLL\obj\Release\MyCSharpDLL.csproj.AssemblyReference.cache
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpDLL\obj\Release\MyCSharpDLL.csproj.CoreCompileInputs.cache
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpDLL\obj\Release\MyCSharpDLL.csproj.CopyComplete
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpDLL\obj\Release\MyCSharpDLL.dll
+D:\개인공부\sourcecode\MyProject\MyCSharp\MyCSharpDLL\obj\Release\MyCSharpDLL.pdb
