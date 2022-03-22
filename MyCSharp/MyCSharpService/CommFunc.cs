@@ -468,7 +468,7 @@ namespace IMyCSharpService
                 char c = originalPath[0];
                 if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
                 {
-                    int error = WNetGetConnection(originalPath.Substring(0, 2), sb, ref size);
+                    int error = NativeAPI.WNetGetConnection(originalPath.Substring(0, 2), sb, ref size);
                     if (error == 0)
                     {
                         DirectoryInfo dir = new DirectoryInfo(originalPath);
@@ -637,10 +637,5 @@ namespace IMyCSharpService
                 }
             }
         }
-
-    [DllImport("mpr.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    public static extern int WNetGetConnection([MarshalAs(UnmanagedType.LPTStr)] string localName,
-                                                [MarshalAs(UnmanagedType.LPTStr)] StringBuilder remoteName,
-                                                ref int length);
     }
 }
