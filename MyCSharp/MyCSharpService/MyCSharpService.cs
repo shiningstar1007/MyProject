@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿using IMyCSharpService;
+using System.ServiceModel;
 
 namespace MyCSharp.Service
 {
@@ -15,6 +16,15 @@ namespace MyCSharp.Service
         public string testFunc()
         {
             return "testFunc";
+        }
+
+        public string getUNCPathFromHostName(string UNCPath)
+        {
+            string hostName = "";
+            CommFunc func = new CommFunc();
+            hostName = func.GetUNCPathFromHostName(UNCPath);
+
+            return hostName;
         }
     }
 }
