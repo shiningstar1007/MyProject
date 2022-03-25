@@ -26,5 +26,14 @@ namespace MyCSharp.Service
 
             return hostName;
         }
+
+        public string getUNCPath(string originalPath)
+        {
+            string UNCName = "";
+            CommFunc func = new CommFunc();
+            UNCName = func.GetUNCPath(originalPath);
+
+            return UNCName;
+        }
     }
 }

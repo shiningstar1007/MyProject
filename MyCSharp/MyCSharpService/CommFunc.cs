@@ -457,7 +457,7 @@ namespace IMyCSharpService
             return hostName;
         }
 
-        public static string GetUNCPath(string originalPath)
+        public string GetUNCPath(string originalPath)
         {
             StringBuilder sb = new StringBuilder(512);
             int size = sb.Capacity;
