@@ -480,7 +480,7 @@ namespace IMyCSharpService
             return string.Empty;
         }
 
-        public static string GetIPInfo()
+        public string GetIPInfo()
         {
             string IPString = "";
 

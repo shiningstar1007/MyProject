@@ -35,5 +35,14 @@ namespace MyCSharp.Service
 
             return UNCName;
         }
+
+        public string getIPInfo()
+        {
+            string IPString = "";
+            CommFunc func = new CommFunc();
+            IPString = func.GetIPInfo();
+
+            return IPString;
+        }
     }
 }
