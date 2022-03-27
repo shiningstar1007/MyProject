@@ -1,4 +1,5 @@
 ﻿using IMyCSharpService;
+using System.Collections.Generic;
 using System.ServiceModel;
 
 namespace MyCSharp.Service
@@ -43,6 +44,16 @@ namespace MyCSharp.Service
             IPString = func.GetIPInfo();
 
             return IPString;
+        }
+
+        public List<string> getProcessInfo()
+        {
+            List<string> processList;
+            CommFunc func = new CommFunc();
+
+            processList = func.GetProcessInfo();
+
+            return processList;
         }
     }
 }

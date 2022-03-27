@@ -500,7 +500,7 @@ namespace IMyCSharpService
             return IPString;
         }
 
-        public static List<string> GetProcessInfo()
+        public List<string> GetProcessInfo()
         {
             ManagementClass management = new ManagementClass("Win32_Process");
             ManagementObjectCollection mCollection = management.GetInstances();
