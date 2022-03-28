@@ -278,7 +278,7 @@ namespace IMyCSharpService
 
             return userNameList;
         }
-        public static List<String> GetGroupList()
+        public List<String> GetGroupList()
         {
             SelectQuery userQuery = new SelectQuery("Win32_Group");
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(userQuery);

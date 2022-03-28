@@ -55,5 +55,15 @@ namespace MyCSharp.Service
 
             return processList;
         }
+
+        public List<string> getGroupList()
+        {
+            List<string> groupList;
+            CommFunc func = new CommFunc();
+
+            groupList = func.GetGroupList();
+
+            return groupList;
+        }
     }
 }
