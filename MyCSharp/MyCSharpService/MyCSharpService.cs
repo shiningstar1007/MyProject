@@ -65,5 +65,15 @@ namespace MyCSharp.Service
 
             return groupList;
         }
+
+        public List<string> getUserList()
+        {
+            List<string> userList;
+            CommFunc func = new CommFunc();
+
+            userList = func.userList();
+
+            return userList;
+        }
     }
 }

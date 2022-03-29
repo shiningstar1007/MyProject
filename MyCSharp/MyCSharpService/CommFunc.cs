@@ -265,7 +265,7 @@ namespace IMyCSharpService
 
             return bExeFile;
         }
-        public static List<String> userList()
+        public List<String> userList()
         {
             SelectQuery userQuery = new SelectQuery("Win32_UserAccount");
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(userQuery);
