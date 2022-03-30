@@ -75,5 +75,12 @@ namespace MyCSharp.Service
 
             return userList;
         }
+
+        public bool checkProcessExt(string procExt)
+        {
+            CommFunc func = new CommFunc();
+
+            return func.CheckProcessExt(procExt);
+        }
     }
 }
