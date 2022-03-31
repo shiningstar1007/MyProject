@@ -82,5 +82,12 @@ namespace MyCSharp.Service
 
             return func.CheckProcessExt(procExt);
         }
+
+        public bool createDir(string dirPath)
+        {
+            CommFunc func = new CommFunc();
+
+            return func.CreateDir(dirPath);
+        }
     }
 }

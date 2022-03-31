@@ -533,7 +533,7 @@ namespace IMyCSharpService
             return false;
         }
 
-        public static bool CreateDir(string dirPath)
+        public bool CreateDir(string dirPath)
         {
             if (Directory.Exists(dirPath))
             {
