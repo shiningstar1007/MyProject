@@ -89,5 +89,12 @@ namespace MyCSharp.Service
 
             return func.CreateDir(dirPath);
         }
+
+        public ERR_CODE aclPolicyAdd(ACL_POL polParam)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.aclPolicyAdd(polParam);
+        }
     }
 }
