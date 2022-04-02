@@ -96,5 +96,12 @@ namespace MyCSharp.Service
 
             return acl.aclPolicyAdd(polParam);
         }
+
+        public ERR_CODE aclPolicyModify(ACL_POL polParam)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.aclPolicyModify(polParam);
+        }
     }
 }
