@@ -117,5 +117,12 @@ namespace MyCSharp.Service
 
             return acl.aclPolicyClear();
         }
+
+        public ERR_CODE aclPolicyList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, string polName, out string polList)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.aclPolicyList(addCmd, listOnly, polName, out polList);
+        }
     }
 }
