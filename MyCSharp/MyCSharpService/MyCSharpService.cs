@@ -124,5 +124,12 @@ namespace MyCSharp.Service
 
             return acl.aclPolicyList(addCmd, listOnly, polName, out polList);
         }
+
+        public ERR_CODE aclSubjectAdd(ACL_SUB subParam)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.aclSubjectAdd(subParam);
+        }
     }
 }
