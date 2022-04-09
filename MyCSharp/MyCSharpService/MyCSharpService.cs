@@ -145,5 +145,12 @@ namespace MyCSharp.Service
 
             return acl.aclSubjectClear();
         }
+
+        public ERR_CODE aclSubjectList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, string subName, SUB_TYPE subType, out string subList)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.aclSubjectList(addCmd, listOnly, subName, subType, out subList);
+        }
     }
 }
