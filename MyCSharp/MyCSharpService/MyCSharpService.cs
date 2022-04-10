@@ -152,5 +152,12 @@ namespace MyCSharp.Service
 
             return acl.aclSubjectList(addCmd, listOnly, subName, subType, out subList);
         }
+
+        public ERR_CODE aclObjectAdd(ACL_OBJ objParam)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.aclObjectAdd(objParam);
+        }
     }
 }
