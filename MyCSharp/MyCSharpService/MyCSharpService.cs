@@ -159,5 +159,12 @@ namespace MyCSharp.Service
 
             return acl.aclObjectAdd(objParam);
         }
+
+        public ERR_CODE aclObjectModify(ACL_OBJ objParam)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.aclObjectModify(objParam);
+        }
     }
 }
