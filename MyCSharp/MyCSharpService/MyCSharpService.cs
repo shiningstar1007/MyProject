@@ -173,5 +173,12 @@ namespace MyCSharp.Service
 
             return acl.aclObjectDelete(objParam);
         }
+
+        public ERR_CODE aclObjectClear(ACL_OBJ objParam)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.aclObjectClear(objParam);
+        }
     }
 }
