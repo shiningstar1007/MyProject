@@ -187,5 +187,12 @@ namespace MyCSharp.Service
 
             return acl.aclObjectList(addCmd, objPath, out objList);
         }
+
+        public ERR_CODE AddACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.AddACLObjFromPol(objParam, polParam);
+        }
     }
 }
