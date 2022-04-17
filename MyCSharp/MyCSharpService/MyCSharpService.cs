@@ -153,6 +153,13 @@ namespace MyCSharp.Service
             return acl.aclSubjectList(addCmd, listOnly, subName, subType, out subList);
         }
 
+        public ERR_CODE AddACLSubFromPol(ACL_SUB subParam, SUB_PERM subPerm)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.AddACLSubFromPol(subParam, subPerm);
+        }
+
         public ERR_CODE aclObjectAdd(ACL_OBJ objParam)
         {
             AccessControl acl = new AccessControl();
