@@ -160,6 +160,13 @@ namespace MyCSharp.Service
             return acl.AddACLSubFromPol(subParam, subPerm);
         }
 
+        public ERR_CODE DelACLSubFromPol(ACL_SUB subParam, SUB_PERM subPerm)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.DelACLSubFromPol(subParam, subPerm);
+        }
+
         public ERR_CODE aclObjectAdd(ACL_OBJ objParam)
         {
             AccessControl acl = new AccessControl();
