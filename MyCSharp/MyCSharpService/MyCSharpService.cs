@@ -202,18 +202,25 @@ namespace MyCSharp.Service
             return acl.aclObjectList(addCmd, objPath, out objList);
         }
 
-        public ERR_CODE AddACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam)
+        public ERR_CODE addACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam)
         {
             AccessControl acl = new AccessControl();
 
             return acl.AddACLObjFromPol(objParam, polParam);
         }
 
-        public ERR_CODE DelACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam)
+        public ERR_CODE delACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam)
         {
             AccessControl acl = new AccessControl();
 
             return acl.DelACLObjFromPol(objParam, polParam);
+        }
+
+        public ERR_CODE superSubAdd(SUPER_SUB superParam)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.superSubAdd(superParam);
         }
     }
 }
