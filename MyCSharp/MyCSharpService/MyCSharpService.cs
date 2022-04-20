@@ -222,5 +222,12 @@ namespace MyCSharp.Service
 
             return acl.superSubAdd(superParam);
         }
+
+        public ERR_CODE superSubDel(SUPER_SUB superParam)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.superSubDel(superParam);
+        }
     }
 }
