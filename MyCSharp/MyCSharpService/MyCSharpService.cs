@@ -227,7 +227,14 @@ namespace MyCSharp.Service
         {
             AccessControl acl = new AccessControl();
 
-            return acl.superSubDel(superParam);
+            return acl.superSubDelete(superParam);
+        }
+
+        public ERR_CODE superSubList(ONOFF_MODE addCmd, out string superSubList)
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.superSubList(addCmd, out superSubList);
         }
     }
 }
