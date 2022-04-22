@@ -236,5 +236,12 @@ namespace MyCSharp.Service
 
             return acl.superSubList(addCmd, out superSubList);
         }
+
+        public ERR_CODE superSubClear()
+        {
+            AccessControl acl = new AccessControl();
+
+            return acl.superSubClear();
+        }
     }
 }
