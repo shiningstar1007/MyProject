@@ -248,7 +248,7 @@ namespace IMyCSharpService
 
             return strKey;
         }
-        public Boolean CheckProcessExt(String procExt)
+        public static Boolean CheckProcessExt(String procExt)
         {
             Boolean bExeFile = false;
             String buffer;
