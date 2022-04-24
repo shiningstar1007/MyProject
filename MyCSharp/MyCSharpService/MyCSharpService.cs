@@ -9,16 +9,26 @@ namespace MyCSharp.Service
     public interface IMyCSharpService
     {
         [OperationContract()]
-        string testFunc();
+        string getUNCPathFromHostName(string UNCPath);
+
+        [OperationContract()]
+        string getUNCPath(string originalPath);
+
+        [OperationContract()]
+        string getIPInfo();
+
+        [OperationContract()]
+        List<string> getProcessInfo();
+
+        [OperationContract()]
+        List<string> getGroupList();
+
+        [OperationContract()]
+        List<string> getUserList();
     }
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class MyCSharpService : IMyCSharpService
     {
-        public string testFunc()
-        {
-            return "testFunc";
-        }
-
         public string getUNCPathFromHostName(string UNCPath)
         {
             string hostName = "";
@@ -78,9 +88,7 @@ namespace MyCSharp.Service
 
         public bool checkProcessExt(string procExt)
         {
-            CommFunc func = new CommFunc();
-
-            return func.CheckProcessExt(procExt);
+            return CommFunc.CheckProcessExt(procExt);
         }
 
         public bool createDir(string dirPath)
