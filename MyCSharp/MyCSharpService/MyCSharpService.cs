@@ -25,6 +25,18 @@ namespace MyCSharp.Service
 
         [OperationContract()]
         List<string> getUserList();
+
+        [OperationContract()]
+        ERR_CODE aclPolicyAdd(ACL_POL polParam);
+
+        [OperationContract()]
+        ERR_CODE aclPolicyModify(ACL_POL polParam);
+
+        [OperationContract()]
+        ERR_CODE aclPolicyDelete(ACL_POL polParam);
+
+        [OperationContract()]
+        ERR_CODE aclPolicyList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, string polName, out string polList);
     }
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class MyCSharpService : IMyCSharpService
