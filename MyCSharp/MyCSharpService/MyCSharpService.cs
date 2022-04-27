@@ -39,16 +39,25 @@ namespace MyCSharp.Service
         ERR_CODE aclPolicyList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, string polName, out string polList);
 
         [OperationContract()]
-        ERR_CODE aclObjectAdd(ACL_OBJ polParam);
+        ERR_CODE aclObjectAdd(ACL_OBJ objParam);
 
         [OperationContract()]
-        ERR_CODE aclObjectModify(ACL_OBJ polParam);
+        ERR_CODE aclObjectModify(ACL_OBJ objParam);
 
         [OperationContract()]
-        ERR_CODE aclObjectDelete(ACL_OBJ polParam);
+        ERR_CODE aclObjectDelete(ACL_OBJ objParam);
 
         [OperationContract()]
         ERR_CODE aclObjectList(ONOFF_MODE addCmd, string objPath, out string objList);
+
+        [OperationContract()]
+        ERR_CODE aclSubjectAdd(ACL_SUB SubParam);
+
+        [OperationContract()]
+        ERR_CODE aclSubjectDelete(ACL_SUB SubParam);
+
+        [OperationContract()]
+        ERR_CODE aclSubjectList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, string subName, SUB_TYPE subType, out string subList);
     }
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class MyCSharpService : IMyCSharpService
