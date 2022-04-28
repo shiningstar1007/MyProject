@@ -58,6 +58,15 @@ namespace MyCSharp.Service
 
         [OperationContract()]
         ERR_CODE aclSubjectList(ONOFF_MODE addCmd, ONOFF_MODE listOnly, string subName, SUB_TYPE subType, out string subList);
+
+        [OperationContract()]
+        ERR_CODE superSubAdd(SUPER_SUB superParam);
+
+        [OperationContract()]
+        ERR_CODE superSubDelete(SUPER_SUB superParam);
+
+        [OperationContract()]
+        ERR_CODE superSubList(ONOFF_MODE addCmd, out string superSubList);
     }
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class MyCSharpService : IMyCSharpService
