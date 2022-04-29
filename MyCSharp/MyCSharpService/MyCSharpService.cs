@@ -67,6 +67,12 @@ namespace MyCSharp.Service
 
         [OperationContract()]
         ERR_CODE superSubList(ONOFF_MODE addCmd, out string superSubList);
+
+        [OperationContract()]
+        ERR_CODE AddACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam);
+
+        [OperationContract()]
+        ERR_CODE DelACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam);
     }
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class MyCSharpService : IMyCSharpService
