@@ -69,11 +69,18 @@ namespace MyCSharp.Service
         ERR_CODE superSubList(ONOFF_MODE addCmd, out string superSubList);
 
         [OperationContract()]
-        ERR_CODE AddACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam);
+        ERR_CODE addACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam);
 
         [OperationContract()]
-        ERR_CODE DelACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam);
+        ERR_CODE delACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam);
+
+        [OperationContract()]
+        ERR_CODE addACLSubFromPol(ACL_SUB subParam, ACL_POL polParam);
+
+        [OperationContract()]
+        ERR_CODE delACLSubFromPol(ACL_SUB subParam, ACL_POL polParam);
     }
+
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class MyCSharpService : IMyCSharpService
     {
@@ -279,11 +286,11 @@ namespace MyCSharp.Service
             return acl.superSubAdd(superParam);
         }
 
-        public ERR_CODE superSubDel(SUPER_SUB superParam)
+        public ERR_CODE superSubDelete(SUPER_SUB superParam)
         {
             AccessControl acl = new AccessControl();
 
-            return acl.superSubDelete(superParam);
+            return acl.SuperSubDelete(superParam);
         }
 
         public ERR_CODE superSubList(ONOFF_MODE addCmd, out string superSubList)

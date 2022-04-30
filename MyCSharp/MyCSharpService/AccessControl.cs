@@ -1150,7 +1150,7 @@ namespace IMyCSharpService
             return errCode;
         }
 
-        public ERR_CODE superSubDelete(SUPER_SUB superParam)
+        public ERR_CODE SuperSubDelete(SUPER_SUB superParam)
         {
             ERR_CODE errCode = ERR_CODE.ERR_SUCCESS;
             SUPER_SUB superSub;
@@ -1166,7 +1166,7 @@ namespace IMyCSharpService
 
             g_SuperSub.Remove(superSub);
 
-            return ERR_CODE.ERR_SUCCESS;
+            return errCode;
         }
 
         public ERR_CODE superSubList(ONOFF_MODE addCmd, out String superSubList)
