@@ -554,6 +554,14 @@ namespace IMyCSharpService
             return true;
         }
 
+        public void DeleteDir(string dirPath)
+        {
+            if (Directory.Exists(dirPath) == true)
+            {
+                Directory.Delete(dirPath);
+            }
+        }
+
 
         public string MyReadFile(string fileName, int length)
         {
