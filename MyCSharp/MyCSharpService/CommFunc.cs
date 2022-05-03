@@ -12,6 +12,7 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Data.SQLite;
 
 namespace IMyCSharpService
 {
@@ -643,6 +644,33 @@ namespace IMyCSharpService
                     regKey.SetValue(keyName, (byte)data, RegistryValueKind.Binary);
                 }
             }
+        }
+
+        public static List<string> ExcuteDBQuery(string dbPath, string sql)
+        {
+            List<string> resultList = new List<string>();
+
+            try
+            {
+                using (SQLiteConnection dbCon = new SQLiteConnection(dbPath))
+                {
+                    dbCon.Open();
+                    SQLiteCommand cmd = new SQLiteCommand(sql, dbCon);
+                    SQLiteDataReader dataReader = null;
+
+                    dataReader = cmd.ExecuteReader();
+
+                    while (dataReader.Read())
+                    {
+                        resultList.Add(dataReader.ToString());
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+            return resultList;
         }
     }
 }
