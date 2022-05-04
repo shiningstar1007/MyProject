@@ -646,7 +646,7 @@ namespace IMyCSharpService
             }
         }
 
-        public static List<string> ExcuteDBQuery(string dbPath, string sql)
+        public List<string> ExcuteDBQuery(string dbPath, string sql)
         {
             List<string> resultList = new List<string>();
 
@@ -671,6 +671,27 @@ namespace IMyCSharpService
 
             }
             return resultList;
+        }
+
+        public int GetLogCount(string dbPath, string sql)
+        {
+            int count = 0;
+
+            try
+            {
+                using (SQLiteConnection dbCon = new SQLiteConnection(dbPath))
+                {
+                    dbCon.Open();
+                    SQLiteCommand cmd = new SQLiteCommand(sql, dbCon);
+                    count = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+            catch
+            {
+                count = 0;
+            }
+
+            return count;
         }
     }
 }
