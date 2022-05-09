@@ -75,10 +75,10 @@ namespace MyCSharp.Service
         ERR_CODE delACLObjFromPol(ACL_OBJ objParam, ACL_POL polParam);
 
         [OperationContract()]
-        ERR_CODE addACLSubFromPol(ACL_SUB subParam, ACL_POL polParam);
+        ERR_CODE addACLSubFromPol(ACL_SUB subParam, SUB_PERM subPerm);
 
         [OperationContract()]
-        ERR_CODE delACLSubFromPol(ACL_SUB subParam, ACL_POL polParam);
+        ERR_CODE delACLSubFromPol(ACL_SUB subParam, SUB_PERM subPerm);
     }
 
 
